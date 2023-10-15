@@ -131,3 +131,5 @@ dist
 
 # api data
 data/
+
+.vscode/
