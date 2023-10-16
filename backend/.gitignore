@@ -1,3 +1,7 @@
+# IDE
+.idea
+.vscode
+
 # Logs
 logs
 *.log
@@ -131,5 +135,3 @@ dist
 
 # api data
 data/
-
-.vscode/
