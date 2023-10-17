@@ -10,7 +10,11 @@ export const {
     /**
      * @type {string | undefined}
      */
-    ORIGIN
+    ORIGIN,
+    /**
+     * @type {string}
+     */
+    MONGO_URI
 } = process.env;
 
 export const LOG_DIR = process.env.LOG_DIR || '/logs';
