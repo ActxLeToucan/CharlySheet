@@ -13,13 +13,17 @@ class RouterV1 {
     }
 
     #initializeRoutes() {
-        const tags = [];
+        const sheetsRoutes = new RouterSheets();
+        this.router.use(`${this.path}`, sheetsRoutes.router);
+
+        const tags = [
+            sheetsRoutes.tag
+        ];
 
         this.router.use(
             `${this.path}`,
             new DocsRoutes(this.version, 'v1', tags).router
         );
-        this.router.use(`${this.path}/sheets`, new RouterSheets().router);
     }
 }
 

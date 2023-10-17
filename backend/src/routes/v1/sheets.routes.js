@@ -1,7 +1,12 @@
 import { Router } from 'express';
 
 class RouterSheets {
+    path = '/sheets';
     router = Router();
+    tag = {
+        name: 'Sheets',
+        description: 'Sheets routes'
+    };
 
     constructor() {
         this.#initializeRoutes();
@@ -33,7 +38,7 @@ class RouterSheets {
          *         example: Feuille 1
          *
          */
-        this.router.get('/', (req, res) => {
+        this.router.get(`${this.path}`, (req, res) => {
             res.json({
                 items: [
                     {
