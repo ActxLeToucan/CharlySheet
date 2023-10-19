@@ -5,7 +5,7 @@ const schema = new Schema({
     name: {
         type: String,
         required: true,
-        unique: true,
+        unique: false,
         minlength: 3,
         maxlength: 30
     },
@@ -24,8 +24,16 @@ const schema = new Schema({
         }
     ]
 });
+schema.set('toJSON', {
+    transform: (doc, ret) => {
+        ret.id = ret._id;
+        delete ret._id;
+        delete ret.__v;
+        return ret;
+    }
+});
 
 /**
  * @type {import('mongoose').Model}
  */
-export default model('Sheet', schema);
+export const Sheet = model('Sheet', schema);

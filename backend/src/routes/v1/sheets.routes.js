@@ -1,5 +1,8 @@
 import { Router } from 'express';
 
+import { Sheet } from '../../models/sheet.models.js';
+import { logger } from '../../utils/logger.js';
+
 class RouterSheets {
     path = '/sheets';
     router = Router();
@@ -52,6 +55,60 @@ class RouterSheets {
                     }
                 ]
             });
+        });
+        /**
+         * @openapi
+         * /v1/sheets:
+         *   post:
+         *     summary: Create a new sheet
+         *     tags:
+         *       - Sheets
+         *     requestBody:
+         *       required: true
+         *       content:
+         *         application/json:
+         *           schema:
+         *             type: object
+         *             properties:
+         *               name:
+         *                 type: string
+         *             required:
+         *               - name
+         *     responses:
+         *       200:
+         *         description: The created sheet
+         *         content:
+         *           application/json:
+         *             schema:
+         *               type: object
+         *               properties:
+         *                 id:
+         *                   type: string
+         *                 name:
+         *                   type: string
+         *                 users:
+         *                   type: array
+         *                 createdAt:
+         *                   type: string
+         *               example:
+         *                 id: 60f9a5f9d3f9f20015c1d7a8
+         *                 name: Feuille 1
+         *                 users: []
+         *                 createdAt: 2021-07-23T13:53:05.000Z
+         */
+        this.router.post(`${this.path}`, async (req, res) => {
+            const { name } = req.body;
+            /**
+             * @type {import('../../models/sheet.models.js').Sheet}
+             */
+            const sheet = new Sheet({ name });
+            try {
+                await sheet.save();
+            } catch (error) {
+                res.status(409).json({ message: error.message });
+                return;
+            }
+            res.json(sheet.toJSON());
         });
     }
 }
