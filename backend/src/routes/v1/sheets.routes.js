@@ -1,7 +1,7 @@
 import { Router } from 'express';
 
+import { HttpException } from '../../exceptions/HttpException.js';
 import { Sheet } from '../../models/sheet.models.js';
-import { logger } from '../../utils/logger.js';
 
 class RouterSheets {
     path = '/sheets';
@@ -96,7 +96,7 @@ class RouterSheets {
          *                 users: []
          *                 createdAt: 2021-07-23T13:53:05.000Z
          */
-        this.router.post(`${this.path}`, async (req, res) => {
+        this.router.post(`${this.path}`, async (req, res, next) => {
             const { name } = req.body;
             /**
              * @type {import('../../models/sheet.models.js').Sheet}
@@ -105,8 +105,7 @@ class RouterSheets {
             try {
                 await sheet.save();
             } catch (error) {
-                res.status(409).json({ message: error.message });
-                return;
+                next(new HttpException(409, error.message, 'Can\'t create sheet'));
             }
             res.json(sheet.toJSON());
         });

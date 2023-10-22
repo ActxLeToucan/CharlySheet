@@ -3,24 +3,23 @@ import cors from 'cors';
 import express from 'express';
 import helmet from 'helmet';
 import hpp from 'hpp';
-import morgan from 'morgan';
-import { Server } from 'socket.io';
 import { createServer } from 'http';
 import { connect } from 'mongoose';
+import morgan from 'morgan';
+import { Server } from 'socket.io';
 
 import {
     LOG_FORMAT,
+    MONGO_URI,
     NODE_ENV,
     ORIGIN,
-    PORT,
-    MONGO_URI
-} from './config/index.js';
+    PORT} from './config/index.js';
 import { HttpException } from './exceptions/HttpException.js';
+import SocketIOEventHandlers from './handlers/SocketIOEventHandlers.js';
 import errorMiddleware from './middlewares/error.middleware.js';
-import { logger, stream } from './utils/logger.js';
 import HealthcheckRoutes from './routes/healthcheck.routes.js';
 import RouterV1 from './routes/v1/index.js';
-import SocketIOEventHandlers from './handlers/SocketIOEventHandlers.js';
+import { logger, stream } from './utils/logger.js';
 
 class App {
     /**

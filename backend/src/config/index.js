@@ -1,3 +1,5 @@
+import validateEnv from '../utils/envValidator.js';
+
 export const {
     /**
      * @type {string}
@@ -8,14 +10,19 @@ export const {
      */
     PORT,
     /**
-     * @type {string | undefined}
+     * @type {string}
      */
     ORIGIN,
     /**
      * @type {string}
      */
-    MONGO_URI
-} = process.env;
-
-export const LOG_DIR = process.env.LOG_DIR || '/logs';
-export const LOG_FORMAT = process.env.LOG_FORMAT || 'combined';
+    MONGO_URI,
+    /**
+     * @type {string}
+     */
+    LOG_DIR,
+    /**
+     * @type {string}
+     */
+    LOG_FORMAT
+} = validateEnv();
