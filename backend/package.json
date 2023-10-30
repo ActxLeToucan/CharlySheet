@@ -37,6 +37,7 @@
     "helmet": "^7.0.0",
     "hpp": "^0.2.3",
     "joi": "^17.11.0",
+    "mongoose": "^7.6.3",
     "morgan": "^1.10.0",
     "socket.io": "^4.7.2",
     "swagger-jsdoc": "^6.2.8",
@@ -47,6 +48,8 @@
   "devDependencies": {
     "eslint": "^8.7.0",
     "eslint-config-prettier": "^9.0.0",
+    "eslint-plugin-n": "^16.2.0",
+    "eslint-plugin-simple-import-sort": "^10.0.0",
     "nodemon": "^3.0.1",
     "prettier": "^2.5.1"
   },

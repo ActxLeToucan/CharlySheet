@@ -3,14 +3,23 @@ import cors from 'cors';
 import express from 'express';
 import helmet from 'helmet';
 import hpp from 'hpp';
+import { createServer } from 'http';
+import { connect } from 'mongoose';
 import morgan from 'morgan';
+import { Server } from 'socket.io';
 
-import { LOG_FORMAT, NODE_ENV, ORIGIN, PORT } from './config/index.js';
+import {
+    LOG_FORMAT,
+    MONGO_URI,
+    NODE_ENV,
+    ORIGIN,
+    PORT} from './config/index.js';
 import { HttpException } from './exceptions/HttpException.js';
+import SocketIOEventHandlers from './handlers/SocketIOEventHandlers.js';
 import errorMiddleware from './middlewares/error.middleware.js';
-import { logger, stream } from './utils/logger.js';
 import HealthcheckRoutes from './routes/healthcheck.routes.js';
 import RouterV1 from './routes/v1/index.js';
+import { logger, stream } from './utils/logger.js';
 
 class App {
     /**
@@ -25,21 +34,33 @@ class App {
      * @type {number | string}
      */
     port;
+    /**
+     * @type {Server}
+     */
+    io;
+    /**
+     * @type {import('http').Server}
+     */
+    server;
 
     constructor() {
         this.app = express();
         this.env = NODE_ENV;
         this.port = PORT;
+        this.server = createServer(this.app);
+        this.io = new Server(this.server, { cors: { origin: ORIGIN } });
 
         this.#initializeMiddlewares();
         this.#initializeRoutes();
         this.#initializeErrorHandling();
+        this.#initializeSocketEvents();
+        this.#initializeMongoDB();
     }
 
     /**
      * Initialise les middleware Express
      */
-    #initializeMiddlewares () {
+    #initializeMiddlewares() {
         // Log des requêtes entrantes
         this.app.use(morgan(LOG_FORMAT, { stream }));
         // Autorisation des cors
@@ -59,7 +80,7 @@ class App {
     /**
      * Initialise les routes Express
      */
-    #initializeRoutes () {
+    #initializeRoutes() {
         // Health check: /healthcheck
         this.app.use('/', new HealthcheckRoutes().router);
 
@@ -71,16 +92,36 @@ class App {
             next(new HttpException(404, 'Route not found', 'Route not found'));
         });
     }
+    /**
+     * Initialise les évènements SocketIO
+     */
+    #initializeSocketEvents() {
+        new SocketIOEventHandlers(this.io);
+    }
+    /**
+     * Initialise la connexion à MongoDB
+     */
+    async #initializeMongoDB() {
+        try {
+            await connect(MONGO_URI, {
+                useNewUrlParser: true,
+                useUnifiedTopology: true
+            });
+            logger.info('MongoDB connected');
+        } catch (error) {
+            logger.error('MongoDB connection error: ', error);
+        }
+    }
 
     /**
      * Initialise les gestionnaires d'erreurs Express
      */
-    #initializeErrorHandling () {
+    #initializeErrorHandling() {
         this.app.use(errorMiddleware);
     }
 
-    listen () {
-        this.app.listen(this.port, () => {
+    listen() {
+        this.server.listen(this.port, () => {
             logger.info('=================================');
             logger.info(`======= ENV: ${this.env} =======`);
             logger.info(`🚀 App listening on the port ${this.port}`);

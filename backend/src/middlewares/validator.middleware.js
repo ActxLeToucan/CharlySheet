@@ -22,7 +22,7 @@ import { HttpException } from '../exceptions/HttpException.js';
 const validate = (validator, property) => {
     return (req, res, next) => {
         const data = property === 'body' ? req.body : property === 'params' ? req.params : req.query;
-        validator.validateAsync(data, { errors: { wrap: { label: "'" } } }).then((validatedData) => {
+        validator.validateAsync(data, { errors: { wrap: { label: '\'' } } }).then((validatedData) => {
             req[property] = validatedData;
             next();
         }).catch(error => {
