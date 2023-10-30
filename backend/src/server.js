@@ -1,5 +1,4 @@
 import App from './app.js';
 
 const app = new App();
-
-app.listen();
+app.initialize().then(app.listen.bind(app));

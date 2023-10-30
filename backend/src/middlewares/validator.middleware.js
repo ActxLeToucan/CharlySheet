@@ -10,8 +10,6 @@
  *             $ref: '#/components/schemas/Error'
  */
 
-import { ValidationError } from 'joi';
-
 import { HttpException } from '../exceptions/HttpException.js';
 
 /**
@@ -26,7 +24,7 @@ const validate = (validator, property) => {
             req[property] = validatedData;
             next();
         }).catch(error => {
-            next(error instanceof ValidationError
+            next(error.isJoi
                 ? new HttpException(422, error.message, error.message)
                 : error instanceof Error
                     ? new HttpException(500, error.message, error.message)

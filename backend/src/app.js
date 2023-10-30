@@ -49,12 +49,17 @@ class App {
         this.port = PORT;
         this.server = createServer(this.app);
         this.io = new Server(this.server, { cors: { origin: ORIGIN } });
+    }
 
+    /**
+     * Initialise l'ensemble de l'application
+     */
+    async initialize() {
         this.#initializeMiddlewares();
         this.#initializeRoutes();
         this.#initializeErrorHandling();
         this.#initializeSocketEvents();
-        this.#initializeMongoDB();
+        await this.#initializeMongoDB();
     }
 
     /**
@@ -92,12 +97,14 @@ class App {
             next(new HttpException(404, 'Route not found', 'Route not found'));
         });
     }
+
     /**
      * Initialise les évènements SocketIO
      */
     #initializeSocketEvents() {
         new SocketIOEventHandlers(this.io);
     }
+
     /**
      * Initialise la connexion à MongoDB
      */
