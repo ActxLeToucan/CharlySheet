@@ -1,7 +1,7 @@
 import { Router } from 'express';
 
 import { HttpException } from '../../exceptions/HttpException.js';
-import { Sheet } from '../../models/sheet.models.js';
+import { Sheet } from '../../models/sheet.model.js';
 
 class RouterSheets {
     path = '/sheets';
@@ -99,7 +99,7 @@ class RouterSheets {
         this.router.post(`${this.path}`, async (req, res, next) => {
             const { name } = req.body;
             /**
-             * @type {import('../../models/sheet.models.js').Sheet}
+             * @type {import('../../models/sheet.model.js').Sheet}
              */
             const sheet = new Sheet({ name });
             try {
