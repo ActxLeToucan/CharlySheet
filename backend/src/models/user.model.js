@@ -8,14 +8,14 @@ import uniqueValidator from 'mongoose-unique-validator';
  *     User:
  *       type: object
  *       properties:
+ *         _id:
+ *           type: string
+ *           description: Unique identifier
  *         username:
  *           type: string
  *           description: Username of the user
  *           minLength: 3
  *           maxLength: 20
- *         password:
- *           type: string
- *           description: Password of the user
  *         email:
  *           type: string
  *           description: Email of the user
@@ -59,6 +59,14 @@ const schema = new Schema({
     createdAt: {
         type: Date,
         default: Date.now
+    }
+});
+
+schema.set('toJSON', {
+    transform: (doc, ret) => {
+        delete ret.password;
+        delete ret.__v;
+        return ret;
     }
 });
 

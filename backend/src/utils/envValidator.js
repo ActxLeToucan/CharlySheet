@@ -1,5 +1,5 @@
 import dotenv from 'dotenv';
-import { cleanEnv, port, str } from 'envalid';
+import { cleanEnv, num, port, str } from 'envalid';
 
 dotenv.config();
 
@@ -13,7 +13,8 @@ const validateEnv = () => {
         LOG_FORMAT: str({ default: 'combined' }),
         ORIGIN: str({ default: '*' }),
         PORT: port({ default: 3000 }),
-        MONGO_URI: str()
+        MONGO_URI: str(),
+        PASSWORD_SALT: num({ default: 10 })
     });
 };
 

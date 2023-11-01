@@ -2,7 +2,7 @@ import { Router } from 'express';
 
 import UserController from '../../controllers/user.controller.js';
 import validate from '../../middlewares/validator.middleware.js';
-import { userIdentifierSchema } from '../../validators/user.validator.js';
+import { newUserSchema, userIdentifierSchema } from '../../validators/user.validator.js';
 
 class UserRoutes {
     path = '/user';
@@ -19,6 +19,39 @@ class UserRoutes {
     }
 
     #initializeRoutes() {
+        /**
+         * @openapi
+         * /user/signup:
+         *   post:
+         *     tags:
+         *     - User
+         *     summary: Signup
+         *     requestBody:
+         *       $ref: '#/components/requestBodies/newUser'
+         *     responses:
+         *       201:
+         *         description: User created
+         *         content:
+         *           application/json:
+         *             schema:
+         *               $ref: '#/components/schemas/User'
+         *       409:
+         *         description: Username or email already exists
+         *         content:
+         *           application/json:
+         *             schema:
+         *               $ref: '#/components/schemas/Error'
+         *       422:
+         *         description: Validation error
+         *         content:
+         *           application/json:
+         *             schema:
+         *               $ref: '#/components/schemas/Error'
+         */
+        this.router.post(`${this.path}/signup`,
+            validate(newUserSchema),
+            this.#controller.signup);
+
         /**
          * @openapi
          * /user/{username}:
@@ -49,7 +82,7 @@ class UserRoutes {
          *               $ref: '#/components/schemas/Error'
          */
         this.router.get(`${this.path}/:username`,
-            validate(userIdentifierSchema, 'params'),
+            validate(userIdentifierSchema),
             this.#controller.get);
     }
 }
