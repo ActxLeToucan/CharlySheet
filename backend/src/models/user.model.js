@@ -1,5 +1,6 @@
 import { model, Schema } from 'mongoose';
 import uniqueValidator from 'mongoose-unique-validator';
+import passportLocalMongoose from 'passport-local-mongoose';
 
 /**
  * @openapi
@@ -33,23 +34,14 @@ import uniqueValidator from 'mongoose-unique-validator';
  *           format: date-time
  */
 const schema = new Schema({
-    username: {
-        type: String,
-        required: true,
-        unique: true,
-        minlength: 3,
-        maxlength: 20
-    },
-    password: {
-        type: String,
-        required: true
-    },
     email: {
         type: String,
         required: true,
         unique: true,
         minlength: 3,
-        maxlength: 64
+        maxlength: 64,
+        lowercase: true,
+        trim: true
     },
     role: {
         type: String,
@@ -64,13 +56,17 @@ const schema = new Schema({
 
 schema.set('toJSON', {
     transform: (doc, ret) => {
-        delete ret.password;
+        delete ret.hash;
+        delete ret.salt;
         delete ret.__v;
         return ret;
     }
 });
 
 schema.plugin(uniqueValidator);
+schema.plugin(passportLocalMongoose, {
+    session: false
+});
 
 /**
  * @type {import('mongoose').Model}

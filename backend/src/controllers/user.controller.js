@@ -1,6 +1,7 @@
-import bcrypt from 'bcryptjs';
+import jwt from 'jsonwebtoken';
+import passport from 'passport';
 
-import { PASSWORD_SALT } from '../config/index.js';
+import { EXPIRES_IN,JWT_SECRET } from '../config/index.js';
 import { HttpException } from '../exceptions/HttpException.js';
 import User from '../models/user.model.js';
 
@@ -9,27 +10,72 @@ class UserController {
         const { username } = req.params;
 
         User.findOne({ username })
-            .then(user => {
+            .then((user) => {
                 if (!user) {
-                    throw new HttpException(404, 'User not found', 'User not found');
+                    throw new HttpException(
+                        404,
+                        'User not found',
+                        'User not found'
+                    );
                 }
 
                 res.status(200).json(user);
-            }).catch(next);
+            })
+            .catch(next);
     };
 
-    signup = (req, res, next) => {
+    signup = async (req, res, next) => {
         const { email, password, username } = req.body;
 
-        bcrypt.hashSync(password, PASSWORD_SALT).then(hash => {
-            User.findOne({ $or: [{ email }, { username }] })
-                .then(user => {
-                    if (user) throw new HttpException(409, 'User already exists', 'User already exists');
+        try {
+            const user = await User.register(
+                new User({ email, username }),
+                password
+            );
+            passport.authenticate('local')(req, res, () => {
+                res.statusCode = 200;
+                res.setHeader('Content-Type', 'application/json');
+                res.json({
+                    success: true,
+                    status: 'Registration Successful!',
+                    user: user.toJSON()
+                });
+            });
+        } catch (error) {
+            next(error);
+        }
+    };
 
-                    User.create({ email, password: hash, username })
-                        .then((user) => res.status(201).json(user)).catch(next);
-                }).catch(next);
-        }).catch(next);
+    me = async (req, res, next) => {
+        try {
+            const { user } = req;
+            const dbUser = await User.findById(user._id);
+            if (!dbUser) {
+                throw new HttpException(
+                    404,
+                    'User not found',
+                    'User not found'
+                );
+            }
+            res.status(200).json(dbUser);
+        } catch (error) {
+            next(error);
+        }
+    };
+
+    login = (req, res, next) => {
+        try {
+            const token = jwt.sign(
+                { _id: req.user._id, role: req.user.role },
+                JWT_SECRET,
+                {
+                    expiresIn: EXPIRES_IN
+                }
+            );
+            res.status(200).json({ success: true, token: `Bearer ${token}` });
+        } catch (error) {
+            next(error);
+        }
     };
 }
 
