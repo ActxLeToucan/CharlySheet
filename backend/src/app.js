@@ -147,6 +147,16 @@ class App {
             secretOrKey: JWT_SECRET
         };
         // stratégie d'authentification JWT qui vérifie la validité du token
+
+        /**
+         * @openapi
+         * components:
+         *   securitySchemes:
+         *     bearerAuth:
+         *       type: http
+         *       scheme: bearer
+         *       bearerFormat: JWT
+         */
         passport.use(
             new JwtStrategy(options, (jwtPayload, done) => {
                 if (jwtPayload) {
