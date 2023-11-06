@@ -1,10 +1,11 @@
 <template>
-    <div class="flex flex-col grow min-w-0 min-h-0 dark:bg-slate-700 bg-slate-50 dark:text-slate-200 text-slate-700 overflow-hidden">        
+    <div class="flex flex-col grow min-w-0 min-h-0 dark:bg-slate-700 bg-slate-50 dark:text-slate-200 text-slate-700 overflow-hidden">
         <router-view />
     </div>
 </template>
 
 <script>
+import EventManager from './scripts/EventManager';
 export default {
     name: "App",
     components: {

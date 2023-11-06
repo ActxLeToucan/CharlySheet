@@ -1,6 +1,9 @@
 <template>
     <div class="flex flex-col md:flex-row items-start md:items-center justify-center">
-        <p class="flex text-lg font-semibold grow min-h-fit pr-10">
+        <p
+            v-if="label"
+            class="flex text-lg font-semibold grow min-h-fit pr-10"
+        >
             {{ label }}
         </p>
         <input

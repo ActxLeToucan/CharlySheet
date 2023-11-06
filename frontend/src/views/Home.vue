@@ -1,15 +1,15 @@
 <template>
-    <div class="flex grow flex-col min-h-full h-fit max-w-full w-full justify-center items-center">
+    <div class="flex grow flex-col min-h-full max-h-full h-fit max-w-full w-full justify-center items-center">
         <div class="flex fixed w-screen h-screen">
             <div class="flex grow back-img -rotate-[10deg] scale-[1.4] opacity-[0.2] drop-shadow-lg" />
         </div>
         <div
-            class="show-up flex flex-col h-full w-full md:h-[40em] md:w-[40em] justify-evenly items-center overflow-hidden
+            class="show-up flex flex-col h-full w-full md:h-[40em] md:w-[40em] justify-evenly items-center p-4 md:p-8 overflow-hidden
                    bg-slate-50 dark:bg-slate-700 border-2 border-slate-200 dark:border-slate-600 rounded-lg shadow-2xl"
         >
             <div
                 ref="panels"
-                class="flex w-[80%] h-[80%]"
+                class="flex grow w-full h-full"
             >
                 <div
                     ref="home-panel"
@@ -30,20 +30,24 @@
                         </p>
                     </div>
                     <div
-                        class="flex grow flex-col md:flex-row justify-end md:justify-between items-center md:items-end w-full space-y-4 md:space-y-0 md:space-x-32"
+                        class="flex grow items-end"
                     >
-                        <comp-button
-                            :icon="UserPlusIcon"
-                            :onclick="() => goToRegister()"
-                        >
-                            S'inscrire
-                        </comp-button>
-                        <comp-button
-                            :icon="UserIcon"
-                            :onclick="() => goToLogin()"
-                        >
-                            Se connecter
-                        </comp-button>
+                        <div class="flex flex-wrap w-full h-fit">
+                            <comp-button
+                                class="mx-auto my-2"
+                                :icon="UserPlusIcon"
+                                :onclick="() => goToRegister()"
+                            >
+                                S'inscrire
+                            </comp-button>
+                            <comp-button
+                                class="mx-auto my-2"
+                                :icon="UserIcon"
+                                :onclick="() => goToLogin()"
+                            >
+                                Se connecter
+                            </comp-button>
+                        </div>
                     </div>
                 </div>
 
@@ -69,20 +73,24 @@
                         />
                     </div>
                     <div
-                        class="flex grow flex-col md:flex-row justify-end md:justify-between items-center md:items-end w-full space-y-4 md:space-y-0 md:space-x-32"
+                        class="flex grow items-end"
                     >
-                        <comp-button
-                            :icon="ChevronLeftIcon"
-                            :onclick="() => goToHome()"
-                        >
-                            Retour
-                        </comp-button>
-                        <comp-button
-                            :icon="CheckIcon"
-                            :onclick="() => login()"
-                        >
-                            Continuer
-                        </comp-button>
+                        <div class="flex flex-wrap w-full h-fit">
+                            <comp-button
+                                class="mx-auto my-2"
+                                :icon="ChevronLeftIcon"
+                                :onclick="() => goToHome()"
+                            >
+                                Retour
+                            </comp-button>
+                            <comp-button
+                                class="mx-auto my-2"
+                                :icon="CheckIcon"
+                                :onclick="() => login()"
+                            >
+                                Continuer
+                            </comp-button>
+                        </div>
                     </div>
                 </div>
 
@@ -120,20 +128,24 @@
                         />
                     </div>
                     <div
-                        class="flex grow flex-col md:flex-row justify-end md:justify-between items-center md:items-end w-full space-y-4 md:space-y-0 md:space-x-32"
+                        class="flex grow items-end"
                     >
-                        <comp-button
-                            :icon="ChevronLeftIcon"
-                            :onclick="() => goToHome()"
-                        >
-                            Retour
-                        </comp-button>
-                        <comp-button
-                            :icon="CheckIcon"
-                            :onclick="() => register()"
-                        >
-                            Continuer
-                        </comp-button>
+                        <div class="flex flex-wrap w-full h-fit">
+                            <comp-button
+                                class="mx-auto my-2"
+                                :icon="ChevronLeftIcon"
+                                :onclick="() => goToHome()"
+                            >
+                                Retour
+                            </comp-button>
+                            <comp-button
+                                class="mx-auto my-2"
+                                :icon="CheckIcon"
+                                :onclick="() => register()"
+                            >
+                                Continuer
+                            </comp-button>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -220,16 +232,10 @@ export default {
 </script>
 
 <style scoped>
-@keyframes bg-scroll {
-    0% { background-position: 0 0; }
-    100% { background-position: 100% 0; }
-}
-
 .back-img {
     background-image: url('/img/background.png');
     background-size: 35em;
     background-position: 0 0;
     background-repeat: repeat;
-    animation: bg-scroll 200s linear infinite;
 }
 </style>

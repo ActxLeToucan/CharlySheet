@@ -2,51 +2,25 @@
     <div class="flex grow flex-col min-h-full h-full max-w-full w-full">
         <comp-navbar />
         <div class="h-fit w-full min-h-0 max-h-full min-w-0 max-w-full overflow-scroll">
-            <div class="flex flex-col grow p-4 space-y-8 text-slate-700 dar:text-slate-300">
+            <div class="flex flex-col grow p-4 space-y-8 text-slate-700 dark:text-slate-300">
                 <div
+                    v-for="(categ, index) in categs"
+                    :key="categ.name"
                     class="show-up flex flex-col space-y-4"
-                    style="animation-delay: 0.0s;"
+                    :style="'animation-delay: '+index+'00ms;'"
                 >
                     <p class="text-2xl font-semibold tracking-wide">
-                        Récents
+                        {{ categ.name }}
                     </p>
-                    <div class="flex w-full space-x-4 ">
-                        <comp-doccard
-                            v-for="doc in recentDocs"
-                            :key="doc.id"
-                            :doc="doc"
-                        />
-                    </div>
-                </div>
-                <div
-                    class="show-up flex flex-col space-y-4"
-                    style="animation-delay: 0.1s;"
-                >
-                    <p class="text-2xl font-semibold tracking-wide">
-                        Mes tableaux personnels
-                    </p>
-                    <div class="flex w-full space-x-4 ">
-                        <comp-doccard
-                            v-for="doc in myDocs"
-                            :key="doc.id"
-                            :doc="doc"
-                        />
-                        <comp-newdoccard />
-                    </div>
-                </div>
-                <div
-                    class="show-up flex flex-col space-y-4"
-                    style="animation-delay: 0.2s;"
-                >
-                    <p class="text-2xl font-semibold tracking-wide">
-                        Tableaux partagés avec moi
-                    </p>
-                    <div class="flex w-full space-x-4 ">
-                        <comp-doccard
-                            v-for="doc in sharedDocs"
-                            :key="doc.id"
-                            :doc="doc"
-                        />
+                    <div class="flex w-full overflow-auto">
+                        <div class="flex w-fit space-x-4 py-3">
+                            <comp-doccard
+                                v-for="doc in categ.docs"
+                                :key="doc.id"
+                                :doc="doc"
+                            />
+                            <comp-newdoccard v-if="categ.showNewCard" />
+                        </div>
                     </div>
                 </div>
             </div>
@@ -58,38 +32,66 @@
 import CompNavbar from '../components/CompNavbar.vue';
 import CompDoccard from '../components/CompDoccard.vue';
 import CompNewdoccard from '../components/CompNewdoccard.vue';
+import User from '../models/User';
 
-const myDocs = [
+const categs = [
     {
-        id: 1,
-        name: "Mon premier tableau",
-        owner: {
-            name: "Paul",
-            id: 1
-        }
-    }
-];
-
-const sharedDocs = [
-    {
-        id: 2,
-        name: "Tableau de test",
-        owner: {
-            name: "Antonin",
-            id: 2
-        }
+        name: 'Récents',
+        docs: [
+            {
+                id: 1,
+                name: "Mon premier tableau",
+                owner: {
+                    name: "Paul",
+                    id: 1
+                }
+            }
+        ]
     },
     {
-        id: 3,
-        name: "Triple A",
-        owner: {
-            name: "Antoine",
-            id: 3
-        }
+        name: 'Mes tableaux personnels',
+        docs: [
+            {
+                id: 1,
+                name: "Mon premier tableau",
+                owner: {
+                    name: "Paul",
+                    id: 1
+                }
+            }
+        ],
+        showNewCard: true
+    },
+    {
+        name: 'Tableaux partagés avec moi',
+        docs: [
+            {
+                id: 2,
+                name: "Tableau de test",
+                owner: {
+                    name: "Antonin",
+                    id: 2
+                }
+            },
+            {
+                id: 3,
+                name: "Triple A",
+                owner: {
+                    name: "Antoine",
+                    id: 3
+                }
+            },
+            {
+                id: 3,
+                name: "Oulala ca va plus",
+                owner: {
+                    name: "Guillaume",
+                    id: 3
+                }
+            }
+        ]
     }
 ];
-
-const recentDocs = [myDocs[0]];
 
 export default {
     name: "MyView",
@@ -100,13 +102,16 @@ export default {
     },
     data() {
         return {
-            myDocs,
-            sharedDocs,
-            recentDocs
+            categs
         };
     },
     mounted() {
-        
+        if (!User.currentUser) User.currentUser = new User({
+            pseudo: "Paul",
+            email: "paul@charlysheet.fr",
+            color: "#FF0040"
+        });
+        // TODO : Remove that when connection is done
     },
     methods: {
         
