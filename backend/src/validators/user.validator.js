@@ -55,3 +55,22 @@ export const newUserSchema = {
     }),
     location: 'body'
 };
+
+/**
+ * @openapi
+ * components:
+ *  requestBodies:
+ *    arrayOfUserIds:
+ *      content:
+ *        application/json:
+ *          schema:
+ *            type: array
+ *            items:
+ *              type: string
+ *              minLength: 24
+ *              maxLength: 24
+ */
+export const arrayOfUserIdsSchema = {
+    joiSchema: Joi.array().items(Joi.string().required().min(24).max(24)),
+    location: 'body'
+};
