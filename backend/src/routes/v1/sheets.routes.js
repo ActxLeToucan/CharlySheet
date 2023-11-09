@@ -1,4 +1,5 @@
 import { Router } from 'express';
+import passport from 'passport';
 
 import SheetController from '../../controllers/sheet.controller.js';
 import validate from '../../middlewares/validator.middleware.js';
@@ -55,6 +56,8 @@ class RouterSheets {
          * /v1/sheets:
          *   post:
          *     summary: Create a new sheet
+         *     security:
+         *      - bearerAuth: []
          *     tags:
          *       - Sheets
          *     requestBody:
@@ -94,7 +97,8 @@ class RouterSheets {
          */
         this.router.post(
             `${this.path}`,
-            validate(sheetSchema, 'body'),
+            passport.authenticate('jwt', { session: false }),
+            validate(sheetSchema),
             this.#controller.post
         );
 
@@ -149,7 +153,7 @@ class RouterSheets {
          */
         this.router.get(
             `${this.path}/:id`,
-            validate(sheetIdentifierSchema, 'params'),
+            validate(sheetIdentifierSchema),
             this.#controller.getById
         );
     }

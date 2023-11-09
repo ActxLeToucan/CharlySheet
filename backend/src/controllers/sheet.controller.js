@@ -1,5 +1,6 @@
 import { HttpException } from '../exceptions/HttpException.js';
 import { Sheet } from '../models/sheet.model.js';
+import User from '../models/user.model.js';
 
 class SheetController {
     getById = async (req, res, next) => {
@@ -33,11 +34,22 @@ class SheetController {
          */
         const sheet = new Sheet({ name });
         try {
+            const { user } = req;
+            const dbUser = await User.findById(user._id);
+            if (!dbUser) {
+                throw new HttpException(
+                    404,
+                    'User not found',
+                    'User not found'
+                );
+            }
+            sheet.owner = dbUser._id;
             await sheet.save();
+            await sheet.populate('owner');
+            res.json(sheet.toJSON());
         } catch (error) {
-            next(new HttpException(409, error.message, 'Can\'t create sheet'));
+            next(error);
         }
-        res.json(sheet.toJSON());
     };
 }
 
