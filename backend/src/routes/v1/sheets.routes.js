@@ -4,6 +4,7 @@ import passport from 'passport';
 import SheetController from '../../controllers/sheet.controller.js';
 import validate from '../../middlewares/validator.middleware.js';
 import {
+    sheetIdandUserIdSchema,
     sheetIdentifierSchema,
     sheetSchema
 } from '../../validators/sheet.validator.js';
@@ -220,6 +221,61 @@ class RouterSheets {
             validate(sheetIdentifierSchema),
             validate(arrayOfUserIdsSchema),
             this.#controller.addUsers
+        );
+        /**
+         * @openapi
+         * /v1/sheets/{id}/users/{userId}:
+         *   delete:
+         *     summary: Remove a user from a sheet
+         *     security:
+         *       - bearerAuth: []
+         *     tags: [Sheets]
+         *     parameters:
+         *       - $ref: '#/components/parameters/id'
+         *       - name: userId
+         *         in: path
+         *         required: true
+         *         description: ID of the user to remove from the sheet
+         *         schema:
+         *           type: string
+         *           minLength: 24
+         *           maxLength: 24
+         *     responses:
+         *       204:
+         *         description: User removed from the sheet
+         *       404:
+         *         description: Sheet or user not found
+         *         content:
+         *           application/json:
+         *             schema:
+         *               type: object
+         *               properties:
+         *                 statusCode:
+         *                   type: number
+         *                 message:
+         *                   type: string
+         *                 error:
+         *                   type: string
+         *               example:
+         *                 statusCode: 404
+         *                 message: Sheet or user not found
+         *                 error: Sheet or user not found
+         *       403:
+         *         description: Forbidden
+         *         content:
+         *           application/json:
+         *             schema:
+         *               type: object
+         *               properties:
+         *                 example:
+         *                   type: string
+         *               example: You are not the owner of this sheet
+         */
+        this.router.delete(
+            `${this.path}/:id/users/:userId`,
+            passport.authenticate('jwt', { session: false }),
+            validate(sheetIdandUserIdSchema),
+            this.#controller.removeUser
         );
     }
 }

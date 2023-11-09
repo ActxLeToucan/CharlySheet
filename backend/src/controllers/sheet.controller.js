@@ -94,6 +94,40 @@ class SheetController {
             next(error);
         }
     };
+    removeUser = async (req, res, next) => {
+        const { id, userId } = req.params;
+        const { user } = req;
+        try {
+            const sheet = await Sheet.findById(id);
+            if (!sheet) {
+                throw new HttpException(
+                    404,
+                    'Sheet not found',
+                    'Sheet not found'
+                );
+            }
+            if (sheet.owner.toString() !== user._id.toString()) {
+                throw new HttpException(
+                    403,
+                    'Forbidden',
+                    'You are not the owner of this sheet'
+                );
+            }
+            // Filtrer manuellement le tableau des utilisateurs pour retirer l'utilisateur
+            sheet.users = sheet.users.filter((u) => u.toString() !== userId);
+
+            // Enregistrer le document mis à jour
+            await sheet.save();
+
+            // Rechercher le document mis à jour pour la population
+            const updatedSheet = await Sheet.findById(id)
+                .populate('users')
+                .populate('owner');
+            res.json(updatedSheet.users);
+        } catch (error) {
+            next(error);
+        }
+    };
 }
 
 export default SheetController;
