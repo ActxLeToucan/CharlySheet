@@ -28,6 +28,7 @@ function generateDoc(version, folder, tags) {
             ]
         },
         apis: [
+            './src/app.js',
             './src/routes/*.routes.js',
             `./src/routes/${folder}/*.js`,
             './src/middlewares/*.js',
