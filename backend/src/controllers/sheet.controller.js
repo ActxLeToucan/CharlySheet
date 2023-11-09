@@ -7,6 +7,8 @@ class SheetController {
         const { id } = req.params;
 
         Sheet.findOne({ _id: id })
+            .populate('users')
+            .populate('owner')
             .then((sheet) => {
                 if (!sheet) {
                     throw new HttpException(
