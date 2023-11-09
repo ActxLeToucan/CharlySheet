@@ -53,6 +53,35 @@ class SheetController {
             next(error);
         }
     };
+    changeName = async (req, res, next) => {
+        const { id } = req.params;
+        const { name } = req.body;
+        try {
+            const sheet = await Sheet.findById(id);
+            if (!sheet) {
+                throw new HttpException(
+                    404,
+                    'Sheet not found',
+                    'Sheet not found'
+                );
+            }
+            // vérifier que l'utilisateur est bien le propriétaire de la feuille
+            if (sheet.owner.toString() !== req.user._id.toString()) {
+                throw new HttpException(
+                    403,
+                    'Forbidden',
+                    'You are not the owner of this sheet'
+                );
+            }
+            sheet.name = name;
+            await sheet.save();
+            await sheet.populate('owner');
+            await sheet.populate('users');
+            res.json(sheet.toJSON());
+        } catch (error) {
+            next(error);
+        }
+    };
     addUsers = async (req, res, next) => {
         const { id } = req.params;
         const { user } = req;

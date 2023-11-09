@@ -1,4 +1,5 @@
 import { Router } from 'express';
+import Joi from 'joi';
 import passport from 'passport';
 
 import SheetController from '../../controllers/sheet.controller.js';
@@ -102,6 +103,92 @@ class RouterSheets {
             passport.authenticate('jwt', { session: false }),
             validate(sheetSchema),
             this.#controller.createSheet
+        );
+
+        /**
+         * @openapi
+         * /v1/sheets/{id}/name:
+         *   put:
+         *     summary: Change the name of a sheet
+         *     security:
+         *       - bearerAuth: []
+         *     tags:
+         *       - Sheets
+         *     parameters:
+         *       - $ref: '#/components/parameters/id'
+         *     requestBody:
+         *       required: true
+         *       content:
+         *         application/json:
+         *           schema:
+         *             type: object
+         *             properties:
+         *               name:
+         *                 type: string
+         *             required:
+         *               - name
+         *     responses:
+         *       '200':
+         *         description: The updated sheet
+         *         content:
+         *           application/json:
+         *             schema:
+         *               type: object
+         *               properties:
+         *                 id:
+         *                   type: string
+         *                 name:
+         *                   type: string
+         *                 users:
+         *                   type: array
+         *                   items:
+         *                     type: object
+         *                 createdAt:
+         *                   type: string
+         *               example:
+         *                 id: 60f9a5f9d3f9f20015c1d7a8
+         *                 name: Feuille 1
+         *                 users: []
+         *                 createdAt: 2021-07-23T13:53:05.000Z
+         *       '404':
+         *         description: Sheet not found
+         *         content:
+         *           application/json:
+         *             schema:
+         *               type: object
+         *               properties:
+         *                 statusCode:
+         *                   type: number
+         *                 message:
+         *                   type: string
+         *                 error:
+         *                   type: string
+         *               example:
+         *                 statusCode: 404
+         *                 message: Sheet not found
+         *                 error: Sheet not found
+         *       '403':
+         *         description: Forbidden
+         *         content:
+         *           application/json:
+         *             schema:
+         *               type: object
+         *               properties:
+         *                 example:
+         *                   type: string
+         *               example: You are not the owner of this sheet
+         */
+        this.router.put(
+            `${this.path}/:id/name`,
+            passport.authenticate('jwt', { session: false }),
+            validate(sheetIdentifierSchema),
+            validate({
+                joiSchema: Joi.object({
+                    name: Joi.string().required().min(3).max(30)
+                }),
+                location: 'body'
+            }),
+            this.#controller.changeName
         );
 
         /**
