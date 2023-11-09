@@ -28,5 +28,13 @@ export const {
     /**
      * @type {number}
      */
-    PASSWORD_SALT
+    PASSWORD_SALT,
+    /**
+     * @type {string}
+     */
+    JWT_SECRET,
+    /**
+     * @type {string}
+     */
+    EXPIRES_IN
 } = validateEnv();

@@ -14,7 +14,9 @@ const validateEnv = () => {
         ORIGIN: str({ default: '*' }),
         PORT: port({ default: 3000 }),
         MONGO_URI: str(),
-        PASSWORD_SALT: num({ default: 10 })
+        PASSWORD_SALT: num({ default: 10 }),
+        JWT_SECRET: str(),
+        EXPIRES_IN: str({ default: '1d' })
     });
 };
 
