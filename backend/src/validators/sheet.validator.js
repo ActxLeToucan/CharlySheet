@@ -14,10 +14,16 @@ import Joi from 'joi';
  *         minLength: 24
  *         maxLength: 24
  */
-export const sheetIdentifierSchema = Joi.object({
-    id: Joi.string().required().min(24).max(24)
-});
+export const sheetIdentifierSchema = {
+    joiSchema: Joi.object({
+        id: Joi.string().required().min(24).max(24)
+    }),
+    location: 'params'
+};
 
-export const sheetSchema = Joi.object({
-    name: Joi.string().required().min(3).max(30)
-});
+export const sheetSchema = {
+    joiSchema: Joi.object({
+        name: Joi.string().required().min(3).max(30)
+    }),
+    location: 'body'
+};
