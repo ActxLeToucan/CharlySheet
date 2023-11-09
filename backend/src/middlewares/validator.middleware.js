@@ -10,23 +10,20 @@
  *             $ref: '#/components/schemas/Error'
  */
 
-import { ValidationError } from 'joi';
-
 import { HttpException } from '../exceptions/HttpException.js';
 
 /**
- * @param validator {ObjectSchema}
- * @param property {'body'|'params'|'query'}
+ * @param validator {{joiSchema: ObjectSchema, location: 'body'|'params'|'query'}}
  * @returns {(function(Request, Response, NextFunction): void)|*}
  */
-const validate = (validator, property) => {
+const validate = (validator) => {
     return (req, res, next) => {
-        const data = property === 'body' ? req.body : property === 'params' ? req.params : req.query;
-        validator.validateAsync(data, { errors: { wrap: { label: '\'' } } }).then((validatedData) => {
-            req[property] = validatedData;
+        const data = validator.location === 'body' ? req.body : validator.location === 'params' ? req.params : req.query;
+        validator.joiSchema.validateAsync(data, { errors: { wrap: { label: '\'' } } }).then((validatedData) => {
+            req[validator.location] = validatedData;
             next();
         }).catch(error => {
-            next(error instanceof ValidationError
+            next(error.isJoi
                 ? new HttpException(422, error.message, error.message)
                 : error instanceof Error
                     ? new HttpException(500, error.message, error.message)

@@ -24,5 +24,17 @@ export const {
     /**
      * @type {string}
      */
-    LOG_FORMAT
+    LOG_FORMAT,
+    /**
+     * @type {number}
+     */
+    PASSWORD_SALT,
+    /**
+     * @type {string}
+     */
+    JWT_SECRET,
+    /**
+     * @type {string}
+     */
+    EXPIRES_IN
 } = validateEnv();

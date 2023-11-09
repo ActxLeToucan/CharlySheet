@@ -7,7 +7,7 @@ import swaggerJsdoc from 'swagger-jsdoc';
  * @param tags {Array.<{name: string, description: string}>|undefined}
  * @returns {object} Swagger's output objecthealthcheck.routes.ts
  */
-function generateDoc (version, folder, tags) {
+function generateDoc(version, folder, tags) {
     const options = {
         definition: {
             openapi: '3.0.0',
@@ -28,11 +28,13 @@ function generateDoc (version, folder, tags) {
             ]
         },
         apis: [
+            './src/app.js',
             './src/routes/*.routes.js',
             `./src/routes/${folder}/*.js`,
             './src/middlewares/*.js',
             './src/utils/*.js',
-            './src/validators/*.js'
+            './src/validators/*.js',
+            './src/models/*.js'
         ]
     };
 

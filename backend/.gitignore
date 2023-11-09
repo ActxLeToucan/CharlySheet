@@ -135,3 +135,7 @@ dist
 
 # api data
 data/
+
+# docker compose
+docker-compose.yml
+docker-compose.dev.yml

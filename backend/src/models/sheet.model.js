@@ -1,6 +1,6 @@
 import { model,Schema } from 'mongoose';
 
-import User from './user.models.js';
+import User from './user.model.js';
 
 const schema = new Schema({
     name: {
