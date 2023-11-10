@@ -56,6 +56,37 @@ class RouterSheets {
 
         /**
          * @openapi
+         * /v1/sheets/me:
+         *   get:
+         *     tags:
+         *       - Sheets
+         *     summary: Get current user's sheets
+         *     security:
+         *       - bearerAuth: []
+         *     responses:
+         *       200:
+         *         description: Current user's sheets
+         *         content:
+         *           application/json:
+         *             schema:
+         *               type: array
+         *               items:
+         *                 $ref: '#/components/schemas/Sheet'
+         *       401:
+         *         description: Unauthorized
+         *         content:
+         *           application/json:
+         *             schema:
+         *               $ref: '#/components/schemas/Error'
+         */
+        this.router.get(
+            `${this.path}/me`,
+            passport.authenticate('jwt', { session: false }),
+            this.#controller.getMySheets
+        );
+
+        /**
+         * @openapi
          * /v1/sheets:
          *   post:
          *     summary: Create a new sheet

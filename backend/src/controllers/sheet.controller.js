@@ -22,6 +22,15 @@ class SheetController {
             })
             .catch(next);
     };
+    getMySheets = async (req, res, next) => {
+        try {
+            const { user } = req;
+            const sheets = await Sheet.find({ owner: user._id });
+            res.status(200).json(sheets);
+        } catch (error) {
+            next(error);
+        }
+    };
     getAll = async (req, res, next) => {
         Sheet.find()
             .then((sheets) => {

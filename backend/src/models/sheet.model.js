@@ -1,7 +1,36 @@
-import { model,Schema } from 'mongoose';
+import { model, Schema } from 'mongoose';
 
 import User from './user.model.js';
 
+/**
+ * @openapi
+ * components:
+ *   schemas:
+ *     Sheet:
+ *       type: object
+ *       properties:
+ *         _id:
+ *           type: string
+ *           description: Unique identifier
+ *         name:
+ *           type: string
+ *           description: Name of the sheet
+ *           minLength: 3
+ *           maxLength: 30
+ *         owner:
+ *           type: string
+ *           description: Owner of the sheet
+ *         users:
+ *           type: array
+ *           description: Users of the sheet
+ *           items:
+ *            type: string
+ *            format: ObjectId
+ *         createdAt:
+ *           type: string
+ *           description: Date of creation
+ *           format: date-time
+ */
 const schema = new Schema({
     name: {
         type: String,
@@ -27,8 +56,6 @@ const schema = new Schema({
 });
 schema.set('toJSON', {
     transform: (doc, ret) => {
-        ret.id = ret._id;
-        delete ret._id;
         delete ret.__v;
         return ret;
     }
