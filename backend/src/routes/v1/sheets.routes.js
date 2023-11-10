@@ -53,7 +53,6 @@ class RouterSheets {
          *                 - name: Feuille 1
          */
         this.router.get(`${this.path}`, this.#controller.getAll);
-
         /**
          * @openapi
          * /v1/sheets/me:
@@ -306,6 +305,54 @@ class RouterSheets {
             `${this.path}/:id`,
             validate(sheetIdentifierSchema),
             this.#controller.getById
+        );
+        /**
+         * @openapi
+         * /v1/sheets/{id}:
+         *   delete:
+         *     summary: Delete a sheet by ID
+         *     security:
+         *       - bearerAuth: []
+         *     tags: [Sheets]
+         *     parameters:
+         *       - $ref: '#/components/parameters/id'
+         *     responses:
+         *       '204':
+         *         description: Sheet deleted
+         *       '404':
+         *         description: Sheet not found
+         *         content:
+         *           application/json:
+         *             schema:
+         *               type: object
+         *               properties:
+         *                 statusCode:
+         *                   type: number
+         *                 message:
+         *                   type: string
+         *                 error:
+         *                   type: string
+         *               example:
+         *                 statusCode: 404
+         *                 message: Sheet not found
+         *                 error: Sheet not found
+         *       '403':
+         *         description: Forbidden
+         *         content:
+         *           application/json:
+         *             schema:
+         *               type: object
+         *               properties:
+         *                 message:
+         *                   type: string
+         *               example:
+         *                 message: You are not the owner of this sheet
+         */
+        this.router.delete(
+            `${this.path}/:id`,
+            passport.authenticate('jwt', { session: false }),
+            validate(sheetIdentifierSchema),
+            this.#controller.deleteById
         );
 
         /**

@@ -1,5 +1,3 @@
-import mongoose from 'mongoose';
-
 import { HttpException } from '../exceptions/HttpException.js';
 import { Sheet } from '../models/sheet.model.js';
 import User from '../models/user.model.js';
@@ -23,6 +21,31 @@ class SheetController {
                 res.status(200).json(sheet);
             })
             .catch(next);
+    };
+    deleteById = async (req, res, next) => {
+        try {
+            const { id } = req.params;
+            const { user } = req;
+            const sheet = await Sheet.findOne({ _id: id });
+            if (!sheet) {
+                throw new HttpException(
+                    404,
+                    'Sheet not found',
+                    'Sheet not found'
+                );
+            }
+            if (sheet.owner.toString() !== user._id.toString()) {
+                throw new HttpException(
+                    403,
+                    'Forbidden',
+                    'You are not the owner of this sheet'
+                );
+            }
+            await sheet.deleteOne();
+            res.status(204).end();
+        } catch (error) {
+            next(error);
+        }
     };
     getMySheets = async (req, res, next) => {
         try {
