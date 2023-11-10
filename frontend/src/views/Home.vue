@@ -17,16 +17,18 @@
                 >
                     <div class="flex flex-col items-center space-y-4">
                         <comp-icon class="w-32" />
-                        <comp-title>CharlySheet</comp-title>
+                        <comp-title>
+                            <get-text :context="Lang.CreateTranslationContext('home', 'CharlySheet')" />
+                        </comp-title>
                     </div>
                     <div
                         class="flex flex-col items-center space-y-2 text-slate-600 dark:text-slate-300"
                     >
                         <p class="text-center text-xl">
-                            Bienvenue sur CharlySheet !
+                            <get-text :context="Lang.CreateTranslationContext('home', 'Welcome')" />
                         </p>
                         <p class="text-center text-xl">
-                            Avant de commencer, créez un compte ou connectez-vous.
+                            <get-text :context="Lang.CreateTranslationContext('home', 'WelcomeDesc')" />
                         </p>
                     </div>
                     <div
@@ -36,16 +38,16 @@
                             <comp-button
                                 class="mx-auto my-2"
                                 :icon="UserPlusIcon"
-                                :onclick="() => goToRegister()"
+                                :onclick="() => goTosignup()"
                             >
-                                S'inscrire
+                                <get-text :context="Lang.CreateTranslationContext('verbs', 'SignUp')" />
                             </comp-button>
                             <comp-button
                                 class="mx-auto my-2"
                                 :icon="UserIcon"
                                 :onclick="() => goToLogin()"
                             >
-                                Se connecter
+                                <get-text :context="Lang.CreateTranslationContext('verbs', 'LogIn')" />
                             </comp-button>
                         </div>
                     </div>
@@ -57,93 +59,105 @@
                 >
                     <div class="flex flex-row items-center justify-center space-x-4">
                         <comp-icon class="w-10" />
-                        <comp-title>Connexion</comp-title>
+                        <comp-title>
+                            <get-text :context="Lang.CreateTranslationContext('verbs', 'LogIn')" />
+                        </comp-title>
                     </div>
-                    <div class="flex flex-col space-y-4 mx-auto">
+                    <div
+                        v-if="shownPanel === 'login-panel'"
+                        class="flex flex-col space-y-4 mx-auto"
+                    >
                         <comp-input
-                            label="Nom d'utilisateur"
-                            placeholder="Nom d'utilisateur"
+                            :label="Lang.CreateTranslationContext('home', 'Username')"
+                            :placeholder="Lang.CreateTranslationContext('home', 'Username')"
                             name="username"
                         />
                         <comp-input
-                            label="Mot de passe"
-                            placeholder="Mot de passe"
+                            :label="Lang.CreateTranslationContext('home', 'Password')"
+                            :placeholder="Lang.CreateTranslationContext('home', 'Password')"
                             type="password"
                             name="password"
                         />
                     </div>
                     <div
-                        class="flex grow items-end"
+                        class="flex flex-col grow justify-end"
                     >
+                        <log-zone ref="login-log-zone" />
                         <div class="flex flex-wrap w-full h-fit">
                             <comp-button
                                 class="mx-auto my-2"
                                 :icon="ChevronLeftIcon"
                                 :onclick="() => goToHome()"
                             >
-                                Retour
+                                <get-text :context="Lang.CreateTranslationContext('verbs', 'Back')" />
                             </comp-button>
                             <comp-button
                                 class="mx-auto my-2"
                                 :icon="CheckIcon"
                                 :onclick="() => login()"
                             >
-                                Continuer
+                                <get-text :context="Lang.CreateTranslationContext('verbs', 'Continue')" />
                             </comp-button>
                         </div>
                     </div>
                 </div>
 
                 <div
-                    ref="register-panel"
+                    ref="signup-panel"
                     class="flex flex-col grow hidden space-y-8 md:space-y-16"
                 >
                     <div class="flex flex-row items-center justify-center space-x-4">
                         <comp-icon class="w-10" />
-                        <comp-title>Inscription</comp-title>
+                        <comp-title>
+                            <get-text :context="Lang.CreateTranslationContext('verbs', 'SignUp')" />
+                        </comp-title>
                     </div>
-                    <div class="flex flex-col space-y-4 mx-auto">
+                    <div
+                        v-if="shownPanel === 'signup-panel'"
+                        class="flex flex-col space-y-4 mx-auto"
+                    >
                         <comp-input
-                            label="Nom d'utilisateur"
-                            placeholder="Nom d'utilisateur"
+                            :label="Lang.CreateTranslationContext('home', 'Username')"
+                            :placeholder="Lang.CreateTranslationContext('home', 'Username')"
                             name="username"
                         />
                         <comp-input
-                            label="Adresse e-mail"
-                            placeholder="Adresse e-mail"
+                            :label="Lang.CreateTranslationContext('home', 'Email')"
+                            :placeholder="Lang.CreateTranslationContext('home', 'Email')"
                             type="email"
                             name="email"
                         />
                         <comp-input
-                            label="Mot de passe"
-                            placeholder="Mot de passe"
+                            :label="Lang.CreateTranslationContext('home', 'Password')"
+                            :placeholder="Lang.CreateTranslationContext('home', 'Password')"
                             type="password"
                             name="password"
                         />
                         <comp-input
-                            label="Confirmation"
-                            placeholder="Confirmation"
+                            :label="Lang.CreateTranslationContext('home', 'ConfirmPassword')"
+                            :placeholder="Lang.CreateTranslationContext('home', 'ConfirmPassword')"
                             type="password"
                             name="password-confirm"
                         />
                     </div>
                     <div
-                        class="flex grow items-end"
+                        class="flex flex-col grow justify-end"
                     >
+                        <log-zone ref="signup-log-zone" />
                         <div class="flex flex-wrap w-full h-fit">
                             <comp-button
                                 class="mx-auto my-2"
                                 :icon="ChevronLeftIcon"
                                 :onclick="() => goToHome()"
                             >
-                                Retour
+                                <get-text :context="Lang.CreateTranslationContext('verbs', 'Back')" />
                             </comp-button>
                             <comp-button
                                 class="mx-auto my-2"
                                 :icon="CheckIcon"
-                                :onclick="() => register()"
+                                :onclick="() => signup()"
                             >
-                                Continuer
+                                <get-text :context="Lang.CreateTranslationContext('verbs', 'Continue')" />
                             </comp-button>
                         </div>
                     </div>
@@ -158,6 +172,11 @@ import CompButton from '../components/CompButton.vue';
 import CompIcon from '../components/CompIcon.vue';
 import CompTitle from '../components/CompTitle.vue';
 import CompInput from '../components/CompInput.vue';
+import GetText from '../components/text/GetText.vue';
+import LogZone from '../components/text/LogZone.vue';
+import API from '../scripts/API';
+import Lang from '../scripts/Lang';
+import Logs from '../scripts/Logs';
 
 import {
     UserPlusIcon,
@@ -165,6 +184,7 @@ import {
     ChevronLeftIcon,
     CheckIcon
 } from '@heroicons/vue/24/outline';
+import User from '../scripts/User';
 
 export default {
     name: "HomeView",
@@ -172,17 +192,26 @@ export default {
         CompIcon,
         CompButton,
         CompTitle,
-        CompInput
+        CompInput,
+        GetText,
+        LogZone
     },
     data() {
         return {
+            Lang,
             UserPlusIcon,
             UserIcon,
             ChevronLeftIcon,
-            CheckIcon
+            CheckIcon,
+            shownPanel: 'home-panel'
         };
     },
     mounted() {
+        if (User.CurrentUser) {
+            this.$router.push({ name: 'My' });
+            return;
+        }
+
         setTimeout(() => {
             this.goToHome('left');
         }, 200);
@@ -195,9 +224,10 @@ export default {
         },
         showPanel(name, direction = (name === 'home-panel' ? 'right' : 'left')) {
             this.hidePanel(direction);
+            this.shownPanel = name;
 
             setTimeout(() => {
-                const panels = ['home-panel', 'register-panel', 'login-panel'];
+                const panels = ['home-panel', 'signup-panel', 'login-panel'];
                 panels.forEach((panelName) => {
                     const panel = this.$refs[panelName];
                     if (!panel) return;
@@ -214,17 +244,139 @@ export default {
         goToHome(dir) {
             this.showPanel('home-panel', dir);
         },
-        goToRegister() {
-            this.showPanel('register-panel');
+        goTosignup() {
+            this.showPanel('signup-panel');
         },
         goToLogin() {
             this.showPanel('login-panel');
         },
-        login() {
-            this.$router.push('/my'); // TODO
+        async login() {
+            const logZone = this.$refs['login-log-zone'];
+            const log = logZone.log('', Logs.INFO);
+            Lang.GetTextAsync(Lang.CreateTranslationContext('verbs', 'LoggingIn')).then(text => {
+                log.update(text);
+            });
+
+            const username = document.querySelector('input[name=username]');
+            const password = document.querySelector('input[name=password]');
+
+            if (!username.value) {
+                log.update(await Lang.GetTextAsync(Lang.CreateTranslationContext('errors', 'UsernameRequired')), Logs.WARNING);
+                username.focus();
+                log.delete(4000);
+                return;
+            }
+            if (!password.value) {
+                log.update(await Lang.GetTextAsync(Lang.CreateTranslationContext('errors', 'PasswordRequired')), Logs.WARNING);
+                password.focus();
+                log.delete(4000);
+                return;
+            }
+
+            try {
+                const response = await API.execute(API.ROUTE.LOGIN(), API.METHOD.POST, {
+                    username: username.value,
+                    password: password.value
+                });
+                
+                const user = new User({ token: response.token });
+                await user.fetchInformations();
+                user.save();
+
+                log.update(await Lang.GetTextAsync(Lang.CreateTranslationContext('verbs', 'LoggedIn')), Logs.SUCCESS);
+                log.delete(2000);
+                setTimeout(() => {
+                    this.$router.push({ name: 'My' })
+                }, 1000);
+            } catch (err) {
+                switch (err.status) {
+                case 401:
+                    log.update(await Lang.GetTextAsync(Lang.CreateTranslationContext('errors', 'InvalidCredentials')), Logs.ERROR);
+                    log.delete(4000);
+                    break;
+                default:
+                    log.update(await Lang.GetTextAsync(Lang.CreateTranslationContext('errors', 'Unknown', {msg: err.message})), Logs.ERROR);
+                    log.delete(4000);
+                    break;
+                }
+            }
         },
-        register() {
-            this.$router.push('/my'); // TODO
+        async signup() {
+            const logZone = this.$refs['signup-log-zone'];
+            const log = logZone.log('', Logs.INFO);
+            Lang.GetTextAsync(Lang.CreateTranslationContext('verbs', 'SigningUp')).then(text => {
+                log.update(text);
+            });
+
+            const username = document.querySelector('input[name=username]');
+            const email = document.querySelector('input[name=email]');
+            const password = document.querySelector('input[name=password]');
+            const confirm = document.querySelector('input[name=password-confirm]');
+
+            if (!username.value) {
+                log.update(await Lang.GetTextAsync(Lang.CreateTranslationContext('errors', 'UsernameRequired')), Logs.WARNING);
+                username.focus();
+                log.delete(4000);
+                return;
+            }
+            if (!password.value) {
+                log.update(await Lang.GetTextAsync(Lang.CreateTranslationContext('errors', 'PasswordRequired')), Logs.WARNING);
+                password.focus();
+                log.delete(4000);
+                return;
+            }
+            if (!email.value) {
+                log.update(await Lang.GetTextAsync(Lang.CreateTranslationContext('errors', 'EmailRequired')), Logs.WARNING);
+                email.focus();
+                log.delete(4000);
+                return;
+            }
+            if (!confirm.value) {
+                log.update(await Lang.GetTextAsync(Lang.CreateTranslationContext('errors', 'ConfirmRequired')), Logs.WARNING);
+                confirm.focus();
+                log.delete(4000);
+                return;
+            }
+            if (confirm.value !== password.value) {
+                log.update(await Lang.GetTextAsync(Lang.CreateTranslationContext('errors', 'ConfirmInvalid')), Logs.ERROR);
+                confirm.focus();
+                log.delete(4000);
+                return;
+            }
+
+            try {
+                const response = await API.execute(API.ROUTE.SIGNUP(), API.METHOD.POST, {
+                    username: username.value,
+                    email: email.value,
+                    password: password.value
+                });
+
+                await API.execute(API.ROUTE.LOGIN(), API.METHOD.POST, {
+                    username: username.value,
+                    password: password.value
+                });
+                
+                const user = new User({ token: response.token });
+                await user.fetchInformations();
+                user.save();
+
+                log.update(await Lang.GetTextAsync(Lang.CreateTranslationContext('verbs', 'SignedUp')), Logs.SUCCESS);
+                log.delete(2000);
+                setTimeout(() => {
+                    this.$router.push({ name: 'My' })
+                }, 1000);
+            } catch (err) {
+                switch (err.status) {
+                case 401:
+                    log.update(await Lang.GetTextAsync(Lang.CreateTranslationContext('errors', 'InvalidCredentials')), Logs.ERROR);
+                    log.delete(4000);
+                    break;
+                default:
+                    log.update(await Lang.GetTextAsync(Lang.CreateTranslationContext('errors', 'Unknown', {msg: err.message})), Logs.ERROR);
+                    log.delete(4000);
+                    break;
+                }
+            }
         }
     }
 }
