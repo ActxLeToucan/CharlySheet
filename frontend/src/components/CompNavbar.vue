@@ -1,18 +1,21 @@
 <template>
     <div class="show-down flex h-fit border-b-2 border-slate-800 p-2">
         <div class="flex items-center w-[30%]">
-            <button
+            <!-- <button
                 class="text-indigo-600 dark:text-indigo-400 p-1.5 rounded-lg hover:bg-slate-200 hover:dark:bg-slate-600 hover:text-slate-700 hover:dark:text-slate-200 transition-all"
                 @click="() => $router.go(-1)"
             >
                 <chevron-left-icon class="w-6 md:w-8" />
-            </button>
+            </button> -->
         </div>
         <div class="flex items-center mx-auto">
             <comp-title>CharlySheet</comp-title>
         </div>
         <div class="flex items-center w-[30%] justify-end">
-            <button class="text-indigo-600 dark:text-indigo-400 p-1.5 rounded-lg hover:bg-slate-200 hover:dark:bg-slate-600 hover:text-slate-700 hover:dark:text-slate-200 transition-all">
+            <button
+                class="text-indigo-600 dark:text-indigo-400 p-1.5 rounded-lg hover:bg-slate-200 hover:dark:bg-slate-600 hover:text-slate-700 hover:dark:text-slate-200 transition-all"
+                @click="disconnect"
+            >
                 <user-icon class="w-6 md:w-8" />
             </button>
         </div>
@@ -24,15 +27,16 @@ import CompTitle from './CompTitle.vue'
 
 import {
     UserIcon,
-    ChevronLeftIcon
+    // ChevronLeftIcon
 } from '@heroicons/vue/24/outline';
+import User from '../scripts/User';
 
 export default {
     name: "CompNavbar",
     components: {
         CompTitle,
         UserIcon,
-        ChevronLeftIcon
+        // ChevronLeftIcon
     },
     data() {
         return {
@@ -43,7 +47,10 @@ export default {
         
     },
     methods: {
-        
+        disconnect() {
+            User.forget();
+            this.$router.push({ name: 'Home' });
+        }
     }
 }
 </script>
