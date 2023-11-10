@@ -1,3 +1,5 @@
+import mongoose from 'mongoose';
+
 import { HttpException } from '../exceptions/HttpException.js';
 import { Sheet } from '../models/sheet.model.js';
 import User from '../models/user.model.js';
@@ -27,6 +29,15 @@ class SheetController {
             const { user } = req;
             const sheets = await Sheet.find({ owner: user._id });
             res.status(200).json(sheets);
+        } catch (error) {
+            next(error);
+        }
+    };
+    getSharedSheets = async (req, res, next) => {
+        try {
+            const { user } = req;
+            const sharedSheets = await Sheet.find({ users: user._id });
+            res.json(sharedSheets);
         } catch (error) {
             next(error);
         }
