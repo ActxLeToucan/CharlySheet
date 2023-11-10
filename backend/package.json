@@ -1,0 +1,65 @@
+{
+  "name": "charlysheet",
+  "version": "1.0.0",
+  "description": "Google Sheets like. 4th year computer science student project at the Faculty of Science and Technology in Nancy. ",
+  "main": "src/server.js",
+  "type": "module",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node src/server.js",
+    "dev": "nodemon --config nodemon.json",
+    "prod": "npm ci ; docker compose up --build -d"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ActxLeToucan/CharlySheet.git"
+  },
+  "keywords": [
+    "sheet",
+    "charlemagne",
+    "school",
+    "API",
+    "REST"
+  ],
+  "author": "",
+  "license": "LGPL-2.1",
+  "bugs": {
+    "url": "https://github.com/ActxLeToucan/CharlySheet/issues"
+  },
+  "homepage": "https://github.com/ActxLeToucan/CharlySheet#readme",
+  "dependencies": {
+    "bcryptjs": "^2.4.3",
+    "compression": "^1.7.4",
+    "cors": "^2.8.5",
+    "dotenv": "^16.3.1",
+    "envalid": "^8.0.0",
+    "express": "^4.18.2",
+    "helmet": "^7.0.0",
+    "hpp": "^0.2.3",
+    "joi": "^17.11.0",
+    "mongoose": "^7.6.3",
+    "mongoose-unique-validator": "^4.0.0",
+    "morgan": "^1.10.0",
+    "passport": "^0.6.0",
+    "passport-jwt": "^4.0.1",
+    "passport-local": "^1.0.0",
+    "passport-local-mongoose": "^8.0.0",
+    "socket.io": "^4.7.2",
+    "swagger-jsdoc": "^6.2.8",
+    "swagger-ui-express": "^5.0.0",
+    "winston": "^3.11.0",
+    "winston-daily-rotate-file": "^4.7.1"
+  },
+  "devDependencies": {
+    "eslint": "^8.7.0",
+    "eslint-config-prettier": "^9.0.0",
+    "eslint-plugin-n": "^16.2.0",
+    "eslint-plugin-simple-import-sort": "^10.0.0",
+    "nodemon": "^3.0.1",
+    "prettier": "^2.5.1"
+  },
+  "optionalDependencies": {
+    "bufferutil": "^4.0.7",
+    "utf-8-validate": "^5.0.10"
+  }
+}

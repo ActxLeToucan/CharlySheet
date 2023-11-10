@@ -1,0 +1,26 @@
+version: '3.8'
+
+services:
+  charlysheet-backend:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      args:
+        NODE_VERSION: 'lts'
+    restart: always
+    ports:
+      - "127.0.0.1:3000:3000"
+    environment:
+      LOG_DIR: '/logs'
+      LOG_FORMAT: 'dev'
+      ORIGIN: '*'
+  mongo:
+    image: mongo
+    restart: always
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: ${MONGO_USERNAME}
+      MONGO_INITDB_ROOT_PASSWORD: ${MONGO_PASSWORD}
+    ports:
+      - "27017:27017"
+    volumes:
+      - ./data/db:/data/db
