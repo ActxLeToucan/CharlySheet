@@ -4,14 +4,14 @@
             v-if="label"
             class="flex text-lg font-semibold grow min-h-fit pr-10"
         >
-            {{ label }}
+            <get-text :context="label" />
         </p>
         <input
             class="flex p-1 w-fit h-fit border-2 rounded-md text-slate-700 dark:text-white bg-white dark:bg-slate-800 overflow-hidden transition-all"
             :class="`bg-${color}-500 border-${color}-500 ` + (disabled ? `opacity-50 cursor-default` : `hover:text-${color}-500 hover:dark:text-${color}-500 hover:shadow-slate-300 hover:dark:shadow-slate-800`)"
-            :placeholder="placeholder"
+            :placeholder="placeholder_str"
             :type="type"
-            :value="value"
+            :value="value_str"
             :name="name"
         >
         <span
@@ -25,10 +25,13 @@
 </template>
 
 <script>
+import Lang from '../scripts/Lang';
+import GetText from './text/GetText.vue';
 
 export default {
     name: "CompButton",
     components: {
+        GetText
         
     },
     props: {
@@ -41,15 +44,15 @@ export default {
             default: false
         },
         label: {
-            type: String,
+            type: [String, Object],
             default: ''
         },
         placeholder: {
-            type: String,
+            type: [String, Object],
             default: ''
         },
         value: {
-            type: String,
+            type: [String, Object],
             default: ''
         },
         type: {
@@ -62,12 +65,30 @@ export default {
         }
     },
     data() {
-        return {};
+        return {
+            placeholder_str: '',
+            value_str: ''
+        };
+    },
+    watch: {
+        placeholder() {
+            this.loadPlaceholderTranslations();
+        },
+        value() {
+            this.loadValueTranslations();
+        }
     },
     mounted() {
-
+        this.loadPlaceholderTranslations();
+        this.loadValueTranslations();
     },
     methods: {
+        async loadPlaceholderTranslations() {
+            this.placeholder_str = await Lang.GetTextAsync(this.placeholder);
+        },
+        async loadValueTranslations() {
+            this.value_str = await Lang.GetTextAsync(this.value);
+        },
         triggerOnClick(ev) {
             if (!this.disabled) {
                 this.onclick(ev);
