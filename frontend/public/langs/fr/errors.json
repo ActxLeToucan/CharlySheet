@@ -1,0 +1,9 @@
+{
+    "Unknown": "Une erreur inconnue s'est produite : {msg}",
+    "UsernameRequired": "Le nom d'utilisateur est requis",
+    "PasswordRequired": "Le mot de passe est requis",
+    "ConfirmRequired": "La confirmation du mot de passe est requise",
+    "ConfirmInvalid": "La confirmation du mot de passe doit correspondre au mot de passe",
+    "EmailRequired": "L'adresse e-mail est requise",
+    "InvalidCredentials": "Nom d'utilisateur ou mot de passe invalide"
+}
