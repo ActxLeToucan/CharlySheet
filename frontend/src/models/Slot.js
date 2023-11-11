@@ -16,7 +16,7 @@ export default class Slot {
     /** @type {string} slot formula */
     #formula = '';
     
-    constructor(infos) {
+    constructor() {
         this.#users = [];
         this.#formula = Slot.DEFAULT_FORMULA;
     }
@@ -97,6 +97,6 @@ export default class Slot {
      * @returns A string representing the result of the formula
      */
     get result() {
-        return '<result>' // TODO : implement
+        return '' // TODO : implement
     }
 }
