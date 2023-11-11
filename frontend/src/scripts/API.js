@@ -6,7 +6,7 @@ class Credentials {
     token = "";
 
     constructor(token) {
-        if (!typeof(token) === "string" || token == "") {
+        if (typeof(token) !== "string" || token == "") {
             console.error("Error: Invalid token given to Credentials constructor");
             return;
         }
@@ -86,7 +86,7 @@ class API {
      * @param {object[]} headers API call additional headers
      * @returns a promise resolving when the API call is done
      */
-    static execute(path, method = this.METHOD.GET, body = {}, type = this.TYPE.JSON, headers = {}) {
+    static execute(path, method = this.METHOD.GET, body = {}, type = this.TYPE.JSON, headers = []) {
         return new Promise((resolve, reject) => {
             if (!API.API_URL) reject("Error : API host not set");
             path = path.replace("/?", "?").replace(/\/\//g, "/");
@@ -111,7 +111,7 @@ class API {
                 case "string":
                     if (body.startsWith("{") && body.endsWith("}"))
                         body = JSON.parse(body);
-                    // pas de break, pour faire le traitement "object" suivant
+                    // @SuppressWarnings("fallthrough") pas de break, pour faire le traitement "object" suivant
                 case "object":
                     if (type == this.TYPE_FORM)
                         reqBody = new URLSearchParams(body).toString();
@@ -132,13 +132,13 @@ class API {
                         status: err.status,
                         message: data.error.message ?? 'Unknown error'
                     });
-                }).catch(jsonerr => {
-                    err.text().then(text => {
+                }).catch(_ => {
+                    err.text().then(_ => {
                         reject({
                             status: err.status,
                             message: err.message ?? err.text()
                         });
-                    }).catch(texterr => {
+                    }).catch(_ => {
                         reject({
                             status: err.status,
                             message: err.statusText ?? 'Unknown error'
@@ -170,14 +170,13 @@ class API {
      * Makes a logged API call with the specified parameters, using the specified credentials (token + token type / username + password)
      * @param {string} path API call url path (see API.ROUTES for possible routes)
      * @param {string} method API call method (see API.METHOD for possible values)
-     * @param {Credentials} credentials API call credentials to use (use User.currentUser.getCredentials() to get the current user's credentials)
      * @param {object|string} body API call body (data to send, ignored if METHOD.GET is used)
      * @param {string} type API call data type (see API.TYPE for possible values)
-     * @param {object[]} headers API call additionnal headers
-     * @param {object[]} user User to use for the API call (by default User.currentUser)
+     * @param {object[]} headers API call additional headers
+     * @param {object} user User to use for the API call (by default User.currentUser)
      * @returns A promise resolving when the API call is done
      */
-    static execute_logged(path, method = API.METHOD.GET, body = {}, type = this.TYPE.JSON, headers = {}, user = User.CurrentUser) {
+    static execute_logged(path, method = API.METHOD.GET, body = {}, type = this.TYPE.JSON, headers = [], user = User.CurrentUser) {
         return new Promise((resolve, reject) => {
             const credentials = user.getCredentials();
             if (!credentials) {
@@ -212,7 +211,8 @@ class API {
         case "string":
             if (params.startsWith("?")) return params;
             if (params.startsWith("{") && params.endsWith("}"))
-                params = JSON.parse(params);
+                params = JSON.parse(String(params));
+            // @SuppressWarnings("fallthrough") pas de break, pour faire le traitement "object" suivant
         case "object":
             return "?" + new URLSearchParams(params).toString();
         default:
