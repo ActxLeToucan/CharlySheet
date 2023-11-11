@@ -68,8 +68,13 @@ export default class Lang {
     }
 
     static #getBrowserLanguageCode() {
-        if (!this.#browserLanguageCode)
+        if (!this.#browserLanguageCode) {
             this.#retreiveBrowserLanguageCode();
+            window.addEventListener("languagechange", () => {
+                this.#retreiveBrowserLanguageCode();
+                this.#onlanguageChangeEvents.forEach(callback => callback(this.#browserLanguageCode));
+            });
+        }
         return this.#browserLanguageCode;
     }
 
