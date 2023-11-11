@@ -2,11 +2,11 @@
     <div class="flex grow flex-col min-h-full h-full max-w-full w-full">
         <div class="flex p-2 w-full h-fit items-center justify-center">
             <div class="flex w-fit h-full items-center justify-center pr-2">
-                <document-icon class="w-14 h-full text-slate-500 dark:text-slate-400 bg-slate-200 dark:bg-slate-800 rounded-lg p-1" />
+                <document-icon class="show-right w-14 h-full text-slate-500 dark:text-slate-400 bg-slate-200 dark:bg-slate-800 rounded-lg p-1" />
             </div>
             <div class="flex flex-col w-full h-full">
                 <div class="flex w-full h-fit">
-                    <div class="">
+                    <div class="show-right">
                         <comp-input value="Nouveau document" />
                     </div>
                     <div>
@@ -22,7 +22,7 @@
                 </div>
             </div>
         </div>
-        <div class="flex grow min-h-0 max-h-full bg-slate-200 dark:bg-slate-600">
+        <div class="show-up flex grow min-h-0 max-h-full bg-slate-200 dark:bg-slate-600">
             <div class="flex flex-col grow min-w-0 overflow-hidden">
                 <div class="flex grow h-fit w-full">
                     <span class="min-w-[128px] h-8 border-[2px] border-r-[1px] border-b-[1px] border-slate-300 dark:border-slate-500" />
