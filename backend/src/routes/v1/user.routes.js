@@ -124,11 +124,7 @@ class UserRoutes {
          *             schema:
          *               $ref: '#/components/schemas/Error'
          */
-        this.router.post(
-            `${this.path}/login`,
-            passport.authenticate('local', { session: false }),
-            this.#controller.login
-        );
+        this.router.post(`${this.path}/login`, this.#controller.login);
 
         /**
          * @openapi
