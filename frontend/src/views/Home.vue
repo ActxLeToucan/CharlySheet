@@ -212,6 +212,15 @@ export default {
             return;
         }
 
+        const signupPanel = this.$refs['signup-panel'];
+        const loginPanel = this.$refs['login-panel'];
+        signupPanel.addEventListener('keydown', ev => {
+            if (ev.key === 'Enter') this.signup();
+        });
+        loginPanel.addEventListener('keydown', ev => {
+            if (ev.key === 'Enter') this.login();
+        });
+
         setTimeout(() => {
             this.goToHome('left');
         }, 200);
@@ -345,13 +354,13 @@ export default {
             }
 
             try {
-                const response = await API.execute(API.ROUTE.SIGNUP(), API.METHOD.POST, {
+                await API.execute(API.ROUTE.SIGNUP(), API.METHOD.POST, {
                     username: username.value,
                     email: email.value,
                     password: password.value
                 });
 
-                await API.execute(API.ROUTE.LOGIN(), API.METHOD.POST, {
+                const response = await API.execute(API.ROUTE.LOGIN(), API.METHOD.POST, {
                     username: username.value,
                     password: password.value
                 });
