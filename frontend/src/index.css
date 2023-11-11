@@ -2,13 +2,6 @@
 @tailwind components;
 @tailwind utilities;
 
-::root {
-    --scroll-1: 0;
-    --scroll-2: 0;
-    --scroll-3: 0;
-    --scroll-4: 0;
-}
-
 @keyframes show-up {
     0% { opacity: 0; transform: translateY(20px); }
     100% { opacity: 1; transform: translateY(0); }
