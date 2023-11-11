@@ -144,7 +144,7 @@ export default {
         }
     },
     meta: {
-        title: async (el) => {
+        title: async () => {
             return "Document " + window.location.href.split('/').pop();
         }
     }
