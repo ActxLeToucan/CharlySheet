@@ -1,7 +1,7 @@
 import jwt from 'jsonwebtoken';
 import passport from 'passport';
 
-import { EXPIRES_IN,JWT_SECRET } from '../config/index.js';
+import { EXPIRES_IN, JWT_SECRET } from '../config/index.js';
 import { HttpException } from '../exceptions/HttpException.js';
 import User from '../models/user.model.js';
 
@@ -28,6 +28,15 @@ class UserController {
         const { email, password, username } = req.body;
 
         try {
+            if (await User.find({
+                $or: [{ email }, { username }]
+            }).count() > 0) {
+                throw new HttpException(
+                    409,
+                    'User already exists',
+                    'User already exists'
+                );
+            }
             const user = await User.register(
                 new User({ email, username }),
                 password
