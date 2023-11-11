@@ -1,5 +1,5 @@
 {
-    "Unknown": "An unknown error has occurred : {msg}",
+    "Unknown": "An unknown error has occurred: {msg}",
     "UsernameRequired": "The username is required",
     "PasswordRequired": "The password is required",
     "ConfirmRequired": "The password confirmation is required",
