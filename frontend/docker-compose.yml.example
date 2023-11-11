@@ -2,7 +2,7 @@ version: "3.8"
 name: charlysheet-frontend
 
 services:
-  charlysheet-frontend:
+  web:
     build: .
     ports:
       - "80:80"

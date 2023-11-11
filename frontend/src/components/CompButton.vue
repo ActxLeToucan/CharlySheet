@@ -12,6 +12,7 @@
                 v-if="typeof icon === 'string' && (icon.startsWith('/') || icon.startsWith('http'))"
                 :src="icon"
                 class="h-4"
+                alt=""
             >
             <svg
                 v-else-if="typeof icon === 'string'"

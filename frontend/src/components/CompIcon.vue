@@ -1,7 +1,6 @@
 <template>
     <svg
         xmlns="http://www.w3.org/2000/svg"
-        xmlns:xlink="http://www.w3.org/1999/xlink"
         viewBox="-1 0 153 153"
         stroke="#6366f1"
         stroke-width="10"

@@ -116,7 +116,7 @@ class LogZone {
         this.toadd = [];
 
         this.toremove.forEach(l => {
-            l.dom.style.maxHeight = "0";
+            l.dom.style.maxHeight = "0px";
         });
         this.toremove.forEach(l => {
             setTimeout(() => { l.dom.remove(); }, 500);
