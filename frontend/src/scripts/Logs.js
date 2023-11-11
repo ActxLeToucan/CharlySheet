@@ -84,6 +84,8 @@ class Log {
 }
 
 class LogZone {
+    static DEFAULT_LOG_SIZE = 56;
+
     constructor(dom) {
         this.dom = dom;
         this.logs = [];
@@ -99,7 +101,7 @@ class LogZone {
             return this.dom.children[1].getBoundingClientRect().top -
                        this.dom.children[0].getBoundingClientRect().top;
         default:
-            return 56;
+            return LogZone.DEFAULT_LOG_SIZE;
         }
     }
 
@@ -114,7 +116,7 @@ class LogZone {
         this.toadd = [];
 
         this.toremove.forEach(l => {
-            l.dom.style.maxHeight = "0px";
+            l.dom.style.maxHeight = "0";
         });
         this.toremove.forEach(l => {
             setTimeout(() => { l.dom.remove(); }, 500);

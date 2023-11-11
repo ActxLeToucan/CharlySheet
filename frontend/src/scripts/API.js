@@ -82,7 +82,7 @@ class API {
      * @param {string} path API call url path (see API.ROUTES for possible routes)
      * @param {string} method API call method (see API.METHOD for possible values)
      * @param {object|string} body API call body (data to send, ignored if METHOD.GET is used)
-     * @param {string} type API call data type (see API.TYPE for possible values))  
+     * @param {string} type API call data type (see API.TYPE for possible values)
      * @param {object[]} headers API call additional headers
      * @returns a promise resolving when the API call is done
      */
@@ -172,8 +172,9 @@ class API {
      * @param {string} method API call method (see API.METHOD for possible values)
      * @param {Credentials} credentials API call credentials to use (use User.currentUser.getCredentials() to get the current user's credentials)
      * @param {object|string} body API call body (data to send, ignored if METHOD.GET is used)
-     * @param {string} type API call data type (see API.TYPE for possible values))
+     * @param {string} type API call data type (see API.TYPE for possible values)
      * @param {object[]} headers API call additionnal headers
+     * @param {object[]} user User to use for the API call (by default User.currentUser)
      * @returns A promise resolving when the API call is done
      */
     static execute_logged(path, method = API.METHOD.GET, body = {}, type = this.TYPE.JSON, headers = {}, user = User.CurrentUser) {
