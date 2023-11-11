@@ -233,9 +233,9 @@ export default {
         },
         showPanel(name, direction = (name === 'home-panel' ? 'right' : 'left')) {
             this.hidePanel(direction);
-            this.shownPanel = name;
 
             setTimeout(() => {
+                this.shownPanel = name;
                 const panels = ['home-panel', 'signup-panel', 'login-panel'];
                 panels.forEach((panelName) => {
                     const panel = this.$refs[panelName];
