@@ -1,11 +1,12 @@
 <template>
     <button
-        class="flex bg-white dark:bg-slate-800 w-fit h-fit outline-none border-2 border-transparent rounded-md text-slate-700 dark:text-white dark:shadow-slate-800/[0.5] overflow-hidden transition-all hover-resize"
-        :class="`hover:border-slate-600 focus:outline-${color}-500 ` + (disabled ? `opacity-50 cursor-default` : `hover:text-slate-900 hover:dark:text-white hover:shadow-slate-300 hover:dark:shadow-slate-800`)"
+        class="flex bg-slate-200 dark:bg-slate-800 w-fit h-fit outline-none border-2 border-transparent rounded-md text-slate-700 dark:text-white dark:shadow-slate-800/[0.5] overflow-hidden
+               hover:border-slate-300 hover:dark:border-slate-600 transition-all hover-resize"
+        :class="`focus:outline-${color}-500 ` + (disabled ? `opacity-50 cursor-default` : `hover:text-slate-900 hover:dark:text-white hover:shadow-slate-300 hover:dark:shadow-slate-800`)"
         @click="triggerOnClick"
     >
         <div
-            class="flex grow w-fit justify-center items-center py-1 px-2 hover-maximize transition-all rounded-r-sm"
+            class="flex grow w-fit justify-center items-center py-1 px-2 hover-maximize transition-all rounded-r"
             :class="`bg-${color}-500 ` + (disabled? '' : '')"
         >
             <img
