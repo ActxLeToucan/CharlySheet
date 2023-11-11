@@ -25,7 +25,7 @@
         <div class="flex grow min-h-0 max-h-full bg-slate-200 dark:bg-slate-600">
             <div class="flex flex-col grow min-w-0 overflow-hidden">
                 <div class="flex grow h-fit w-full">
-                    <span class="min-w-[128px] h-8 border-[2px] border-r-[1px] border-slate-300 dark:border-slate-500" />
+                    <span class="min-w-[128px] h-8 border-[2px] border-r-[1px] border-b-[1px] border-slate-300 dark:border-slate-500" />
                     <div
                         ref="col-bar"
                         class="flex w-full h-fit overflow-hidden"
@@ -34,7 +34,7 @@
                             <div
                                 v-for="col in nbCols"
                                 :key="col"
-                                class="w-32 h-8 items-center justify-center border-y-[2px] border-x-[1px] border-slate-300 dark:border-slate-500"
+                                class="w-32 h-8 items-center justify-center border-t-[2px] border-[1px] border-slate-300 dark:border-slate-500"
                             >
                                 <p class="flex grow w-full h-full h-full justify-center items-center">
                                     {{ getIndexName(col - 1) }}
