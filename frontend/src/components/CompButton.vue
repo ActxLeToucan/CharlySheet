@@ -1,12 +1,12 @@
 <template>
     <button
-        class="flex w-fit h-fit border-2 rounded-md text-slate-700 dark:text-white dark:shadow-slate-800/[0.5] overflow-hidden transition-all"
-        :class="`bg-${color}-500 border-${color}-500 ` + (disabled ? `opacity-50 cursor-default` : `hover:text-${color}-500 hover:dark:text-${color}-500 hover:shadow-slate-300 hover:dark:shadow-slate-800`)"
+        class="flex bg-white dark:bg-slate-800 w-fit h-fit outline-none border-2 border-transparent rounded-md text-slate-700 dark:text-white dark:shadow-slate-800/[0.5] overflow-hidden transition-all hover-resize"
+        :class="`hover:border-slate-600 focus:outline-${color}-500 ` + (disabled ? `opacity-50 cursor-default` : `hover:text-slate-900 hover:dark:text-white hover:shadow-slate-300 hover:dark:shadow-slate-800`)"
         @click="triggerOnClick"
     >
         <div
-            class="flex grow w-fit justify-center items-center py-1 px-2 pr-1.5"
-            :class="disabled? '' : 'shifted'"
+            class="flex grow w-fit justify-center items-center py-1 px-2 hover-maximize transition-all rounded-r-sm"
+            :class="`bg-${color}-500 ` + (disabled? '' : '')"
         >
             <img
                 v-if="typeof icon === 'string' && (icon.startsWith('/') || icon.startsWith('http'))"
@@ -29,16 +29,15 @@
                 class="h-5 text-slate-200 transition-all"
             />
         </div>
-        <span class="flex grow -skew-x-12 transform-gpu bg-white dark:bg-slate-800 w-2 translate-x-1" />
-        <p class="flex font-semibold grow min-h-fit py-1 pl-2 px-4 bg-white dark:bg-slate-800">
+        <p class="flex font-semibold grow min-h-fit py-1 px-4 hover-minimize transition-all">
             <slot />
         </p>
         <span
-            class="hidden bg-indigo-500 border-indigo-500 hover:text-indigo-500 hover:dark:text-indigo-500
-                   bg-red-500    border-red-500    hover:text-red-500    hover:dark:text-red-500
-                   bg-green-500  border-green-500  hover:text-green-500  hover:dark:text-green-500
-                   bg-blue-500   border-blue-500   hover:text-blue-500   hover:dark:text-blue-500
-                   bg-yellow-500 border-yellow-500 hover:text-yellow-500 hover:dark:text-yellow-500"
+            class="hidden bg-indigo-500 hover:border-indigo-500
+                   bg-red-500           hover:border-red-500   
+                   bg-green-500         hover:border-green-500 
+                   bg-blue-500          hover:border-blue-500  
+                   bg-yellow-500        hover:border-yellow-500"
         /> <!-- useless, just for tailwind to generate classes -->
     </button>
 </template>
@@ -93,10 +92,10 @@ export default {
 </script>
 
 <style scoped>
-button > .shifted {
-    @apply translate-x-0 w-9 transition-all
+.hover-resize:hover > .hover-maximize {
+    @apply px-3;
 }
-button:hover > .shifted {
-    @apply -translate-x-1 w-10
+.hover-resize:hover > .hover-minimize {
+    @apply pl-3 pr-3;
 }
 </style>

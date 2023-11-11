@@ -7,8 +7,8 @@
             <get-text :context="label" />
         </p>
         <input
-            class="bg-slate-200 dark:bg-slate-800 rounded-md p-1 px-2 font-semibold placeholder-slate-400 dark:placeholder-slate-500
-                   outline-2 hover:outline hover:outline-slate-300 hover:dark:outline-slate-600 focus:outline focus:outline-indigo-500"
+            class="bg-slate-200 dark:bg-slate-800 rounded-md p-1 px-2 font-semibold placeholder-slate-400 dark:placeholder-slate-500 outline-none
+                   border-2 border-transparent hover:dark:border-slate-600 hover:border-slate-300 focus:outline focus:outline-indigo-500 transition-all"
             :placeholder="placeholder_str"
             :type="type"
             :value="value_str"
