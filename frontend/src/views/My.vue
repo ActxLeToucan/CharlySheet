@@ -10,7 +10,7 @@
                     :style="'animation-delay: '+index+'00ms;'"
                 >
                     <p class="text-2xl font-semibold tracking-wide">
-                        {{ categ.name }}
+                        <get-text :context="categ.name" />
                     </p>
                     <div class="flex w-full overflow-auto">
                         <div class="flex w-fit space-x-4 py-3">
@@ -33,10 +33,12 @@ import CompNavbar from '../components/CompNavbar.vue';
 import CompDoccard from '../components/CompDoccard.vue';
 import CompNewdoccard from '../components/CompNewdoccard.vue';
 import User from '../models/User';
+import Lang from '../scripts/Lang';
+import GetText from '../components/text/GetText.vue';
 
 const categs = [
     {
-        name: 'Récents',
+        name: Lang.CreateTranslationContext('my', 'Recent'),
         docs: [
             {
                 id: 1,
@@ -49,7 +51,7 @@ const categs = [
         ]
     },
     {
-        name: 'Mes tableaux personnels',
+        name: Lang.CreateTranslationContext('my', 'Personnal'),
         docs: [
             {
                 id: 1,
@@ -63,7 +65,7 @@ const categs = [
         showNewCard: true
     },
     {
-        name: 'Tableaux partagés avec moi',
+        name: Lang.CreateTranslationContext('my', 'Shared'),
         docs: [
             {
                 id: 2,
@@ -98,7 +100,8 @@ export default {
     components: {
         CompNavbar,
         CompDoccard,
-        CompNewdoccard
+        CompNewdoccard,
+        GetText
     },
     data() {
         return {
