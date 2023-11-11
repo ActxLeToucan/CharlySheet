@@ -5,7 +5,6 @@
 </template>
 
 <script>
-import EventManager from './scripts/EventManager';
 export default {
     name: "App",
     components: {
