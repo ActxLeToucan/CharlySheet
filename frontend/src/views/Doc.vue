@@ -142,6 +142,11 @@ export default {
         getSlotAt(x, y) {
             return new Slot();
         }
+    },
+    meta: {
+        title: async (el) => {
+            return "Document " + window.location.href.split('/').pop();
+        }
     }
 }
 

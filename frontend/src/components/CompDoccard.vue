@@ -1,6 +1,7 @@
 <template>
-    <router-link
-        :to="'/doc/' + doc.id"
+    <a
+        :href="'/doc/' + doc.id"
+        target="_blank"
         class="flex flex-col justify-center items-center w-40 h-60 md:w-56 md:h-80 border-2 rounded-lg bg-slate-50 dark:bg-slate-700 text-slate-700 dark:text-slate-200 border-slate-200 dark:border-slate-600 overflow-hidden
                 hover:bg-indigo-500/[0.1] hover:dark:bg-indigo-500/[0.1] hover:text-slate-800 hover:dark:text-slate-50 hover:border-indigo-500 hover:dark:border-indigo-500 hover:shadow-lg hover:-translate-y-1 transition-all"
     >
@@ -11,7 +12,7 @@
             <p class="text-lg font-semibold whitespace-nowrap text-ellipsis overflow-hidden"> {{ doc.name }} </p>
             <p class="text-base font-normal whitespace-nowrap text-ellipsis overflow-hidden"> {{ doc.owner.name }} </p>
         </div>
-    </router-link>
+    </a>
 </template>
 
 <script>
