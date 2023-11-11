@@ -1,10 +1,10 @@
 <template>
-    <div class="show-down flex h-fit border-b-2 border-slate-800 p-2">
+    <div class="show-down flex h-fit border-b-2 border-slate-200 dark:border-slate-800 p-2">
         <div class="flex items-center w-[30%]">
             <comp-icon class="w-10" />
         </div>
         <div class="flex items-center mx-auto">
-            <comp-title>
+            <comp-title class="text-slate-600 dark:text-slate-200">
                 <get-text :context="Lang.CreateTranslationContext('my', 'Documents')" />
             </comp-title>
         </div>
