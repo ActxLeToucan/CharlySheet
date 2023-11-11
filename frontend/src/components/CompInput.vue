@@ -7,20 +7,13 @@
             <get-text :context="label" />
         </p>
         <input
-            class="flex p-1 w-fit h-fit border-2 rounded-md text-slate-700 dark:text-white bg-white dark:bg-slate-800 overflow-hidden transition-all"
-            :class="`bg-${color}-500 border-${color}-500 ` + (disabled ? `opacity-50 cursor-default` : `hover:text-${color}-500 hover:dark:text-${color}-500 hover:shadow-slate-300 hover:dark:shadow-slate-800`)"
+            class="bg-slate-200 dark:bg-slate-800 rounded-md p-1 px-2 font-semibold placeholder-slate-400 dark:placeholder-slate-500
+                   outline-2 hover:outline hover:outline-slate-300 hover:dark:outline-slate-600 focus:outline focus:outline-indigo-500"
             :placeholder="placeholder_str"
             :type="type"
             :value="value_str"
             :name="name"
         >
-        <span
-            class="hidden bg-indigo-500 border-indigo-500 hover:text-indigo-500 hover:dark:text-indigo-500
-                    bg-red-500    border-red-500    hover:text-red-500    hover:dark:text-red-500
-                    bg-green-500  border-green-500  hover:text-green-500  hover:dark:text-green-500
-                    bg-blue-500   border-blue-500   hover:text-blue-500   hover:dark:text-blue-500
-                    bg-yellow-500 border-yellow-500 hover:text-yellow-500 hover:dark:text-yellow-500"
-        /> <!-- useless, just for tailwind to generate classes -->
     </div>
 </template>
 
