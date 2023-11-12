@@ -23,7 +23,7 @@ Pour lancer le serveur, exécutez la commande ```npm run start```.
 
 ### Docker
 Dupliquer le fichier [`docker-compose.yml.dist`](docker-compose.yml.dist), le renommer en `docker-compose.yml`.\
-Configurer les variables d'environnement manquantes, et si beosin, modifier la configuration.
+Configurer les variables d'environnement manquantes, et si besoin, modifier la configuration.
 
 Exécuter la commande ```npm run prod``` pour construire et lancer l'image docker de l'application.
 
