@@ -9,17 +9,24 @@ services:
       args:
         NODE_VERSION: 'lts'
     restart: always
+    depends_on:
+      - mongo
     ports:
       - "127.0.0.1:3000:3000"
     environment:
       LOG_DIR: '/logs'
       LOG_FORMAT: 'dev'
       ORIGIN: '*'
+      MONGO_URI: mongodb://root:motdepasse@localhost:27017/charlysheet?authMechanism=default&authSource=admin # TODO: change this
+    networks:
+      - charlysheet-backend-network
   mongo:
     image: mongo
     restart: always
     environment:
-      MONGO_INITDB_ROOT_USERNAME: ${MONGO_USERNAME}
-      MONGO_INITDB_ROOT_PASSWORD: ${MONGO_PASSWORD}
+      MONGO_INITDB_ROOT_USERNAME: root # TODO: change this
+      MONGO_INITDB_ROOT_PASSWORD: motdepasse # TODO: change this
     volumes:
       - ./data/db:/data/db
+    networks:
+      - charlysheet-backend-network
