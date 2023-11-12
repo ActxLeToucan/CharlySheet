@@ -1,7 +1,7 @@
 import { Router } from 'express';
-import passport from 'passport';
 
 import UserController from '../../controllers/user.controller.js';
+import authenticateJWT from '../../middlewares/authenticateJWT.middleware.js';
 import validate from '../../middlewares/validator.middleware.js';
 import {
     loginSchema,
@@ -74,10 +74,9 @@ class UserRoutes {
          */
         this.router.get(
             `${this.path}/me`,
-            passport.authenticate('jwt', { session: false }),
+            authenticateJWT,
             this.#controller.me
         );
-        //form with username and password
 
         /**
          * @openapi
