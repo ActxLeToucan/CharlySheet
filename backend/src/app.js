@@ -61,6 +61,7 @@ class App {
      * Initialise l'ensemble de l'application
      */
     async initialize() {
+        logger.info('Initializing application...');
         this.#initializeMiddlewares();
         this.#initializeRoutes();
         this.#initializeErrorHandling();

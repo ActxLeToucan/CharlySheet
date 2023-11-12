@@ -14,12 +14,14 @@ services:
     ports:
       - "127.0.0.1:3000:3000"
     environment:
+      WAIT_HOSTS: mongo:27017
+      WAIT_HOSTS_TIMEOUT: 300
+      WAIT_SLEEP_INTERVAL: 5
+      WAIT_HOST_CONNECT_TIMEOUT: 5
       LOG_DIR: '/logs'
       LOG_FORMAT: 'dev'
       ORIGIN: '*'
-      MONGO_URI: mongodb://root:motdepasse@localhost:27017/charlysheet?authMechanism=default&authSource=admin # TODO: change this
-    networks:
-      - charlysheet-backend-network
+      MONGO_URI: mongodb://root:motdepasse@mongo:27017/charlysheet?authMechanism=default&authSource=admin # TODO: change this
   mongo:
     image: mongo
     restart: always
@@ -27,6 +29,4 @@ services:
       MONGO_INITDB_ROOT_USERNAME: root # TODO: change this
       MONGO_INITDB_ROOT_PASSWORD: motdepasse # TODO: change this
     volumes:
-      - ./data/db:/data/db
-    networks:
-      - charlysheet-backend-network
+      - ./data/prod/db:/data/db
