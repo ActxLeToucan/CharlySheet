@@ -4,6 +4,7 @@ import passport from 'passport';
 import UserController from '../../controllers/user.controller.js';
 import validate from '../../middlewares/validator.middleware.js';
 import {
+    loginSchema,
     newUserSchema,
     userIdentifierSchema
 } from '../../validators/user.validator.js';
@@ -46,11 +47,7 @@ class UserRoutes {
          *             schema:
          *               $ref: '#/components/schemas/Error'
          *       422:
-         *         description: Validation error
-         *         content:
-         *           application/json:
-         *             schema:
-         *               $ref: '#/components/schemas/Error'
+         *         $ref: '#/components/responses/errorValidate'
          */
         this.router.post(
             `${this.path}/signup`,
@@ -123,8 +120,14 @@ class UserRoutes {
          *           application/json:
          *             schema:
          *               $ref: '#/components/schemas/Error'
+         *       '422':
+         *         $ref: '#/components/responses/errorValidate'
          */
-        this.router.post(`${this.path}/login`, this.#controller.login);
+        this.router.post(
+            `${this.path}/login`,
+            validate(loginSchema),
+            this.#controller.login
+        );
 
         /**
          * @openapi
@@ -149,11 +152,7 @@ class UserRoutes {
          *             schema:
          *               $ref: '#/components/schemas/Error'
          *       422:
-         *         description: Validation error
-         *         content:
-         *           application/json:
-         *             schema:
-         *               $ref: '#/components/schemas/Error'
+         *         $ref: '#/components/responses/errorValidate'
          */
         this.router.get(
             `${this.path}/:username`,
