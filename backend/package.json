@@ -9,7 +9,7 @@
     "start": "node src/server.js",
     "dev": "nodemon --config nodemon.json",
     "dev:db": "docker compose --file docker-compose.dev.yml up --build -d",
-    "prod": "npm ci --omit=dev ; docker compose up --build -d"
+    "prod": "docker compose up --build -d"
   },
   "repository": {
     "type": "git",

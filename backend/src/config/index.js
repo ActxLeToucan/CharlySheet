@@ -26,10 +26,6 @@ export const {
      */
     LOG_FORMAT,
     /**
-     * @type {number}
-     */
-    PASSWORD_SALT,
-    /**
      * @type {string}
      */
     JWT_SECRET,
