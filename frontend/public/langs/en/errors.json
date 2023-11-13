@@ -1,0 +1,9 @@
+{
+    "Error": "Error",
+    "Unknown": "An unknown error has occurred: {msg}",
+    "UsernameRequired": "The username is required",
+    "PasswordRequired": "The password is required",
+    "ConfirmRequired": "The password confirmation is required",
+    "EmailRequired": "The email is required",
+    "InvalidCredentials": "Invalid credentials"
+}

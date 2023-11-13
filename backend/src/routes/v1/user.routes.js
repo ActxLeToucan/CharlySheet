@@ -1,9 +1,10 @@
 import { Router } from 'express';
-import passport from 'passport';
 
 import UserController from '../../controllers/user.controller.js';
+import authenticateJWT from '../../middlewares/authenticateJWT.middleware.js';
 import validate from '../../middlewares/validator.middleware.js';
 import {
+    loginSchema,
     newUserSchema,
     userIdentifierSchema
 } from '../../validators/user.validator.js';
@@ -46,11 +47,7 @@ class UserRoutes {
          *             schema:
          *               $ref: '#/components/schemas/Error'
          *       422:
-         *         description: Validation error
-         *         content:
-         *           application/json:
-         *             schema:
-         *               $ref: '#/components/schemas/Error'
+         *         $ref: '#/components/responses/errorValidate'
          */
         this.router.post(
             `${this.path}/signup`,
@@ -77,10 +74,9 @@ class UserRoutes {
          */
         this.router.get(
             `${this.path}/me`,
-            passport.authenticate('jwt', { session: false }),
+            authenticateJWT,
             this.#controller.me
         );
-        //form with username and password
 
         /**
          * @openapi
@@ -123,23 +119,12 @@ class UserRoutes {
          *           application/json:
          *             schema:
          *               $ref: '#/components/schemas/Error'
+         *       '422':
+         *         $ref: '#/components/responses/errorValidate'
          */
         this.router.post(
             `${this.path}/login`,
-            passport.authenticate('local', { session: false },(err, user, info) => {
-                if (err) {
-                    return next(err);
-                }
-                if (!user) {
-                    return res.status(401).json({ success: false, message: 'Authentication failed' });
-                }
-                req.logIn(user, function(err) {
-                    if (err) {
-                        return next(err);
-                    }
-                    return res.status(200).json({ success: true, token: `Bearer ${token}` });
-                });
-            }),
+            validate(loginSchema),
             this.#controller.login
         );
 
@@ -166,11 +151,7 @@ class UserRoutes {
          *             schema:
          *               $ref: '#/components/schemas/Error'
          *       422:
-         *         description: Validation error
-         *         content:
-         *           application/json:
-         *             schema:
-         *               $ref: '#/components/schemas/Error'
+         *         $ref: '#/components/responses/errorValidate'
          */
         this.router.get(
             `${this.path}/:username`,

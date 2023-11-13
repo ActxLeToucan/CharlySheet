@@ -74,3 +74,31 @@ export const arrayOfUserIdsSchema = {
     joiSchema: Joi.array().items(Joi.string().required().min(24).max(24)),
     location: 'body'
 };
+
+/**
+ * @openapi
+ * components:
+ *   requestBodies:
+ *     login:
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               username:
+ *                 type: string
+ *                 minLength: 3
+ *                 maxLength: 20
+ *                 description: Username of the user
+ *               password:
+ *                 type: string
+ *                 minLength: 8
+ *                 description: Password of the user
+ */
+export const loginSchema = {
+    joiSchema: Joi.object({
+        username: Joi.string().required().min(3).max(20),
+        password: Joi.string().required().min(8)
+    }),
+    location: 'body'
+};

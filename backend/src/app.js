@@ -7,18 +7,10 @@ import { createServer } from 'http';
 import { connect } from 'mongoose';
 import morgan from 'morgan';
 import passport from 'passport';
-import { ExtractJwt } from 'passport-jwt';
-import { Strategy as JwtStrategy } from 'passport-jwt';
+import { ExtractJwt, Strategy as JwtStrategy } from 'passport-jwt';
 import { Server } from 'socket.io';
 
-import {
-    JWT_SECRET,
-    LOG_FORMAT,
-    MONGO_URI,
-    NODE_ENV,
-    ORIGIN,
-    PORT
-} from './config/index.js';
+import { JWT_SECRET, LOG_FORMAT, MONGO_URI, NODE_ENV, ORIGIN, PORT } from './config/index.js';
 import { HttpException } from './exceptions/HttpException.js';
 import SocketIOEventHandlers from './handlers/SocketIOEventHandlers.js';
 import errorMiddleware from './middlewares/error.middleware.js';
@@ -61,6 +53,7 @@ class App {
      * Initialise l'ensemble de l'application
      */
     async initialize() {
+        logger.info('Initializing application...');
         this.#initializeMiddlewares();
         this.#initializeRoutes();
         this.#initializeErrorHandling();
@@ -98,6 +91,9 @@ class App {
 
         // V1 de l'API: /v1
         this.app.use('/', new RouterV1().router);
+
+        // Redirection vers la documentation de la dernière version de l'API
+        this.app.get('/', (_, res) => res.redirect('/v1/docs'));
 
         // catch 404 and forward to error handler
         this.app.use((req, res, next) => {

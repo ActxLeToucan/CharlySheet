@@ -1,7 +1,7 @@
 import jwt from 'jsonwebtoken';
 import passport from 'passport';
 
-import { EXPIRES_IN,JWT_SECRET } from '../config/index.js';
+import { EXPIRES_IN, JWT_SECRET } from '../config/index.js';
 import { HttpException } from '../exceptions/HttpException.js';
 import User from '../models/user.model.js';
 
@@ -28,6 +28,17 @@ class UserController {
         const { email, password, username } = req.body;
 
         try {
+            if (
+                (await User.find({
+                    $or: [{ email }, { username }]
+                }).count()) > 0
+            ) {
+                throw new HttpException(
+                    409,
+                    'User already exists',
+                    'User already exists'
+                );
+            }
             const user = await User.register(
                 new User({ email, username }),
                 password
@@ -64,18 +75,33 @@ class UserController {
     };
 
     login = (req, res, next) => {
-        try {
-            const token = jwt.sign(
-                { _id: req.user._id, role: req.user.role },
-                JWT_SECRET,
-                {
-                    expiresIn: EXPIRES_IN
+        passport.authenticate(
+            'local',
+            { session: false },
+            (err, user, info) => {
+                if (err) {
+                    return next(err);
                 }
-            );
-            res.status(200).json({ success: true, token: `Bearer ${token}` });
-        } catch (error) {
-            next(error);
-        }
+                if (!user) {
+                    return next(new HttpException(401, info.message));
+                }
+                try {
+                    const token = jwt.sign(
+                        { _id: user._id, role: user.role },
+                        JWT_SECRET,
+                        {
+                            expiresIn: EXPIRES_IN
+                        }
+                    );
+                    res.status(200).json({
+                        success: true,
+                        token: `Bearer ${token}`
+                    });
+                } catch (error) {
+                    next(error);
+                }
+            }
+        )(req, res, next);
     };
 }
 
