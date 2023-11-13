@@ -5,22 +5,35 @@ import User from '../models/user.model.js';
 class SheetController {
     getById = async (req, res, next) => {
         const { id } = req.params;
-
-        Sheet.findOne({ _id: id })
-            .populate('users')
-            .populate('owner')
-            .then((sheet) => {
-                if (!sheet) {
-                    throw new HttpException(
-                        404,
-                        'Sheet not found',
-                        'Sheet not found'
-                    );
-                }
-
-                res.status(200).json(sheet);
-            })
-            .catch(next);
+        const { user } = req;
+        try {
+            const sheet = await Sheet.findOne({ _id: id })
+                .populate('users')
+                .populate('owner');
+            if (!sheet) {
+                throw new HttpException(
+                    404,
+                    'Sheet not found',
+                    'Sheet not found'
+                );
+            }
+            if (
+                // if the user is not the owner of the sheet and is not a user of the sheet
+                sheet.owner._id.toString() !== user._id.toString() &&
+                !sheet.users.some(
+                    (u) => u._id.toString() === user._id.toString()
+                )
+            ) {
+                throw new HttpException(
+                    403,
+                    'You do not have access to this sheet',
+                    'You do not have access to this sheet'
+                );
+            }
+            res.json(sheet.toJSON());
+        } catch (error) {
+            next(error);
+        }
     };
     deleteById = async (req, res, next) => {
         try {
@@ -37,7 +50,7 @@ class SheetController {
             if (sheet.owner.toString() !== user._id.toString()) {
                 throw new HttpException(
                     403,
-                    'Forbidden',
+                    'You are not the owner of this sheet',
                     'You are not the owner of this sheet'
                 );
             }
@@ -112,7 +125,7 @@ class SheetController {
             if (sheet.owner.toString() !== req.user._id.toString()) {
                 throw new HttpException(
                     403,
-                    'Forbidden',
+                    'You are not the owner of this sheet',
                     'You are not the owner of this sheet'
                 );
             }
@@ -141,7 +154,7 @@ class SheetController {
             if (sheet.owner.toString() !== user._id.toString()) {
                 throw new HttpException(
                     403,
-                    'Forbidden',
+                    'You are not the owner of this sheet',
                     'You are not the owner of this sheet'
                 );
             }

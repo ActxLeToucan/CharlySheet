@@ -257,6 +257,8 @@ class RouterSheets {
          * /v1/sheets/{id}:
          *   get:
          *     summary: Get a sheet by ID
+         *     security:
+         *      - bearerAuth: []
          *     tags: [Sheets]
          *     parameters:
          *       - $ref: '#/components/parameters/id'
@@ -304,6 +306,7 @@ class RouterSheets {
         this.router.get(
             `${this.path}/:id`,
             validate(sheetIdentifierSchema),
+            authenticateJWT,
             this.#controller.getById
         );
         /**
