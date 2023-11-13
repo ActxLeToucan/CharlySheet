@@ -9,7 +9,7 @@ import { HttpException } from '../exceptions/HttpException.js';
  * @param next {import('express').NextFunction}
  */
 const authenticateJWT = (req, res, next) => {
-    passport.authenticate('jwt', function (err, user, info) {
+    passport.authenticate('jwt', { session: false }, (err, user, info) => {
         if (err) return next(err);
         if (!user) throw new HttpException(401, info.message);
         req.user = user;

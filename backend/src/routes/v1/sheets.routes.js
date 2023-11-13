@@ -1,8 +1,8 @@
 import { Router } from 'express';
 import Joi from 'joi';
-import passport from 'passport';
 
 import SheetController from '../../controllers/sheet.controller.js';
+import authenticateJWT from '../../middlewares/authenticateJWT.middleware.js';
 import validate from '../../middlewares/validator.middleware.js';
 import {
     sheetIdandUserIdSchema,
@@ -80,7 +80,7 @@ class RouterSheets {
          */
         this.router.get(
             `${this.path}/me`,
-            passport.authenticate('jwt', { session: false }),
+            authenticateJWT,
             this.#controller.getMySheets
         );
 
@@ -111,7 +111,7 @@ class RouterSheets {
          */
         this.router.get(
             `${this.path}/me/shared`,
-            passport.authenticate('jwt', { session: false }),
+            authenticateJWT,
             this.#controller.getSharedSheets
         );
 
@@ -161,7 +161,7 @@ class RouterSheets {
          */
         this.router.post(
             `${this.path}`,
-            passport.authenticate('jwt', { session: false }),
+            authenticateJWT,
             validate(sheetSchema),
             this.#controller.createSheet
         );
@@ -241,7 +241,7 @@ class RouterSheets {
          */
         this.router.put(
             `${this.path}/:id/name`,
-            passport.authenticate('jwt', { session: false }),
+            authenticateJWT,
             validate(sheetIdentifierSchema),
             validate({
                 joiSchema: Joi.object({
@@ -350,7 +350,7 @@ class RouterSheets {
          */
         this.router.delete(
             `${this.path}/:id`,
-            passport.authenticate('jwt', { session: false }),
+            authenticateJWT,
             validate(sheetIdentifierSchema),
             this.#controller.deleteById
         );
@@ -413,7 +413,7 @@ class RouterSheets {
          */
         this.router.post(
             `${this.path}/:id/users`,
-            passport.authenticate('jwt', { session: false }),
+            authenticateJWT,
             validate(sheetIdentifierSchema),
             validate(arrayOfUserIdsSchema),
             this.#controller.addUsers
@@ -469,7 +469,7 @@ class RouterSheets {
          */
         this.router.delete(
             `${this.path}/:id/users/:userId`,
-            passport.authenticate('jwt', { session: false }),
+            authenticateJWT,
             validate(sheetIdandUserIdSchema),
             this.#controller.removeUser
         );
