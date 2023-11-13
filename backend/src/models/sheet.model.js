@@ -5,6 +5,33 @@ import User from './user.model.js';
 /**
  * @openapi
  * components:
+ *  schemas:
+ *   Cell:
+ *    type: object
+ *    properties:
+ *     x:
+ *      type: number
+ *      description: X coordinate of the cell
+ *     y:
+ *      type: number
+ *      description: Y coordinate of the cell
+ *     formula:
+ *      type: string
+ *      description: Formula of the cell
+ *     style:
+ *      type: object
+ *      description: Style of the cell
+ */
+const cellSchema = new Schema({
+    x: Number,
+    y: Number,
+    formula: String,
+    style: Schema.Types.Mixed
+});
+
+/**
+ * @openapi
+ * components:
  *   schemas:
  *     Sheet:
  *       type: object
@@ -52,7 +79,8 @@ const schema = new Schema({
             type: Schema.Types.ObjectId,
             ref: User
         }
-    ]
+    ],
+    cells: [cellSchema]
 });
 schema.set('toJSON', {
     transform: (doc, ret) => {
