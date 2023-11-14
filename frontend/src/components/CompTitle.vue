@@ -1,6 +1,6 @@
 <template>
     <h1
-        class="text-3xl md:text-4xl text-indigo-500 font-extrabold tracking-wider"
+        class="text-3xl md:text-4xl text-indigo-500 dark:text-slate-50 font-extrabold tracking-wider"
         :class="shadow ? 'shadow-highlight' : ''"
     >
         <slot />
