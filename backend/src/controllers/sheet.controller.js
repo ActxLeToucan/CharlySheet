@@ -78,13 +78,6 @@ class SheetController {
             next(error);
         }
     };
-    getAll = async (req, res, next) => {
-        Sheet.find()
-            .then((sheets) => {
-                res.status(200).json(sheets);
-            })
-            .catch(next);
-    };
     createSheet = async (req, res, next) => {
         const { name } = req.body;
         /**

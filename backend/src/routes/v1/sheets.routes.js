@@ -28,33 +28,6 @@ class RouterSheets {
     #initializeRoutes() {
         /**
          * @openapi
-         * /v1/sheets:
-         *   get:
-         *     summary: Get all sheets
-         *     tags:
-         *       - Sheets
-         *     responses:
-         *       '200':
-         *         description: All sheets
-         *         content:
-         *           application/json:
-         *             schema:
-         *               type: object
-         *               properties:
-         *                 items:
-         *                   type: array
-         *                   items:
-         *                     type: object
-         *                     properties:
-         *                       name:
-         *                         type: string
-         *             example:
-         *               items:
-         *                 - name: Feuille 1
-         */
-        this.router.get(`${this.path}`, this.#controller.getAll);
-        /**
-         * @openapi
          * /v1/sheets/me:
          *   get:
          *     tags:
