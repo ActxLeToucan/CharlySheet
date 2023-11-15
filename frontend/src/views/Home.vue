@@ -71,12 +71,16 @@
                             :label="Lang.CreateTranslationContext('home', 'Username')"
                             :placeholder="Lang.CreateTranslationContext('home', 'Username')"
                             name="username"
+                            autocomplete="off"
+                            autocapitalize="off"
                         />
                         <comp-input
                             :label="Lang.CreateTranslationContext('home', 'Password')"
                             :placeholder="Lang.CreateTranslationContext('home', 'Password')"
                             type="password"
                             name="password"
+                            autocomplete="off"
+                            autocapitalize="off"
                         />
                     </div>
                     <div
@@ -120,6 +124,8 @@
                             :label="Lang.CreateTranslationContext('home', 'Username')"
                             :placeholder="Lang.CreateTranslationContext('home', 'Username')"
                             name="username"
+                            autocomplete="off"
+                            autocapitalize="off"
                         />
                         <comp-input
                             :label="Lang.CreateTranslationContext('home', 'Email')"
@@ -132,12 +138,16 @@
                             :placeholder="Lang.CreateTranslationContext('home', 'Password')"
                             type="password"
                             name="password"
+                            autocomplete="off"
+                            autocapitalize="off"
                         />
                         <comp-input
                             :label="Lang.CreateTranslationContext('home', 'ConfirmPassword')"
                             :placeholder="Lang.CreateTranslationContext('home', 'ConfirmPassword')"
                             type="password"
                             name="password-confirm"
+                            autocomplete="off"
+                            autocapitalize="off"
                         />
                     </div>
                     <div
