@@ -5,5 +5,7 @@
     "Username": "Username",
     "Password": "Password",
     "ConfirmPassword": "Confirm password",
-    "Email": "Email"
+    "Email": "Email",
+    "NoAccountQuestion": "No account yet ?",
+    "AccountQuestion": "Already have an account ?"
 }

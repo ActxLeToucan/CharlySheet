@@ -78,6 +78,15 @@
                             type="password"
                             name="password"
                         />
+                        <button
+                            class="w-fit border-b border-transparent hover:border-slate-300"
+                            @click="goToSignup"
+                        >
+                            <p class="flex space-x-2 text-slate-300 italic">
+                                <get-text :context="Lang.CreateTranslationContext('home', 'NoAccountQuestion')" />
+                                <get-text :context="Lang.CreateTranslationContext('verbs', 'SignUp')" />
+                            </p>
+                        </button>
                     </div>
                     <div
                         class="flex flex-col grow justify-end"
@@ -139,6 +148,15 @@
                             type="password"
                             name="password-confirm"
                         />
+                        <button
+                            class="w-fit border-b border-transparent hover:border-slate-300"
+                            @click="goToLogin"
+                        >
+                            <p class="flex space-x-2 text-slate-300 italic">
+                                <get-text :context="Lang.CreateTranslationContext('home', 'AccountQuestion')" />
+                                <get-text :context="Lang.CreateTranslationContext('verbs', 'LogIn')" />
+                            </p>
+                        </button>
                     </div>
                     <div
                         class="flex flex-col grow justify-end"
