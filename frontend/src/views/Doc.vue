@@ -6,10 +6,7 @@
             </div>
             <div class="flex flex-col w-full h-full space-y-2">
                 <div class="flex w-full h-fit">
-                    <div class="show-right">
-                        <comp-input value="Nouveau document" />
-                    </div>
-                    <div class="flex space-x-4 px-4 items-center justify-center">
+                    <div class="show-down flex space-x-4 items-center justify-center">
                         <button
                             v-for="menu in menus"
                             :key="menu.name"
@@ -20,8 +17,8 @@
                         </button>
                     </div>
                 </div>
-                <div class="w-fit h-fit">
-                    <comp-input label="Formule" />
+                <div class="show-right w-fit h-fit">
+                    <comp-input value="Nouveau document" />
                 </div>
             </div>
         </div>
@@ -122,8 +119,8 @@ export default {
             MODE_EDIT: 1,
             docMode: (this.$route.params.id === "new" ? 0 : 1),
             docId: this.$route.params.id,
-            nbRows: 30,
-            nbCols: 19,
+            nbRows: 40,
+            nbCols: 20,
             menus
         };
     },
@@ -158,9 +155,6 @@ export default {
                 this.setBorder(startDiv, ev.target);
             }
         });
-
-        window.colBar = colBar;
-        window.rowBar = rowBar;
     },
     methods: {
         getIndexName(index) {
@@ -185,10 +179,10 @@ export default {
 
             const x = (dom2
                 ? Math.min(dom1rect.x, dom2rect.x)
-                : dom1rect.x) - containerRect.x;
+                : dom1rect.x) - containerRect.x + container.scrollLeft;
             const y = (dom2
                 ? Math.min(dom1rect.y, dom2rect.y)
-                : dom1rect.y) - containerRect.y;
+                : dom1rect.y) - containerRect.y + container.scrollTop;
             const w = dom2
                 ? Math.max(dom1rect.x, dom2rect.x) - Math.min(dom1rect.x, dom2rect.x) + dom2rect.width
                 : dom1rect.width;
