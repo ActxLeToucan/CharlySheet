@@ -38,7 +38,7 @@
                             <comp-button
                                 class="mx-auto my-2"
                                 :icon="UserPlusIcon"
-                                :onclick="() => goTosignup()"
+                                :onclick="() => goToSignup()"
                             >
                                 <get-text :context="Lang.CreateTranslationContext('verbs', 'SignUp')" />
                             </comp-button>
@@ -222,7 +222,10 @@ export default {
         });
 
         setTimeout(() => {
-            this.goToHome('left');
+            const redirect = this.$route.query.redirect;
+            if (redirect) {
+                this.goToLogin();
+            } else this.goToHome('left');
         }, 200);
     },
     methods: {
@@ -253,7 +256,7 @@ export default {
         goToHome(dir) {
             this.showPanel('home-panel', dir);
         },
-        goTosignup() {
+        goToSignup() {
             this.showPanel('signup-panel');
         },
         goToLogin() {
@@ -295,7 +298,7 @@ export default {
                 log.update(await Lang.GetTextAsync(Lang.CreateTranslationContext('verbs', 'LoggedIn')), Logs.SUCCESS);
                 log.delete(2000);
                 setTimeout(() => {
-                    this.$router.push({ name: 'My' })
+                    this.redirectToPage();
                 }, 1000);
             } catch (err) {
                 switch (err.status) {
@@ -372,7 +375,7 @@ export default {
                 log.update(await Lang.GetTextAsync(Lang.CreateTranslationContext('verbs', 'SignedUp')), Logs.SUCCESS);
                 log.delete(2000);
                 setTimeout(() => {
-                    this.$router.push({ name: 'My' })
+                    this.redirectToPage();
                 }, 1000);
             } catch (err) {
                 switch (err.status) {
@@ -386,6 +389,12 @@ export default {
                     break;
                 }
             }
+        },
+        redirectToPage() {
+            const redirect = this.$route.query.redirect;
+            if (redirect) {
+                this.$router.push(redirect);
+            } else this.$router.push({ name: 'My' });
         }
     }
 }
