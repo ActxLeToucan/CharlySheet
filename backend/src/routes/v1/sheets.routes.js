@@ -87,6 +87,36 @@ class RouterSheets {
             authenticateJWT,
             this.#controller.getSharedSheets
         );
+        /**
+         * @openapi
+         * /v1/sheets/me/recents:
+         *   get:
+         *     tags:
+         *       - Sheets
+         *     summary: Get current user's recent sheets
+         *     security:
+         *       - bearerAuth: []
+         *     responses:
+         *       200:
+         *         description: Current user's recent sheets
+         *         content:
+         *           application/json:
+         *             schema:
+         *               type: array
+         *               items:
+         *                 $ref: '#/components/schemas/Sheet'
+         *       401:
+         *         description: Unauthorized
+         *         content:
+         *           application/json:
+         *             schema:
+         *               $ref: '#/components/schemas/Error'
+         */
+        this.router.get(
+            `${this.path}/me/recents`,
+            authenticateJWT,
+            this.#controller.getRecentsSheets
+        );
 
         /**
          * @openapi

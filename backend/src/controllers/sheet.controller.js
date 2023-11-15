@@ -31,6 +31,20 @@ class SheetController {
                 );
             }
             res.json(sheet.toJSON());
+            res.end();
+            // add the sheet to the user recents in background, like it was a 10 circular buffer
+            const dbUser = await User.findById(user._id);
+            if (dbUser) {
+                // remove the sheet from the recents if it is already in
+                dbUser.recents = dbUser.recents.filter(
+                    (s) => s.toString() !== sheet._id.toString()
+                );
+                // add the sheet to the beginning of the recents
+                dbUser.recents.unshift(sheet._id);
+                // keep only the 10 first recents
+                dbUser.recents = dbUser.recents.slice(0, 10);
+                await dbUser.save();
+            }
         } catch (error) {
             next(error);
         }
@@ -74,6 +88,23 @@ class SheetController {
             const { user } = req;
             const sharedSheets = await Sheet.find({ users: user._id });
             res.json(sharedSheets);
+        } catch (error) {
+            next(error);
+        }
+    };
+    getRecentsSheets = async (req, res, next) => {
+        try {
+            const { user } = req;
+            const dbUser = await User.findById(user._id);
+            if (!dbUser) {
+                throw new HttpException(
+                    404,
+                    'User not found',
+                    'User not found'
+                );
+            }
+            await dbUser.populate('recents');
+            res.json(dbUser.recents);
         } catch (error) {
             next(error);
         }
