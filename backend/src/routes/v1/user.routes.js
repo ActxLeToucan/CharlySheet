@@ -182,7 +182,8 @@ class UserRoutes {
          *              username:
          *                type: string
          *            required:
-         *              - name
+         *              - email
+         *              - username
          *     responses:
          *       200:
          *         description: User
@@ -196,8 +197,12 @@ class UserRoutes {
          *           application/json:
          *             schema:
          *               $ref: '#/components/schemas/Error'
-         *       422:
-         *         $ref: '#/components/responses/errorValidate'
+         *       409:
+         *         description: Username or email already exists
+         *         content:
+         *           application/json:
+         *             schema:
+         *               $ref: '#/components/schemas/Error'
          */
         this.router.patch(
             `${this.path}/me`,
