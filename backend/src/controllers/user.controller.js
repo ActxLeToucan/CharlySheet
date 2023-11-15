@@ -103,6 +103,42 @@ class UserController {
             }
         )(req, res, next);
     };
+
+
+    changeAccount = async (req, res, next) => {
+        try {
+            const {email, username} = req.body;
+            const {user} = req;
+
+            const dbUser = await User.findById(user._id);
+            if (!dbUser) {
+                throw new HttpException(
+                    404,
+                    'User not found',
+                    'User not found'
+                );
+            }
+
+            if (
+                (await User.find({
+                    $or: [{email}, {username}]
+                }).count()) > 0
+            ) {
+                throw new HttpException(
+                    409,
+                    'User already exists',
+                    'User already exists'
+                );
+            }
+
+            dbUser.username = username;
+            dbUser.email = email;
+            await dbUser.save();
+            res.json(dbUser.toJSON());
+        } catch (error) {
+            next(error);
+        }
+    };
 }
 
 export default UserController;

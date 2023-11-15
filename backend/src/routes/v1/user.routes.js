@@ -158,6 +158,52 @@ class UserRoutes {
             validate(userIdentifierSchema),
             this.#controller.get
         );
+
+
+        /**
+         * @openapi
+         * /v1/user/me:
+         *   patch:
+         *     summary: modify account
+         *     security:
+         *       - bearerAuth: []
+         *     tags:
+         *       - User
+         *     requestBody:
+         *      required : true
+         *      content:
+         *        application/json:
+         *          schema:
+         *            type: object
+         *            properties:
+         *              email:
+         *                type: string
+         *                example : 'user@example.com'
+         *              username:
+         *                type: string
+         *            required:
+         *              - name
+         *     responses:
+         *       200:
+         *         description: User
+         *         content:
+         *           application/json:
+         *             schema:
+         *               $ref: '#/components/schemas/User'
+         *       404:
+         *         description: User not found
+         *         content:
+         *           application/json:
+         *             schema:
+         *               $ref: '#/components/schemas/Error'
+         *       422:
+         *         $ref: '#/components/responses/errorValidate'
+         */
+        this.router.patch(
+            `${this.path}/me`,
+            authenticateJWT,
+            this.#controller.changeAccount
+        );
     }
 }
 
