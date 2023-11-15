@@ -13,6 +13,8 @@
             :type="type"
             :value="value_str"
             :name="name"
+            :autocomplete="autocomplete"
+            :autocapitalize="autocapitalize"
         >
     </div>
 </template>
@@ -55,7 +57,15 @@ export default {
         name: {
             type: String,
             default: ''
-        }
+        },
+        autocomplete: {
+            type: String,
+            default: 'on'
+        },
+        autocapitalize: {
+            type: String,
+            default: 'on'
+        },
     },
     data() {
         return {
