@@ -79,10 +79,10 @@
                             name="password"
                         />
                         <button
-                            class="w-fit border-b border-transparent hover:border-slate-300"
+                            class="w-fit border-b border-transparent dark:border-transparent hover:border-slate-500 hover:dark:border-slate-300"
                             @click="goToSignup"
                         >
-                            <p class="flex space-x-2 text-slate-300 italic">
+                            <p class="flex space-x-2 text-slate-500 dark:text-slate-300 italic">
                                 <get-text :context="Lang.CreateTranslationContext('home', 'NoAccountQuestion')" />
                                 <get-text :context="Lang.CreateTranslationContext('verbs', 'SignUp')" />
                             </p>
@@ -149,10 +149,10 @@
                             name="password-confirm"
                         />
                         <button
-                            class="w-fit border-b border-transparent hover:border-slate-300"
+                            class="w-fit border-b border-transparent dark:border-transparent hover:border-slate-500 hover:dark:border-slate-300"
                             @click="goToLogin"
                         >
-                            <p class="flex space-x-2 text-slate-300 italic">
+                            <p class="flex space-x-2 text-slate-500 dark:text-slate-300 italic">
                                 <get-text :context="Lang.CreateTranslationContext('home', 'AccountQuestion')" />
                                 <get-text :context="Lang.CreateTranslationContext('verbs', 'LogIn')" />
                             </p>
