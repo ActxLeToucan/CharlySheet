@@ -104,7 +104,6 @@ class UserController {
         )(req, res, next);
     };
 
-
     changeAccount = async (req, res, next) => {
         try {
             const {email, username} = req.body;
@@ -135,6 +134,29 @@ class UserController {
             dbUser.email = email;
             await dbUser.save();
             res.json(dbUser.toJSON());
+        } catch (error) {
+            next(error);
+        }
+    };
+
+    changePassword = async (req, res, next) => {
+        try {
+            const {oldpassword, newpassword} = req.body;
+            const {user} = req;
+
+            const dbUser = await User.findById(user._id);
+            if (!dbUser) {
+                throw new HttpException(404, 'User not found', 'User not found');
+            }
+
+            dbUser.changePassword(oldpassword, newpassword, (err) => {
+                if (err) {
+                    next(new HttpException(400, 'Failed to change password', 'Failed to change password'));
+                } else {
+                    res.json(dbUser.toJSON());
+                }
+            });
+
         } catch (error) {
             next(error);
         }

@@ -209,6 +209,57 @@ class UserRoutes {
             authenticateJWT,
             this.#controller.changeAccount
         );
+
+        /**
+         * @openapi
+         * /v1/user/me/password:
+         *   patch:
+         *     summary: modify password
+         *     security:
+         *       - bearerAuth: []
+         *     tags:
+         *       - User
+         *     requestBody:
+         *      required : true
+         *      content:
+         *        application/json:
+         *          schema:
+         *            type: object
+         *            properties:
+         *              oldpassword:
+         *                type: string
+         *              newpassword:
+         *                type: string
+         *            required:
+         *              - oldpassword
+         *              - newpassword
+         *     responses:
+         *       200:
+         *         description: User
+         *         content:
+         *           application/json:
+         *             schema:
+         *               $ref: '#/components/schemas/User'
+         *       400:
+         *         description: Password not changed
+         *         content:
+         *           application/json:
+         *             schema:
+         *               $ref: '#/components/schemas/Error'
+         *       404:
+         *         description: User not found
+         *         content:
+         *           application/json:
+         *             schema:
+         *               $ref: '#/components/schemas/Error'
+         *
+         */
+        this.router.patch(
+            `${this.path}/me/password`,
+            authenticateJWT,
+            this.#controller.changePassword
+        );
+
     }
 }
 
