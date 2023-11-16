@@ -235,7 +235,7 @@ export default {
         };
     },
     mounted() {
-        if (User.CurrentUser) {
+        if (User.currentUser) {
             this.$router.push({ name: 'My' });
             return;
         }

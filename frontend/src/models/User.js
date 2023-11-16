@@ -64,6 +64,7 @@ export default class User extends Callbackable {
 
     setInformations(infos) {
         if (!infos) return;
+        console.log('creating user', infos)
         this.#username = infos?.username ?? User.DEFAULT_USERNAME;
         this.#email = infos?.email ?? User.DEFAULT_EMAIL;
         this.#color = infos?.color ?? User.DEFAULT_COLOR;
@@ -159,7 +160,13 @@ export default class User extends Callbackable {
      * Saves the user to local storage
      */
     save() {
-        localStorage.setItem('user', JSON.stringify(this));
+        localStorage.setItem('user', JSON.stringify({
+            id: this.#id,
+            username: this.#username,
+            email: this.#email,
+            token: this.#token,
+            color: this.#color
+        }));
     }
 
     /**

@@ -21,14 +21,14 @@ const routes = [
         path: "/my",
         name: "My",
         component: () => import("./views/My.vue"),
-        condition: () => User.CurrentUser !== null,
+        condition: () => User.currentUser !== null,
         meta: { title: () => Lang.CreateTranslationContext('my', 'Documents') }
     },
     {
         path: "/doc/:id",
         name: "Doc",
         component: () => import("./views/Doc.vue"),
-        condition: () => User.CurrentUser !== null,
+        condition: () => User.currentUser !== null,
         meta: { title: () => import("./views/Doc.vue").then(async m => await m.default.meta.title()) }
     },
     {
