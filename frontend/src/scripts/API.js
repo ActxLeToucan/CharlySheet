@@ -1,5 +1,5 @@
 import Lang from './Lang.js';
-import User from './User.js';
+import User from '../models/User.js';
 import ROUTES from './routes.js';
 
 class Credentials {
@@ -176,7 +176,7 @@ class API {
      * @param {object} user User to use for the API call (by default User.currentUser)
      * @returns A promise resolving when the API call is done
      */
-    static execute_logged(path, method = API.METHOD.GET, body = {}, type = this.TYPE.JSON, headers = [], user = User.CurrentUser) {
+    static execute_logged(path, method = API.METHOD.GET, body = {}, type = this.TYPE.JSON, headers = [], user = User.currentUser) {
         return new Promise((resolve, reject) => {
             const credentials = user.getCredentials();
             if (!credentials) {

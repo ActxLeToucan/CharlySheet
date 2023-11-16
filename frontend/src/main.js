@@ -4,7 +4,7 @@ import App from './App.vue';
 
 import "./index.css";
 import Lang from './scripts/Lang';
-import User from './scripts/User';
+import User from './models/User';
 
 // https redirection (should be done in NGINX, but it not we do it here)
 // if (window.location.protocol !== 'https:' && window.location.hostname !== 'localhost') {

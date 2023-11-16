@@ -17,8 +17,19 @@
                         </button>
                     </div>
                 </div>
-                <div class="show-right w-fit h-fit">
+                <div class="show-right flex w-full h-fit">
                     <comp-input value="Nouveau document" />
+                    <div class="flex space-x-2 pl-8 w-full">
+                        <comp-input
+                            ref="formula-input"
+                            class="md:space-x-2 w-full"
+                            label="Fx"
+                            :expand="true"
+                            :value="currentFormula || ''"
+                            :disabled="!currentSlot"
+                            @change="ev => { if (currentSlot) User.currentUser.slot.formula = ev.target.value }"
+                        />
+                    </div>
                 </div>
             </div>
         </div>
@@ -73,9 +84,13 @@
                                 <div
                                     v-for="col in nbCols"
                                     :key="col"
-                                    class="w-32 h-8 items-center justify-center"
+                                    class="w-32 h-8 items-center justify-center comp-sheetslot"
                                 >
-                                    <comp-sheetslot :data="getSlotAt(col, row)" />
+                                    <comp-sheetslot
+                                        :data="getSlotAt(col-1, row-1)"
+                                        :data-x="col-1"
+                                        :data-y="row-1"
+                                    />
                                 </div>
                             </div>
                         </div>
@@ -88,12 +103,13 @@
 
 <script>
 import CompSheetslot from '../components/CompSheetslot.vue';
-import Slot from '@/models/Slot';
+import CompInput from '../components/CompInput.vue';
+import Slot from '../models/Slot';
+import User from '../models/User';
 
 import {
     DocumentIcon
 } from '@heroicons/vue/24/outline';
-import CompInput from '../components/CompInput.vue';
 
 const menus = [
     {name: 'Fichier'},
@@ -115,13 +131,16 @@ export default {
     },
     data() {
         return {
+            User,
             MODE_NEW: 0,
             MODE_EDIT: 1,
             docMode: (this.$route.params.id === "new" ? 0 : 1),
             docId: this.$route.params.id,
             nbRows: 40,
             nbCols: 20,
-            menus
+            menus,
+            currentFormula: '',
+            currentSlot: null
         };
     },
     mounted() {
@@ -139,21 +158,47 @@ export default {
 
         let isMouseDown = false;
         let startDiv = null;
+        let endDiv = null;
         container.addEventListener('mousedown', ev => {
+            if (ev.button === 2) return;
             isMouseDown = true;
             startDiv = ev.target;
-            this.setBorder(startDiv);
+            endDiv = ev.target;
+            this.setBorder(startDiv, endDiv);
         });
         container.addEventListener('mouseup', ev => { isMouseDown = false; });
+        container.addEventListener('contextmenu', ev => {
+            ev.preventDefault();
+            return;
+        })
         container.addEventListener('keydown', ev => {
             if (ev.key === 'Escape') {
                 document.querySelector(".border-selector")?.remove();
+                User.currentUser.slot = null;
+            }
+            if (ev.key === 'Delete') {
+                for (let x = startDiv.dataset.x; x <= endDiv.dataset.x; x++) {
+                    for (let y = startDiv.dataset.y; y <= endDiv.dataset.y; y++) {
+                        this.getSlotAt(x, y).formula = '';
+                    }
+                }
             }
         });
         container.addEventListener('mousemove', ev => {
             if (isMouseDown) {
-                this.setBorder(startDiv, ev.target);
+                endDiv = ev.target;
+                this.setBorder(startDiv, endDiv);
             }
+        });
+
+        User.currentUser.on('slot', slot => {
+            this.currentFormula = slot?.formula;
+            this.currentSlot = slot;
+            
+            // need to do this because Vue.JS is shitty and doesn't update the input value
+            const formulaInput = this.$refs['formula-input'];
+            if (formulaInput)
+                formulaInput.$el.querySelector('input').value = this.currentFormula;
         });
     },
     methods: {
@@ -168,9 +213,15 @@ export default {
             return alphabet[index] + name;
         },
         getSlotAt(x, y) {
-            return new Slot();
+            if (!window.slots) window.slots = [];
+            if (!window.slots[x]) window.slots[x] = [];
+            if (!window.slots[x][y]) window.slots[x][y] = new Slot();
+            return window.slots[x][y];
         },
         setBorder(dom1, dom2) {
+            dom1 = this.getSheetSlotDom(dom1);
+            dom2 = this.getSheetSlotDom(dom2);
+
             const dom1rect = dom1?.getBoundingClientRect();
             const dom2rect = dom2?.getBoundingClientRect();
             /**@type {HTMLDivElement} */
@@ -201,6 +252,14 @@ export default {
             border.style.top = y + 'px';
             border.style.width = w + 'px';
             border.style.height = h + 'px';
+        },
+        getSheetSlotDom(dom) {
+            let loops = 5;
+            while (dom && dom.classList && !dom.classList.contains('comp-sheetslot') && loops > 0) {
+                dom = dom.parentElement;
+                loops--;
+            }
+            return dom;
         }
     },
     meta: {

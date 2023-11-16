@@ -212,7 +212,7 @@ import {
     ChevronLeftIcon,
     CheckIcon
 } from '@heroicons/vue/24/outline';
-import User from '../scripts/User';
+import User from '../models/User';
 
 export default {
     name: "HomeView",
