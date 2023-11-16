@@ -6,6 +6,6 @@
     "Password": "Password",
     "ConfirmPassword": "Confirm password",
     "Email": "Email",
-    "NoAccountQuestion": "No account yet ?",
-    "AccountQuestion": "Already have an account ?"
+    "NoAccountQuestion": "No account yet?",
+    "AccountQuestion": "Already have an account?"
 }
