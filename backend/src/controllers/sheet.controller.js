@@ -8,7 +8,7 @@ class SheetController {
         const { user } = req;
         try {
             const sheet = await Sheet.findOne({ _id: id })
-                .populate('users')
+                .populate('users', '-recents')
                 .populate('owner');
             if (!sheet) {
                 throw new HttpException(
@@ -198,8 +198,8 @@ class SheetController {
             );
             sheet.users.push(...newUsers.map((user) => user._id));
             await sheet.save();
-            await sheet.populate('users');
-            await sheet.populate('owner');
+            await sheet.populate('users', '-recents');
+            await sheet.populate('owner', '-recents');
             res.json(sheet.users);
         } catch (error) {
             next(error);
@@ -232,8 +232,8 @@ class SheetController {
 
             // Rechercher le document mis à jour pour la population
             const updatedSheet = await Sheet.findById(id)
-                .populate('users')
-                .populate('owner');
+                .populate('users', '-recents')
+                .populate('owner', '-recents');
             res.json(updatedSheet.users);
         } catch (error) {
             next(error);

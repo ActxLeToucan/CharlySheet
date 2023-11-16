@@ -30,8 +30,8 @@ export const sheetSchema = {
 
 export const sheetIdandUserIdSchema = {
     joiSchema: Joi.object({
-        id: Joi.string().required().min(24).max(24),
-        userId: Joi.string().required().min(24).max(24)
+        id: Joi.string().required().length(24),
+        userId: Joi.string().required().length(24)
     }),
     location: 'params'
 };

@@ -71,7 +71,7 @@ export const newUserSchema = {
  *              maxLength: 24
  */
 export const arrayOfUserIdsSchema = {
-    joiSchema: Joi.array().items(Joi.string().required().min(24).max(24)),
+    joiSchema: Joi.array().items(Joi.string().required().length(24)),
     location: 'body'
 };
 

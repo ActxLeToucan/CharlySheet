@@ -51,12 +51,17 @@ const cellSchema = new Schema({
  *           type: array
  *           description: Users of the sheet
  *           items:
- *            type: string
- *            format: ObjectId
+ *             type: string
+ *             format: ObjectId
  *         createdAt:
  *           type: string
  *           description: Date of creation
  *           format: date-time
+ *         cells:
+ *           type: array
+ *           description: Cells of the sheet
+ *           items:
+ *             $ref: '#/components/schemas/Cell'
  */
 const schema = new Schema({
     name: {

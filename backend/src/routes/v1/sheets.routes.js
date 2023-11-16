@@ -144,23 +144,25 @@ class RouterSheets {
          *         content:
          *           application/json:
          *             schema:
-         *               type: object
-         *               properties:
-         *                 id:
-         *                   type: string
-         *                 name:
-         *                   type: string
-         *                 users:
-         *                   type: array
-         *                   items:
-         *                     type: object
-         *                 createdAt:
-         *                   type: string
-         *               example:
-         *                 id: 60f9a5f9d3f9f20015c1d7a8
-         *                 name: Feuille 1
-         *                 users: []
-         *                 createdAt: 2021-07-23T13:53:05.000Z
+         *               $ref: '#/components/schemas/Sheet'
+         *       '401':
+         *         description: Unauthorized
+         *         content:
+         *           application/json:
+         *             schema:
+         *               $ref: '#/components/schemas/Error'
+         *       '403':
+         *         description: Forbidden
+         *         content:
+         *           application/json:
+         *             schema:
+         *               $ref: '#/components/schemas/Error'
+         *       '422':
+         *         description: Unprocessable Entity
+         *         content:
+         *           application/json:
+         *             schema:
+         *               $ref: '#/components/schemas/Error'
          */
         this.router.post(
             `${this.path}`,
@@ -197,50 +199,36 @@ class RouterSheets {
          *         content:
          *           application/json:
          *             schema:
-         *               type: object
-         *               properties:
-         *                 id:
-         *                   type: string
-         *                 name:
-         *                   type: string
-         *                 users:
-         *                   type: array
-         *                   items:
-         *                     type: object
-         *                 createdAt:
-         *                   type: string
+         *               $ref: '#/components/schemas/Sheet'
          *               example:
          *                 id: 60f9a5f9d3f9f20015c1d7a8
          *                 name: Feuille 1
          *                 users: []
          *                 createdAt: 2021-07-23T13:53:05.000Z
-         *       '404':
-         *         description: Sheet not found
+         *       '401':
+         *         description: Unauthorized
          *         content:
          *           application/json:
          *             schema:
-         *               type: object
-         *               properties:
-         *                 statusCode:
-         *                   type: number
-         *                 message:
-         *                   type: string
-         *                 error:
-         *                   type: string
-         *               example:
-         *                 statusCode: 404
-         *                 message: Sheet not found
-         *                 error: Sheet not found
+         *               $ref: '#/components/schemas/Error'
          *       '403':
          *         description: Forbidden
          *         content:
          *           application/json:
          *             schema:
-         *               type: object
-         *               properties:
-         *                 example:
-         *                   type: string
-         *               example: You are not the owner of this sheet
+         *               $ref: '#/components/schemas/Error'
+         *       '404':
+         *         description: Sheet not found
+         *         content:
+         *           application/json:
+         *             schema:
+         *               $ref: '#/components/schemas/Error'
+         *       '422':
+         *         description: Unprocessable Entity
+         *         content:
+         *           application/json:
+         *             schema:
+         *               $ref: '#/components/schemas/Error'
          */
         this.router.put(
             `${this.path}/:id/name`,
@@ -271,36 +259,13 @@ class RouterSheets {
          *         content:
          *           application/json:
          *             schema:
-         *               type: object
-         *               properties:
-         *                 id:
-         *                   type: string
-         *                 name:
-         *                   type: string
-         *                 users:
-         *                   type: array
-         *                   items:
-         *                    type: object
-         *                 createdAt:
-         *                   type: string
-         *             example:
-         *               id: 60f9a5f9d3f9f20015c1d7a8
-         *               name: Feuille 1
-         *               users: []
-         *               createdAt: 2021-07-23T13:53:05.000Z
+         *               $ref: '#/components/schemas/Sheet'
          *       404:
          *         description: Sheet not found
          *         content:
          *           application/json:
          *             schema:
-         *               type: object
-         *               properties:
-         *                 statusCode:
-         *                   type: number
-         *                 message:
-         *                   type: string
-         *                 error:
-         *                   type: string
+         *               $ref: '#/components/schemas/Error'
          *             example:
          *               statusCode: 404
          *               message: Sheet not found
@@ -368,7 +333,8 @@ class RouterSheets {
          *     summary: Add users to a sheet
          *     security:
          *       - bearerAuth: []
-         *     tags: [Sheets]
+         *     tags:
+         *       - Sheets
          *     parameters:
          *       - $ref: '#/components/parameters/id'
          *     requestBody:
@@ -411,11 +377,13 @@ class RouterSheets {
          *         content:
          *           application/json:
          *             schema:
-         *               type: object
-         *               properties:
-         *                 example:
-         *                   type: string
-         *               example: You are not the owner of this sheet
+         *               $ref: '#/components/schemas/Error'
+         *       422:
+         *         description: Unprocessable Entity
+         *         content:
+         *           application/json:
+         *             schema:
+         *               $ref: '#/components/schemas/Error'
          */
         this.router.post(
             `${this.path}/:id/users`,
@@ -431,7 +399,8 @@ class RouterSheets {
          *     summary: Remove a user from a sheet
          *     security:
          *       - bearerAuth: []
-         *     tags: [Sheets]
+         *     tags:
+         *       - Sheets
          *     parameters:
          *       - $ref: '#/components/parameters/id'
          *       - name: userId
@@ -445,33 +414,18 @@ class RouterSheets {
          *     responses:
          *       204:
          *         description: User removed from the sheet
-         *       404:
-         *         description: Sheet or user not found
-         *         content:
-         *           application/json:
-         *             schema:
-         *               type: object
-         *               properties:
-         *                 statusCode:
-         *                   type: number
-         *                 message:
-         *                   type: string
-         *                 error:
-         *                   type: string
-         *               example:
-         *                 statusCode: 404
-         *                 message: Sheet or user not found
-         *                 error: Sheet or user not found
          *       403:
          *         description: Forbidden
          *         content:
          *           application/json:
          *             schema:
-         *               type: object
-         *               properties:
-         *                 example:
-         *                   type: string
-         *               example: You are not the owner of this sheet
+         *               $ref: '#/components/schemas/Error'
+         *       404:
+         *         description: Sheet or user not found
+         *         content:
+         *           application/json:
+         *             schema:
+         *               $ref: '#/components/schemas/Error'
          */
         this.router.delete(
             `${this.path}/:id/users/:userId`,
