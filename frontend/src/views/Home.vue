@@ -38,7 +38,7 @@
                             <comp-button
                                 class="mx-auto my-2"
                                 :icon="UserPlusIcon"
-                                :onclick="() => goTosignup()"
+                                :onclick="() => goToSignup()"
                             >
                                 <get-text :context="Lang.CreateTranslationContext('verbs', 'SignUp')" />
                             </comp-button>
@@ -71,13 +71,26 @@
                             :label="Lang.CreateTranslationContext('home', 'Username')"
                             :placeholder="Lang.CreateTranslationContext('home', 'Username')"
                             name="username"
+                            autocomplete="off"
+                            autocapitalize="off"
                         />
                         <comp-input
                             :label="Lang.CreateTranslationContext('home', 'Password')"
                             :placeholder="Lang.CreateTranslationContext('home', 'Password')"
                             type="password"
                             name="password"
+                            autocomplete="off"
+                            autocapitalize="off"
                         />
+                        <button
+                            class="w-fit border-b border-transparent dark:border-transparent hover:border-slate-500 hover:dark:border-slate-300"
+                            @click="goToSignup"
+                        >
+                            <p class="flex space-x-2 text-slate-500 dark:text-slate-300 italic">
+                                <get-text :context="Lang.CreateTranslationContext('home', 'NoAccountQuestion')" />
+                                <get-text :context="Lang.CreateTranslationContext('verbs', 'SignUp')" />
+                            </p>
+                        </button>
                     </div>
                     <div
                         class="flex flex-col grow justify-end"
@@ -120,6 +133,8 @@
                             :label="Lang.CreateTranslationContext('home', 'Username')"
                             :placeholder="Lang.CreateTranslationContext('home', 'Username')"
                             name="username"
+                            autocomplete="off"
+                            autocapitalize="off"
                         />
                         <comp-input
                             :label="Lang.CreateTranslationContext('home', 'Email')"
@@ -132,13 +147,26 @@
                             :placeholder="Lang.CreateTranslationContext('home', 'Password')"
                             type="password"
                             name="password"
+                            autocomplete="off"
+                            autocapitalize="off"
                         />
                         <comp-input
                             :label="Lang.CreateTranslationContext('home', 'ConfirmPassword')"
                             :placeholder="Lang.CreateTranslationContext('home', 'ConfirmPassword')"
                             type="password"
                             name="password-confirm"
+                            autocomplete="off"
+                            autocapitalize="off"
                         />
+                        <button
+                            class="w-fit border-b border-transparent dark:border-transparent hover:border-slate-500 hover:dark:border-slate-300"
+                            @click="goToLogin"
+                        >
+                            <p class="flex space-x-2 text-slate-500 dark:text-slate-300 italic">
+                                <get-text :context="Lang.CreateTranslationContext('home', 'AccountQuestion')" />
+                                <get-text :context="Lang.CreateTranslationContext('verbs', 'LogIn')" />
+                            </p>
+                        </button>
                     </div>
                     <div
                         class="flex flex-col grow justify-end"
@@ -222,7 +250,10 @@ export default {
         });
 
         setTimeout(() => {
-            this.goToHome('left');
+            const redirect = this.$route.query.redirect;
+            if (redirect) {
+                this.goToLogin();
+            } else this.goToHome('left');
         }, 200);
     },
     methods: {
@@ -253,7 +284,7 @@ export default {
         goToHome(dir) {
             this.showPanel('home-panel', dir);
         },
-        goTosignup() {
+        goToSignup() {
             this.showPanel('signup-panel');
         },
         goToLogin() {
@@ -295,7 +326,7 @@ export default {
                 log.update(await Lang.GetTextAsync(Lang.CreateTranslationContext('verbs', 'LoggedIn')), Logs.SUCCESS);
                 log.delete(2000);
                 setTimeout(() => {
-                    this.$router.push({ name: 'My' })
+                    this.redirectToPage();
                 }, 1000);
             } catch (err) {
                 switch (err.status) {
@@ -372,7 +403,7 @@ export default {
                 log.update(await Lang.GetTextAsync(Lang.CreateTranslationContext('verbs', 'SignedUp')), Logs.SUCCESS);
                 log.delete(2000);
                 setTimeout(() => {
-                    this.$router.push({ name: 'My' })
+                    this.redirectToPage();
                 }, 1000);
             } catch (err) {
                 switch (err.status) {
@@ -386,6 +417,12 @@ export default {
                     break;
                 }
             }
+        },
+        redirectToPage() {
+            const redirect = this.$route.query.redirect;
+            if (redirect) {
+                this.$router.push(redirect);
+            } else this.$router.push({ name: 'My' });
         }
     }
 }

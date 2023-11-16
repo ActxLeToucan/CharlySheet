@@ -5,5 +5,7 @@
     "Username": "Nom d'utilisateur",
     "Password": "Mot de passe",
     "ConfirmPassword": "Confirmation",
-    "Email": "Email"
+    "Email": "Email",
+    "NoAccountQuestion": "Pas encore de compte ?",
+    "AccountQuestion": "Déjà un compte ?"
 }
