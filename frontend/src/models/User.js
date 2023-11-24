@@ -64,13 +64,12 @@ export default class User extends Callbackable {
 
     setInformations(infos) {
         if (!infos) return;
-        console.log('creating user', infos)
-        this.#username = infos?.username ?? User.DEFAULT_USERNAME;
-        this.#email = infos?.email ?? User.DEFAULT_EMAIL;
-        this.#color = infos?.color ?? User.DEFAULT_COLOR;
+        this.#username = infos?.username ?? this.#username ?? User.DEFAULT_USERNAME;
+        this.#email = infos?.email ?? this.#email ?? User.DEFAULT_EMAIL;
+        this.#color = infos?.color ?? this.#color ?? User.DEFAULT_COLOR;
 
-        this.#id = infos?.id;
-        this.#token = infos?.token;
+        this.#id = infos?.id ?? this.#id;
+        this.#token = infos?.token ?? this.#token;
     }
 
     async fetchInformations() {
