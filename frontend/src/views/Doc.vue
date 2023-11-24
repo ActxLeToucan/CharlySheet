@@ -18,7 +18,10 @@
                     </div>
                 </div>
                 <div class="show-right flex w-full h-fit">
-                    <comp-input value="Nouveau document" />
+                    <comp-input
+                        :value="doc?.name ?? Lang.CreateTranslationContext('doc', 'NewDocument')"
+                        @input="setDocName($event.target.value)"
+                    />
                     <div class="flex space-x-2 pl-8 w-full">
                         <comp-input
                             ref="formula-input"
@@ -110,6 +113,8 @@ import User from '../models/User';
 import {
     DocumentIcon
 } from '@heroicons/vue/24/outline';
+import API from '../scripts/API';
+import Lang from '../scripts/Lang';
 
 const menus = [
     {name: 'Fichier'},
@@ -131,6 +136,7 @@ export default {
     },
     data() {
         return {
+            Lang,
             User,
             MODE_NEW: 0,
             MODE_EDIT: 1,
@@ -140,10 +146,19 @@ export default {
             nbCols: 20,
             menus,
             currentFormula: '',
-            currentSlot: null
+            currentSlot: null,
+            doc: null
         };
     },
-    mounted() {
+    async mounted() {
+        if (this.docMode === this.MODE_NEW) {
+            await this.createNewDoc();
+        }
+
+        API.execute_logged(API.ROUTE.SHEETS.call(this.docId)).then(res => {
+            this.doc = res;
+        }).catch(err => console.error(err));
+
         /** @type {HTMLDivElement} */
         const container = this.$refs['grid-container'];
         /** @type {HTMLDivElement} */
@@ -260,7 +275,24 @@ export default {
                 loops--;
             }
             return dom;
-        }
+        },
+        async createNewDoc() {
+            this.doc = await API.execute_logged(API.ROUTE.SHEETS.call(), API.METHOD.POST, {
+                name: await Lang.GetTextAsync(Lang.CreateTranslationContext('doc', 'NewDocument'))
+            });
+            this.docId = this.doc._id;
+            this.$router.push('/doc/' + this.doc._id);
+        },
+        setDocName(name) {
+            if (!this.doc?._id) return;
+            if (this.changeDocTimeout) clearTimeout(this.changeDocTimeout);
+            this.changeDocTimeout = setTimeout(async () => {
+                this.changeDocTimeout = null;
+                try {
+                    await API.execute_logged(API.ROUTE.SHEETS.NAME(this.doc._id), API.METHOD.PUT, {name})
+                } catch (err) { console.error(err); }
+            }, 300);
+        },
     },
     meta: {
         title: async () => {

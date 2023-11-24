@@ -5,6 +5,7 @@
             <div class="flex flex-col grow p-4 space-y-8 text-slate-700 dark:text-slate-300">
                 <div
                     v-for="(categ, index) in categs"
+                    v-show="categ.docs.length > 0 || categ.id === 'ME'"
                     :key="categ.name"
                     class="show-up flex flex-col space-y-4"
                     :style="'animation-delay: '+index+'00ms;'"
@@ -18,6 +19,7 @@
                                 v-for="doc in categ.docs"
                                 :key="doc.id"
                                 :doc="doc"
+                                :on-delete="retreiveSheets"
                             />
                             <comp-newdoccard v-if="categ.showNewCard" />
                         </div>
@@ -32,68 +34,9 @@
 import CompNavbar from '../components/CompNavbar.vue';
 import CompDoccard from '../components/CompDoccard.vue';
 import CompNewdoccard from '../components/CompNewdoccard.vue';
-import User from '../models/User';
 import Lang from '../scripts/Lang';
 import GetText from '../components/text/GetText.vue';
-
-const categs = [
-    {
-        name: Lang.CreateTranslationContext('my', 'Recent'),
-        docs: [
-            {
-                id: 1,
-                name: "Mon premier tableau",
-                owner: {
-                    name: "Paul",
-                    id: 1
-                }
-            }
-        ]
-    },
-    {
-        name: Lang.CreateTranslationContext('my', 'Personnal'),
-        docs: [
-            {
-                id: 1,
-                name: "Mon premier tableau",
-                owner: {
-                    name: "Paul",
-                    id: 1
-                }
-            }
-        ],
-        showNewCard: true
-    },
-    {
-        name: Lang.CreateTranslationContext('my', 'Shared'),
-        docs: [
-            {
-                id: 2,
-                name: "Tableau de test",
-                owner: {
-                    name: "Antonin",
-                    id: 2
-                }
-            },
-            {
-                id: 3,
-                name: "Triple A",
-                owner: {
-                    name: "Antoine",
-                    id: 3
-                }
-            },
-            {
-                id: 3,
-                name: "Oulala ca va plus",
-                owner: {
-                    name: "Guillaume",
-                    id: 3
-                }
-            }
-        ]
-    }
-];
+import API from '../scripts/API';
 
 export default {
     name: "MyView",
@@ -105,19 +48,44 @@ export default {
     },
     data() {
         return {
-            categs
+            categs: [
+                {
+                    name: Lang.CreateTranslationContext('my', 'Recent'),
+                    id: "RECENTS",
+                    docs: []
+                },
+                {
+                    name: Lang.CreateTranslationContext('my', 'Personnal'),
+                    id: "ME",
+                    docs: [],
+                    showNewCard: true
+                },
+                {
+                    name: Lang.CreateTranslationContext('my', 'Shared'),
+                    id: "SHARED",
+                    docs: []
+                }
+            ],
+            continousUpdate: true
         };
     },
     mounted() {
-        if (!User.currentUser) User.currentUser = new User({
-            pseudo: "Paul",
-            email: "paul@charlysheet.fr",
-            color: "#FF0040"
-        });
-        // TODO : Remove that when connection is done
+        this.retreiveSheets();
+
+        if (this.continousUpdate) {
+            setInterval(this.retreiveSheets, 2000);
+        }
     },
     methods: {
-        
+        async retreiveSheets() {
+            const ME = await API.execute_logged(API.ROUTE.SHEETS.ME());
+            const RECENTS = await API.execute_logged(API.ROUTE.SHEETS.RECENTS());
+            const SHARED = await API.execute_logged(API.ROUTE.SHEETS.SHARED());
+
+            this.categs.find(c => c.id === "ME").docs = ME;
+            this.categs.find(c => c.id === "RECENTS").docs = RECENTS;
+            this.categs.find(c => c.id === "SHARED").docs = SHARED;
+        }
     }
 }
 
