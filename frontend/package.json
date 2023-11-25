@@ -10,6 +10,7 @@
         "@heroicons/vue": "^2.0.14",
         "eslint-plugin-vue": "^9.10.0",
         "highlight.js": "^11.8.0",
+        "js-formula-parser": "^0.0.5",
         "socket.io": "^4.7.2",
         "socket.io-client": "^4.7.2",
         "three": "^0.154.0",

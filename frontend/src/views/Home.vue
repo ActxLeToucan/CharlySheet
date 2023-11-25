@@ -212,7 +212,7 @@ import {
     ChevronLeftIcon,
     CheckIcon
 } from '@heroicons/vue/24/outline';
-import User from '../scripts/User';
+import User from '../models/User';
 
 export default {
     name: "HomeView",
@@ -235,7 +235,7 @@ export default {
         };
     },
     mounted() {
-        if (User.CurrentUser) {
+        if (User.currentUser) {
             this.$router.push({ name: 'My' });
             return;
         }
