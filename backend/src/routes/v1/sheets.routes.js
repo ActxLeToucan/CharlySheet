@@ -266,10 +266,6 @@ class RouterSheets {
          *           application/json:
          *             schema:
          *               $ref: '#/components/schemas/Error'
-         *             example:
-         *               statusCode: 404
-         *               message: Sheet not found
-         *               error: Sheet not found
          */
         this.router.get(
             `${this.path}/:id`,
@@ -290,23 +286,6 @@ class RouterSheets {
          *     responses:
          *       '204':
          *         description: Sheet deleted
-         *       '404':
-         *         description: Sheet not found
-         *         content:
-         *           application/json:
-         *             schema:
-         *               type: object
-         *               properties:
-         *                 statusCode:
-         *                   type: number
-         *                 message:
-         *                   type: string
-         *                 error:
-         *                   type: string
-         *               example:
-         *                 statusCode: 404
-         *                 message: Sheet not found
-         *                 error: Sheet not found
          *       '403':
          *         description: Forbidden
          *         content:
@@ -318,7 +297,14 @@ class RouterSheets {
          *                   type: string
          *               example:
          *                 message: You are not the owner of this sheet
+         *       '404':
+         *         description: Sheet not found
+         *         content:
+         *           application/json:
+         *             schema:
+         *               $ref: '#/components/schemas/Error'
          */
+
         this.router.delete(
             `${this.path}/:id`,
             authenticateJWT,
@@ -360,18 +346,7 @@ class RouterSheets {
          *         content:
          *           application/json:
          *             schema:
-         *               type: object
-         *               properties:
-         *                 statusCode:
-         *                   type: number
-         *                 message:
-         *                   type: string
-         *                 error:
-         *                   type: string
-         *               example:
-         *                 statusCode: 404
-         *                 message: Sheet not found
-         *                 error: Sheet not found
+         *               $ref: '#/components/schemas/Error'
          *       403:
          *         description: Forbidden
          *         content:
