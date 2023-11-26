@@ -144,7 +144,7 @@ class RouterSheets {
          *         content:
          *           application/json:
          *             schema:
-         *               $ref: '#/components/schemas/Sheet'
+         *               $ref: '#/components/schemas/SheetUsersPopulated'
          *       '401':
          *         description: Unauthorized
          *         content:
@@ -199,12 +199,7 @@ class RouterSheets {
          *         content:
          *           application/json:
          *             schema:
-         *               $ref: '#/components/schemas/Sheet'
-         *               example:
-         *                 id: 60f9a5f9d3f9f20015c1d7a8
-         *                 name: Feuille 1
-         *                 users: []
-         *                 createdAt: 2021-07-23T13:53:05.000Z
+         *               $ref: '#/components/schemas/SheetUsersPopulated'
          *       '401':
          *         description: Unauthorized
          *         content:
@@ -259,7 +254,7 @@ class RouterSheets {
          *         content:
          *           application/json:
          *             schema:
-         *               $ref: '#/components/schemas/Sheet'
+         *               $ref: '#/components/schemas/SheetUsersPopulated'
          *       404:
          *         description: Sheet not found
          *         content:

@@ -98,3 +98,37 @@ schema.set('toJSON', {
  * @type {import('mongoose').Model}
  */
 export const Sheet = model('Sheet', schema);
+
+/**
+ * @openapi
+ * components:
+ *   schemas:
+ *     SheetUsersPopulated:
+ *       type: object
+ *       properties:
+ *         _id:
+ *           type: string
+ *           description: Unique identifier
+ *         name:
+ *           type: string
+ *           description: Name of the sheet
+ *           minLength: 3
+ *           maxLength: 30
+ *         owner:
+ *           type: string
+ *           description: Owner of the sheet
+ *         users:
+ *           type: array
+ *           description: Users of the sheet
+ *           items:
+ *            $ref: '#/components/schemas/User'
+ *         createdAt:
+ *           type: string
+ *           description: Date of creation
+ *           format: date-time
+ *         cells:
+ *           type: array
+ *           description: Cells of the sheet
+ *           items:
+ *             $ref: '#/components/schemas/Cell'
+ */
