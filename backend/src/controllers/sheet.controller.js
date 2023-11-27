@@ -25,8 +25,8 @@ class SheetController {
         const { user } = req;
         try {
             const sheet = await Sheet.findOne({ _id: id })
-                .populate('users', '-recents')
-                .populate('owner', '-recents');
+                .populate('users', '-recents -email')
+                .populate('owner', '-recents -email');
             if (!sheet) {
                 throw new HttpException(
                     404,
