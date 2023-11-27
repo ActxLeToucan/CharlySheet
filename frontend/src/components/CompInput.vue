@@ -1,18 +1,20 @@
 <template>
-    <div class="flex flex-col md:flex-row items-start md:items-center justify-center">
+    <div class="flex flex-col md:flex-row items-start md:items-center justify-center md:space-x-8">
         <p
             v-if="label"
-            class="flex text-lg font-semibold grow min-h-fit pr-10"
+            class="flex text-lg font-semibold grow min-h-fit"
         >
             <get-text :context="label" />
         </p>
         <input
             class="bg-slate-200 dark:bg-slate-800 rounded-md p-1 px-2 font-semibold placeholder-slate-400 dark:placeholder-slate-500 outline-none
-                   border-2 border-transparent hover:dark:border-slate-600 hover:border-slate-300 focus:outline focus:outline-indigo-500 transition-all"
+                   border-2 border-transparent transition-all"
+            :class="(expand? ' w-full': '') + (disabled? ' opacity-50 select-none': ' hover:dark:border-slate-600 hover:border-slate-300 focus:outline focus:outline-indigo-500')"
             :placeholder="placeholder_str"
             :type="type"
             :value="value_str"
             :name="name"
+            :disabled="disabled"
             :autocomplete="autocomplete"
             :autocapitalize="autocapitalize"
         >
@@ -66,6 +68,10 @@ export default {
             type: String,
             default: 'on'
         },
+        expand: {
+            type: Boolean,
+            default: false
+        }
     },
     data() {
         return {

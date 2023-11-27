@@ -4,6 +4,7 @@ import App from './App.vue';
 
 import "./index.css";
 import Lang from './scripts/Lang';
+import User from './models/User';
 
 // https redirection (should be done in NGINX, but it not we do it here)
 // if (window.location.protocol !== 'https:' && window.location.hostname !== 'localhost') {
@@ -20,12 +21,14 @@ const routes = [
         path: "/my",
         name: "My",
         component: () => import("./views/My.vue"),
+        condition: () => User.currentUser !== null,
         meta: { title: () => Lang.CreateTranslationContext('my', 'Documents') }
     },
     {
         path: "/doc/:id",
         name: "Doc",
         component: () => import("./views/Doc.vue"),
+        condition: () => User.currentUser !== null,
         meta: { title: () => import("./views/Doc.vue").then(async m => await m.default.meta.title()) }
     },
     {
@@ -46,7 +49,7 @@ router.beforeEach((to, from) => {
     const route = routes.find(r => r.name === to.name);
     if (route.condition === undefined) return true;
 
-    return route.condition() ? true : { name: "Login" };
+    return route.condition() ? true : { name: "Home", query: { redirect: to.fullPath } };
 });
 router.afterEach(async (to, from) => {
     document.title = await Lang.GetTextAsync(Lang.CreateTranslationContext('home', 'CharlySheet'));
