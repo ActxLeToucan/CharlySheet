@@ -26,7 +26,7 @@ import {
     UserMinusIcon,
     // ChevronLeftIcon
 } from '@heroicons/vue/24/outline';
-import User from '../scripts/User';
+import User from '../models/User';
 import CompButton from './CompButton.vue';
 import GetText from './text/GetText.vue';
 import Lang from '../scripts/Lang';
