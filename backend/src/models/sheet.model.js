@@ -45,7 +45,7 @@ const cellSchema = new Schema({
  *           minLength: 3
  *           maxLength: 30
  *         owner:
- *           type: string
+ *           $ref: '#/components/schemas/UserPublic'
  *           description: Owner of the sheet
  *         users:
  *           type: array
@@ -115,7 +115,7 @@ export const Sheet = model('Sheet', schema);
  *           minLength: 3
  *           maxLength: 30
  *         owner:
- *           type: string
+ *           $ref: '#/components/schemas/UserPublic'
  *           description: Owner of the sheet
  *         users:
  *           type: array
