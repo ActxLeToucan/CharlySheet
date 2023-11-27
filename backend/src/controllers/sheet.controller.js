@@ -26,7 +26,7 @@ class SheetController {
         try {
             const sheet = await Sheet.findOne({ _id: id })
                 .populate('users', '-recents')
-                .populate('owner');
+                .populate('owner', '-recents');
             if (!sheet) {
                 throw new HttpException(
                     404,
@@ -136,7 +136,7 @@ class SheetController {
             }
             sheet.owner = dbUser._id;
             await sheet.save();
-            await sheet.populate('owner');
+            await sheet.populate('owner', '-recents');
 
             this.#updateRecents(dbUser, sheet);
 
@@ -167,8 +167,8 @@ class SheetController {
             }
             sheet.name = name;
             await sheet.save();
-            await sheet.populate('owner');
-            await sheet.populate('users');
+            await sheet.populate('owner', '-recents');
+            await sheet.populate('users', '-recents');
             res.json(sheet.toJSON());
         } catch (error) {
             next(error);
