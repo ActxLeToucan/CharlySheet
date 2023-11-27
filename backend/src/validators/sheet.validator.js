@@ -29,8 +29,7 @@ export const sheetSchema = {
 };
 
 export const sheetIdandUserIdSchema = {
-    joiSchema: Joi.object({
-        id: Joi.string().required().length(24),
+    joiSchema: sheetIdentifierSchema.joiSchema.keys({
         userId: Joi.string().required().length(24)
     }),
     location: 'params'
