@@ -3,13 +3,30 @@ import { Sheet } from '../models/sheet.model.js';
 import User from '../models/user.model.js';
 
 class SheetController {
+    /**
+     * Update user recents field by adding provided sheet to it
+     *
+     * @param {import('./../models/user.model.js')} user the user that have opened the sheet
+     * @param {import('./../models/sheet.model.js')} sheet the sheet that have been recently opened
+     */
+    #updateRecents = async (user, sheet) => {
+        // remove the sheet from the recents if it is already in
+        user.recents = user.recents.filter(
+            (s) => s.toString() !== sheet._id.toString()
+        );
+        // add the sheet to the beginning of the recents
+        user.recents.unshift(sheet._id);
+        // keep only the 10 first recents
+        user.recents = user.recents.slice(0, 10);
+        await user.save();
+    };
     getById = async (req, res, next) => {
         const { id } = req.params;
         const { user } = req;
         try {
             const sheet = await Sheet.findOne({ _id: id })
-                .populate('users', '-recents')
-                .populate('owner');
+                .populate('users', '-recents -email')
+                .populate('owner', '-recents -email');
             if (!sheet) {
                 throw new HttpException(
                     404,
@@ -35,15 +52,7 @@ class SheetController {
             // add the sheet to the user recents in background, like it was a 10 circular buffer
             const dbUser = await User.findById(user._id);
             if (dbUser) {
-                // remove the sheet from the recents if it is already in
-                dbUser.recents = dbUser.recents.filter(
-                    (s) => s.toString() !== sheet._id.toString()
-                );
-                // add the sheet to the beginning of the recents
-                dbUser.recents.unshift(sheet._id);
-                // keep only the 10 first recents
-                dbUser.recents = dbUser.recents.slice(0, 10);
-                await dbUser.save();
+                this.#updateRecents(dbUser, sheet);
             }
         } catch (error) {
             next(error);
@@ -77,7 +86,10 @@ class SheetController {
     getMySheets = async (req, res, next) => {
         try {
             const { user } = req;
-            const sheets = await Sheet.find({ owner: user._id });
+            const sheets = await Sheet.find({ owner: user._id }).populate(
+                'owner',
+                '-recents -email'
+            );
             res.status(200).json(sheets);
         } catch (error) {
             next(error);
@@ -86,7 +98,10 @@ class SheetController {
     getSharedSheets = async (req, res, next) => {
         try {
             const { user } = req;
-            const sharedSheets = await Sheet.find({ users: user._id });
+            const sharedSheets = await Sheet.find({ users: user._id }).populate(
+                'owner',
+                '-recents -email'
+            );
             res.json(sharedSheets);
         } catch (error) {
             next(error);
@@ -104,6 +119,7 @@ class SheetController {
                 );
             }
             await dbUser.populate('recents');
+            await dbUser.populate('recents.owner', '-recents -email');
             res.json(dbUser.recents);
         } catch (error) {
             next(error);
@@ -127,7 +143,10 @@ class SheetController {
             }
             sheet.owner = dbUser._id;
             await sheet.save();
-            await sheet.populate('owner');
+            await sheet.populate('owner', '-recents -email');
+
+            this.#updateRecents(dbUser, sheet);
+
             res.json(sheet.toJSON());
         } catch (error) {
             next(error);
@@ -155,8 +174,7 @@ class SheetController {
             }
             sheet.name = name;
             await sheet.save();
-            await sheet.populate('owner');
-            await sheet.populate('users');
+            await sheet.populate('owner', '-recents -email');
             res.json(sheet.toJSON());
         } catch (error) {
             next(error);
@@ -198,8 +216,8 @@ class SheetController {
             );
             sheet.users.push(...newUsers.map((user) => user._id));
             await sheet.save();
-            await sheet.populate('users', '-recents');
-            await sheet.populate('owner', '-recents');
+            await sheet.populate('users', '-recents -email');
+            await sheet.populate('owner', '-recents -email');
             res.json(sheet.users);
         } catch (error) {
             next(error);
@@ -231,9 +249,10 @@ class SheetController {
             await sheet.save();
 
             // Rechercher le document mis à jour pour la population
-            const updatedSheet = await Sheet.findById(id)
-                .populate('users', '-recents')
-                .populate('owner', '-recents');
+            const updatedSheet = await Sheet.findById(id).populate(
+                'users',
+                '-recents -email'
+            );
             res.json(updatedSheet.users);
         } catch (error) {
             next(error);

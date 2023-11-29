@@ -200,11 +200,6 @@ class RouterSheets {
          *           application/json:
          *             schema:
          *               $ref: '#/components/schemas/Sheet'
-         *               example:
-         *                 id: 60f9a5f9d3f9f20015c1d7a8
-         *                 name: Feuille 1
-         *                 users: []
-         *                 createdAt: 2021-07-23T13:53:05.000Z
          *       '401':
          *         description: Unauthorized
          *         content:
@@ -259,17 +254,13 @@ class RouterSheets {
          *         content:
          *           application/json:
          *             schema:
-         *               $ref: '#/components/schemas/Sheet'
+         *               $ref: '#/components/schemas/SheetUsersPopulated'
          *       404:
          *         description: Sheet not found
          *         content:
          *           application/json:
          *             schema:
          *               $ref: '#/components/schemas/Error'
-         *             example:
-         *               statusCode: 404
-         *               message: Sheet not found
-         *               error: Sheet not found
          */
         this.router.get(
             `${this.path}/:id`,
@@ -290,35 +281,20 @@ class RouterSheets {
          *     responses:
          *       '204':
          *         description: Sheet deleted
-         *       '404':
-         *         description: Sheet not found
-         *         content:
-         *           application/json:
-         *             schema:
-         *               type: object
-         *               properties:
-         *                 statusCode:
-         *                   type: number
-         *                 message:
-         *                   type: string
-         *                 error:
-         *                   type: string
-         *               example:
-         *                 statusCode: 404
-         *                 message: Sheet not found
-         *                 error: Sheet not found
          *       '403':
          *         description: Forbidden
          *         content:
          *           application/json:
          *             schema:
-         *               type: object
-         *               properties:
-         *                 message:
-         *                   type: string
-         *               example:
-         *                 message: You are not the owner of this sheet
+         *               $ref: '#/components/schemas/Error'
+         *       '404':
+         *         description: Sheet not found
+         *         content:
+         *           application/json:
+         *             schema:
+         *               $ref: '#/components/schemas/Error'
          */
+
         this.router.delete(
             `${this.path}/:id`,
             authenticateJWT,
@@ -354,24 +330,13 @@ class RouterSheets {
          *             schema:
          *               type: array
          *               items:
-         *                 $ref: '#/components/schemas/User'
+         *                 $ref: '#/components/schemas/UserPublic'
          *       404:
          *         description: Sheet not found
          *         content:
          *           application/json:
          *             schema:
-         *               type: object
-         *               properties:
-         *                 statusCode:
-         *                   type: number
-         *                 message:
-         *                   type: string
-         *                 error:
-         *                   type: string
-         *               example:
-         *                 statusCode: 404
-         *                 message: Sheet not found
-         *                 error: Sheet not found
+         *               $ref: '#/components/schemas/Error'
          *       403:
          *         description: Forbidden
          *         content:
@@ -412,8 +377,13 @@ class RouterSheets {
          *           minLength: 24
          *           maxLength: 24
          *     responses:
-         *       204:
-         *         description: User removed from the sheet
+         *       200:
+         *         content:
+         *           application/json:
+         *             schema:
+         *               type: array
+         *               items:
+         *                 $ref: '#/components/schemas/UserPublic'
          *       403:
          *         description: Forbidden
          *         content:
