@@ -31,13 +31,18 @@ const errorMiddleware = (error, req, res, next) => {
         const message = error.message ?? GENERIC_ERROR_MESSAGE;
         const publicMessage = error.publicMessage ?? GENERIC_ERROR_MESSAGE;
 
-        logger.error(`[${req.method}] ${req.path} >> StatusCode:: ${status}, Message:: ${message}`);
-        res.status(status).json({
-            error: {
-                code: status,
-                message: NODE_ENV === 'development' ? message : publicMessage
-            }
-        });
+        logger.error(
+            `[${req.method}] ${req.path} >> StatusCode:: ${status}, Message:: ${message}`
+        );
+        if (!res.writableEnded) {
+            res.status(status).json({
+                error: {
+                    code: status,
+                    message:
+                        NODE_ENV === 'development' ? message : publicMessage
+                }
+            });
+        }
     } catch (error) {
         next(error);
     }

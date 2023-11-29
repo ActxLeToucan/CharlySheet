@@ -51,7 +51,13 @@ const schema = new Schema({
     createdAt: {
         type: Date,
         default: Date.now
-    }
+    },
+    recents: [
+        {
+            type: Schema.Types.ObjectId,
+            ref: 'Sheet'
+        }
+    ]
 });
 
 schema.set('toJSON', {
