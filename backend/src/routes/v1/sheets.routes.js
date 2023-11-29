@@ -286,12 +286,7 @@ class RouterSheets {
          *         content:
          *           application/json:
          *             schema:
-         *               type: object
-         *               properties:
-         *                 message:
-         *                   type: string
-         *               example:
-         *                 message: You are not the owner of this sheet
+         *               $ref: '#/components/schemas/Error'
          *       '404':
          *         description: Sheet not found
          *         content:
