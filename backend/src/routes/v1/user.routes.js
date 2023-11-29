@@ -86,7 +86,7 @@ class UserRoutes {
          *       - User
          *     summary: Login
          *     requestBody:
-         *     $ref: '#/components/requestBodies/login'
+         *       $ref: '#/components/requestBodies/login'
          *     responses:
          *       '200':
          *         description: Login successful
