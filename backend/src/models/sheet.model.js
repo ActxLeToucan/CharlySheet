@@ -121,7 +121,7 @@ export const Sheet = model('Sheet', schema);
  *           type: array
  *           description: Users of the sheet
  *           items:
- *            $ref: '#/components/schemas/User'
+ *            $ref: '#/components/schemas/UserPublic'
  *         createdAt:
  *           type: string
  *           description: Date of creation
