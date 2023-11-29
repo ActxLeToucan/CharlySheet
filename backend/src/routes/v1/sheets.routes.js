@@ -199,7 +199,7 @@ class RouterSheets {
          *         content:
          *           application/json:
          *             schema:
-         *               $ref: '#/components/schemas/SheetUsersPopulated'
+         *               $ref: '#/components/schemas/Sheet'
          *       '401':
          *         description: Unauthorized
          *         content:

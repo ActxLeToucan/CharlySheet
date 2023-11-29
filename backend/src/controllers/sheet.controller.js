@@ -175,7 +175,6 @@ class SheetController {
             sheet.name = name;
             await sheet.save();
             await sheet.populate('owner', '-recents -email');
-            await sheet.populate('users', '-recents -email');
             res.json(sheet.toJSON());
         } catch (error) {
             next(error);
