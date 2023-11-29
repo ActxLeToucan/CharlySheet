@@ -330,7 +330,7 @@ class RouterSheets {
          *             schema:
          *               type: array
          *               items:
-         *                 $ref: '#/components/schemas/User'
+         *                 $ref: '#/components/schemas/UserPublic'
          *       404:
          *         description: Sheet not found
          *         content:
@@ -377,8 +377,13 @@ class RouterSheets {
          *           minLength: 24
          *           maxLength: 24
          *     responses:
-         *       204:
-         *         description: User removed from the sheet
+         *       200:
+         *         content:
+         *           application/json:
+         *             schema:
+         *               type: array
+         *               items:
+         *                 $ref: '#/components/schemas/UserPublic'
          *       403:
          *         description: Forbidden
          *         content:

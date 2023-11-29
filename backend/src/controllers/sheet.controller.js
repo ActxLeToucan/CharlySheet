@@ -86,7 +86,10 @@ class SheetController {
     getMySheets = async (req, res, next) => {
         try {
             const { user } = req;
-            const sheets = await Sheet.find({ owner: user._id });
+            const sheets = await Sheet.find({ owner: user._id }).populate(
+                'owner',
+                '-recents -email'
+            );
             res.status(200).json(sheets);
         } catch (error) {
             next(error);
@@ -95,7 +98,10 @@ class SheetController {
     getSharedSheets = async (req, res, next) => {
         try {
             const { user } = req;
-            const sharedSheets = await Sheet.find({ users: user._id });
+            const sharedSheets = await Sheet.find({ users: user._id }).populate(
+                'owner',
+                '-recents -email'
+            );
             res.json(sharedSheets);
         } catch (error) {
             next(error);
@@ -113,6 +119,7 @@ class SheetController {
                 );
             }
             await dbUser.populate('recents');
+            await dbUser.populate('recents.owner', '-recents -email');
             res.json(dbUser.recents);
         } catch (error) {
             next(error);
@@ -136,7 +143,7 @@ class SheetController {
             }
             sheet.owner = dbUser._id;
             await sheet.save();
-            await sheet.populate('owner', '-recents');
+            await sheet.populate('owner', '-recents -email');
 
             this.#updateRecents(dbUser, sheet);
 
@@ -167,8 +174,8 @@ class SheetController {
             }
             sheet.name = name;
             await sheet.save();
-            await sheet.populate('owner', '-recents');
-            await sheet.populate('users', '-recents');
+            await sheet.populate('owner', '-recents -email');
+            await sheet.populate('users', '-recents -email');
             res.json(sheet.toJSON());
         } catch (error) {
             next(error);
@@ -210,8 +217,8 @@ class SheetController {
             );
             sheet.users.push(...newUsers.map((user) => user._id));
             await sheet.save();
-            await sheet.populate('users', '-recents');
-            await sheet.populate('owner', '-recents');
+            await sheet.populate('users', '-recents -email');
+            await sheet.populate('owner', '-recents -email');
             res.json(sheet.users);
         } catch (error) {
             next(error);
@@ -243,9 +250,10 @@ class SheetController {
             await sheet.save();
 
             // Rechercher le document mis à jour pour la population
-            const updatedSheet = await Sheet.findById(id)
-                .populate('users', '-recents')
-                .populate('owner', '-recents');
+            const updatedSheet = await Sheet.findById(id).populate(
+                'users',
+                '-recents -email'
+            );
             res.json(updatedSheet.users);
         } catch (error) {
             next(error);
