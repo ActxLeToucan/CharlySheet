@@ -4,19 +4,19 @@ import Joi from 'joi';
  * @openapi
  * components:
  *   parameters:
- *     username:
- *       name: username
+ *     userIdentifier:
+ *       name: id
  *       in: path
- *       description: Username of the user
+ *       description: Unique identifier of the user
  *       required: true
  *       schema:
  *         type: string
- *         minLength: 3
- *         maxLength: 20
+ *         minLength: 24
+ *         maxLength: 24
  */
 export const userIdentifierSchema = {
     joiSchema: Joi.object({
-        username: Joi.string().required().min(3).max(20)
+        id: Joi.string().required().length(24)
     }),
     location: 'params'
 };
@@ -53,6 +53,25 @@ export const newUserSchema = {
         password: Joi.string().required().min(8),
         email: Joi.string().required().email().min(3).max(64)
     }),
+    location: 'body'
+};
+
+/**
+ * @openapi
+ * components:
+ *  requestBodies:
+ *    arrayOfUserIds:
+ *      content:
+ *        application/json:
+ *          schema:
+ *            type: array
+ *            items:
+ *              type: string
+ *              minLength: 24
+ *              maxLength: 24
+ */
+export const arrayOfUserIdsSchema = {
+    joiSchema: Joi.array().items(Joi.string().required().length(24)),
     location: 'body'
 };
 

@@ -4,21 +4,32 @@
             <div class="flex w-fit h-full items-center justify-center pr-2">
                 <document-icon class="show-right w-14 h-full text-slate-500 dark:text-slate-400 bg-slate-200 dark:bg-slate-800 rounded-lg p-1" />
             </div>
-            <div class="flex flex-col w-full h-full">
+            <div class="flex flex-col w-full h-full space-y-2">
                 <div class="flex w-full h-fit">
-                    <div class="show-right">
-                        <comp-input value="Nouveau document" />
-                    </div>
-                    <div>
-                        <p class="hidden">
-                            uwu <!-- CONTEXT MENU / TODO -->
-                        </p>
+                    <div class="show-down flex space-x-4 items-center justify-center">
+                        <button
+                            v-for="menu in menus"
+                            :key="menu.name"
+                            class="flex items-center justify-center w-fit py-1 px-2 rounded-md text-slate-700 dark:text-slate-200
+                                   hover:bg-slate-200 hover:dark:bg-slate-600 transition-all"
+                        >
+                            {{ menu.name }}
+                        </button>
                     </div>
                 </div>
-                <div class="w-full h-8">
-                    <p class="hidden">
-                        owo <!-- FORMULA BAR + FORMATING / TODO -->
-                    </p>
+                <div class="show-right flex w-full h-fit">
+                    <comp-input value="Nouveau document" />
+                    <div class="flex space-x-2 pl-8 w-full">
+                        <comp-input
+                            ref="formula-input"
+                            class="md:space-x-2 w-full"
+                            label="Fx"
+                            :expand="true"
+                            :value="currentFormula || ''"
+                            :disabled="!currentSlot"
+                            @change="ev => { if (currentSlot) User.currentUser.slot.formula = ev.target.value }"
+                        />
+                    </div>
                 </div>
             </div>
         </div>
@@ -62,7 +73,7 @@
                     </div>
                     <div
                         ref="grid-container"
-                        class="flex grow w-full h-full overflow-auto bg-slate-50 dark:bg-slate-700"
+                        class="flex grow relative w-full h-full overflow-auto bg-slate-50 dark:bg-slate-700"
                     >
                         <div class="w-fit h-fit">
                             <div
@@ -73,9 +84,13 @@
                                 <div
                                     v-for="col in nbCols"
                                     :key="col"
-                                    class="w-32 h-8 items-center justify-center"
+                                    class="w-32 h-8 items-center justify-center comp-sheetslot"
                                 >
-                                    <comp-sheetslot :data="getSlotAt(col, row)" />
+                                    <comp-sheetslot
+                                        :data="getSlotAt(col-1, row-1)"
+                                        :data-x="col-1"
+                                        :data-y="row-1"
+                                    />
                                 </div>
                             </div>
                         </div>
@@ -88,12 +103,24 @@
 
 <script>
 import CompSheetslot from '../components/CompSheetslot.vue';
-import Slot from '@/models/Slot';
+import CompInput from '../components/CompInput.vue';
+import Slot from '../models/Slot';
+import User from '../models/User';
 
 import {
     DocumentIcon
 } from '@heroicons/vue/24/outline';
-import CompInput from '../components/CompInput.vue';
+
+const menus = [
+    {name: 'Fichier'},
+    {name: 'Edition'},
+    {name: 'Affichage'},
+    {name: 'Insertion'},
+    {name: 'Format'},
+    {name: 'Outils'},
+    {name: 'Données'},
+    {name: 'Aide'}
+];
 
 export default {
     name: "DocView",
@@ -104,12 +131,16 @@ export default {
     },
     data() {
         return {
+            User,
             MODE_NEW: 0,
             MODE_EDIT: 1,
             docMode: (this.$route.params.id === "new" ? 0 : 1),
             docId: this.$route.params.id,
-            nbRows: 30,
-            nbCols: 19,
+            nbRows: 40,
+            nbCols: 20,
+            menus,
+            currentFormula: '',
+            currentSlot: null
         };
     },
     mounted() {
@@ -125,8 +156,50 @@ export default {
             colBar.scrollTo(ev.target.scrollLeft, 0);
         });
 
-        window.colBar = colBar;
-        window.rowBar = rowBar;
+        let isMouseDown = false;
+        let startDiv = null;
+        let endDiv = null;
+        container.addEventListener('mousedown', ev => {
+            if (ev.button === 2) return;
+            isMouseDown = true;
+            startDiv = ev.target;
+            endDiv = ev.target;
+            this.setBorder(startDiv, endDiv);
+        });
+        container.addEventListener('mouseup', ev => { isMouseDown = false; });
+        container.addEventListener('contextmenu', ev => {
+            ev.preventDefault();
+            return;
+        })
+        container.addEventListener('keydown', ev => {
+            if (ev.key === 'Escape') {
+                document.querySelector(".border-selector")?.remove();
+                User.currentUser.slot = null;
+            }
+            if (ev.key === 'Delete') {
+                for (let x = startDiv.dataset.x; x <= endDiv.dataset.x; x++) {
+                    for (let y = startDiv.dataset.y; y <= endDiv.dataset.y; y++) {
+                        this.getSlotAt(x, y).formula = '';
+                    }
+                }
+            }
+        });
+        container.addEventListener('mousemove', ev => {
+            if (isMouseDown) {
+                endDiv = ev.target;
+                this.setBorder(startDiv, endDiv);
+            }
+        });
+
+        User.currentUser.on('slot', slot => {
+            this.currentFormula = slot?.formula;
+            this.currentSlot = slot;
+            
+            // need to do this because Vue.JS is shitty and doesn't update the input value
+            const formulaInput = this.$refs['formula-input'];
+            if (formulaInput)
+                formulaInput.$el.querySelector('input').value = this.currentFormula;
+        });
     },
     methods: {
         getIndexName(index) {
@@ -140,7 +213,53 @@ export default {
             return alphabet[index] + name;
         },
         getSlotAt(x, y) {
-            return new Slot();
+            if (!window.slots) window.slots = [];
+            if (!window.slots[x]) window.slots[x] = [];
+            if (!window.slots[x][y]) window.slots[x][y] = new Slot();
+            return window.slots[x][y];
+        },
+        setBorder(dom1, dom2) {
+            dom1 = this.getSheetSlotDom(dom1);
+            dom2 = this.getSheetSlotDom(dom2);
+
+            const dom1rect = dom1?.getBoundingClientRect();
+            const dom2rect = dom2?.getBoundingClientRect();
+            /**@type {HTMLDivElement} */
+            const container = this.$refs['grid-container'];
+            const containerRect = container.getBoundingClientRect();
+
+            const x = (dom2
+                ? Math.min(dom1rect.x, dom2rect.x)
+                : dom1rect.x) - containerRect.x + container.scrollLeft;
+            const y = (dom2
+                ? Math.min(dom1rect.y, dom2rect.y)
+                : dom1rect.y) - containerRect.y + container.scrollTop;
+            const w = dom2
+                ? Math.max(dom1rect.x, dom2rect.x) - Math.min(dom1rect.x, dom2rect.x) + dom2rect.width
+                : dom1rect.width;
+            const h = dom2
+                ? Math.max(dom1rect.y, dom2rect.y) - Math.min(dom1rect.y, dom2rect.y) + dom2rect.height
+                : dom1rect.height;
+
+            let border = document.querySelector(".border-selector");
+            if (!border) {
+                border = document.createElement('div');
+                border.className = "border-selector";
+                container.firstElementChild.appendChild(border);
+            }
+            border.style.position = 'absolute';
+            border.style.left = x + 'px';
+            border.style.top = y + 'px';
+            border.style.width = w + 'px';
+            border.style.height = h + 'px';
+        },
+        getSheetSlotDom(dom) {
+            let loops = 5;
+            while (dom && dom.classList && !dom.classList.contains('comp-sheetslot') && loops > 0) {
+                dom = dom.parentElement;
+                loops--;
+            }
+            return dom;
         }
     },
     meta: {
@@ -151,3 +270,9 @@ export default {
 }
 
 </script>
+
+<style>
+.border-selector {
+    @apply bg-indigo-500/[0.1] border-2 border-indigo-500 rounded pointer-events-none;
+}
+</style>

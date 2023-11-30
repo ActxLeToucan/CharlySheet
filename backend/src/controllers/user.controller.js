@@ -7,9 +7,9 @@ import User from '../models/user.model.js';
 
 class UserController {
     get = (req, res, next) => {
-        const { username } = req.params;
+        const { id } = req.params;
 
-        User.findOne({ username })
+        User.findOne({ _id: id })
             .then((user) => {
                 if (!user) {
                     throw new HttpException(
@@ -19,7 +19,7 @@ class UserController {
                     );
                 }
 
-                res.status(200).json(user);
+                res.status(200).json(user.toPublicJSON());
             })
             .catch(next);
     };
@@ -28,11 +28,7 @@ class UserController {
         const { email, password, username } = req.body;
 
         try {
-            if (
-                (await User.find({
-                    $or: [{ email }, { username }]
-                }).count()) > 0
-            ) {
+            if (await User.exists({ $or: [{ email }, { username }] })) {
                 throw new HttpException(
                     409,
                     'User already exists',

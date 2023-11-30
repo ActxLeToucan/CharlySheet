@@ -4,7 +4,7 @@ import App from './App.vue';
 
 import "./index.css";
 import Lang from './scripts/Lang';
-import User from './scripts/User';
+import User from './models/User';
 
 // https redirection (should be done in NGINX, but it not we do it here)
 // if (window.location.protocol !== 'https:' && window.location.hostname !== 'localhost') {
@@ -21,14 +21,14 @@ const routes = [
         path: "/my",
         name: "My",
         component: () => import("./views/My.vue"),
-        condition: () => User.CurrentUser !== null,
+        condition: () => User.currentUser !== null,
         meta: { title: () => Lang.CreateTranslationContext('my', 'Documents') }
     },
     {
         path: "/doc/:id",
         name: "Doc",
         component: () => import("./views/Doc.vue"),
-        condition: () => User.CurrentUser !== null,
+        condition: () => User.currentUser !== null,
         meta: { title: () => import("./views/Doc.vue").then(async m => await m.default.meta.title()) }
     },
     {

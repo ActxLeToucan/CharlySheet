@@ -51,7 +51,13 @@ const schema = new Schema({
     createdAt: {
         type: Date,
         default: Date.now
-    }
+    },
+    recents: [
+        {
+            type: Schema.Types.ObjectId,
+            ref: 'Sheet'
+        }
+    ]
 });
 
 schema.set('toJSON', {
@@ -62,6 +68,37 @@ schema.set('toJSON', {
         return ret;
     }
 });
+
+/**
+ * @openapi
+ * components:
+ *   schemas:
+ *     UserPublic:
+ *       type: object
+ *       properties:
+ *         _id:
+ *           type: string
+ *           description: Unique identifier
+ *         username:
+ *           type: string
+ *           description: Username of the user
+ *           minLength: 3
+ *           maxLength: 20
+ *         role:
+ *           type: string
+ *           description: Role of the user
+ *           enum: [user, admin]
+ *           default: user
+ *         createdAt:
+ *           type: string
+ *           description: Date of creation
+ *           format: date-time
+ */
+schema.methods.toPublicJSON = function toPublicJSON() {
+    const user = this.toJSON();
+    delete user.email;
+    return user;
+};
 
 schema.plugin(uniqueValidator);
 schema.plugin(passportLocalMongoose, {
