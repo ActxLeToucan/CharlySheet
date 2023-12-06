@@ -249,6 +249,32 @@ class UserRoutes {
             this.#controller.changePassword
         );
 
+        /**
+         * @openapi
+         * /v1/user/me:
+         *   delete:
+         *     summary: delete current user
+         *     security:
+         *       - bearerAuth: []
+         *     tags:
+         *       - User
+         *     responses:
+         *       204:
+         *         description: User deleted
+         *       404:
+         *         description: User not found
+         *         content:
+         *           application/json:
+         *             schema:
+         *               $ref: '#/components/schemas/Error'
+         *
+         */
+        this.router.delete(
+            `${this.path}/me`,
+            authenticateJWT,
+            this.#controller.deleteUser
+        );
+
     }
 }
 
