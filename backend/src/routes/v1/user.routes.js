@@ -6,7 +6,9 @@ import validate from '../../middlewares/validator.middleware.js';
 import {
     loginSchema,
     newUserSchema,
-    userIdentifierSchema
+    userIdentifierSchema,
+    modifyUserSchema,
+    modifyPasswordSchema
 } from '../../validators/user.validator.js';
 
 class UserRoutes {
@@ -159,20 +161,7 @@ class UserRoutes {
          *     tags:
          *       - User
          *     requestBody:
-         *      required : true
-         *      content:
-         *        application/json:
-         *          schema:
-         *            type: object
-         *            properties:
-         *              email:
-         *                type: string
-         *                example : 'user@example.com'
-         *              username:
-         *                type: string
-         *            required:
-         *              - email
-         *              - username
+         *       $ref: '#/components/requestBodies/modifyUser'
          *     responses:
          *       200:
          *         description: User
@@ -192,9 +181,12 @@ class UserRoutes {
          *           application/json:
          *             schema:
          *               $ref: '#/components/schemas/Error'
+         *       422:
+         *         $ref: '#/components/responses/errorValidate'
          */
         this.router.patch(
             `${this.path}/me`,
+            validate(modifyUserSchema),
             authenticateJWT,
             this.#controller.changeAccount
         );
@@ -209,19 +201,7 @@ class UserRoutes {
          *     tags:
          *       - User
          *     requestBody:
-         *      required : true
-         *      content:
-         *        application/json:
-         *          schema:
-         *            type: object
-         *            properties:
-         *              oldpassword:
-         *                type: string
-         *              newpassword:
-         *                type: string
-         *            required:
-         *              - oldpassword
-         *              - newpassword
+         *       $ref: '#/components/requestBodies/modifyPassword'
          *     responses:
          *       200:
          *         description: User
@@ -241,10 +221,13 @@ class UserRoutes {
          *           application/json:
          *             schema:
          *               $ref: '#/components/schemas/Error'
+         *       422:
+         *         $ref: '#/components/responses/errorValidate'
          *
          */
         this.router.patch(
             `${this.path}/me/password`,
+            validate(modifyPasswordSchema),
             authenticateJWT,
             this.#controller.changePassword
         );

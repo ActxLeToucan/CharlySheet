@@ -127,8 +127,8 @@ class UserController {
                 );
             }
 
-            dbUser.username = username;
-            dbUser.email = email;
+            dbUser.username =  username || dbUser.username;
+            dbUser.email = email || dbUser.email;
             await dbUser.save();
             res.json(dbUser.toJSON());
         } catch (error) {
