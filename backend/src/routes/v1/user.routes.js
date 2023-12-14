@@ -86,18 +86,7 @@ class UserRoutes {
          *       - User
          *     summary: Login
          *     requestBody:
-         *       content:
-         *         application/json:
-         *           schema:
-         *             type: object
-         *             properties:
-         *               username:
-         *                 type: string
-         *               password:
-         *                 type: string
-         *             required:
-         *               - username
-         *               - password
+         *       $ref: '#/components/requestBodies/login'
          *     responses:
          *       '200':
          *         description: Login successful
@@ -130,20 +119,20 @@ class UserRoutes {
 
         /**
          * @openapi
-         * /v1/user/{username}:
+         * /v1/user/{id}:
          *   get:
          *     tags:
          *     - User
-         *     summary: Get user
+         *     summary: Get user by id
          *     parameters:
-         *     - $ref: '#/components/parameters/username'
+         *     - $ref: '#/components/parameters/userIdentifier'
          *     responses:
          *       200:
          *         description: User
          *         content:
          *           application/json:
          *             schema:
-         *               $ref: '#/components/schemas/User'
+         *               $ref: '#/components/schemas/UserPublic'
          *       404:
          *         description: User not found
          *         content:
@@ -154,7 +143,7 @@ class UserRoutes {
          *         $ref: '#/components/responses/errorValidate'
          */
         this.router.get(
-            `${this.path}/:username`,
+            `${this.path}/:id`,
             validate(userIdentifierSchema),
             this.#controller.get
         );
