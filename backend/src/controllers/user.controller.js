@@ -114,11 +114,11 @@ class UserController {
                     'User not found'
                 );
             }
-
             if (
-                (await User.find({
-                    $or: [{email}, {username}]
-                }).count()) > 0
+                await User.exists({
+                    $or: [{ email }, { username }],
+                    _id: { $ne: user._id }
+                })
             ) {
                 throw new HttpException(
                     409,
