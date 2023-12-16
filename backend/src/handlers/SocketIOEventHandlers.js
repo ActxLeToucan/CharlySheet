@@ -5,6 +5,7 @@ import mongoose from 'mongoose';
 
 import { JWT_SECRET } from '../config/index.js';
 import { Sheet } from '../models/sheet.model.js';
+import { logger } from '../utils/logger.js';
 
 /**
  * @typedef {Object} Events
@@ -199,16 +200,12 @@ class RoomSheet {
     async changeCell(socket, payload) {
         const { x, y, formula, style } = payload;
         const key = `${x},${y}`;
+
         if (this.cellsHolder.get(key) !== socket.decoded._id) {
             socket.emit('error', 'you are not the owner of this cell');
             return;
         }
-        socket.to(this.sheetId).emit(Events.CELL_CHANGED, {
-            x,
-            y,
-            formula,
-            style
-        });
+
         const session = await mongoose.startSession();
         session.startTransaction();
         try {
@@ -223,7 +220,17 @@ class RoomSheet {
                 { upsert: true, new: true, session }
             );
             await session.commitTransaction();
+
+            socket.to(this.sheetId).emit(Events.CELL_CHANGED, {
+                x,
+                y,
+                formula,
+                style
+            });
         } catch (error) {
+            logger.error(error);
+            socket.emit('error', 'error while changing cell');
+
             await session.abortTransaction();
         } finally {
             session.endSession();
