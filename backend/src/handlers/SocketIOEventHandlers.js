@@ -110,12 +110,14 @@ const getRoom = (roomId) => {
     }
     return roomsMutex.get(roomId);
 };
+
 class RoomSheet {
     constructor(sheetId) {
         this.sheetId = sheetId;
         this.mutex = new Mutex();
         this.cellsHolder = new Map();
     }
+
     /**
      *
      * @param {SocketIO.Socket} socket
@@ -137,6 +139,7 @@ class RoomSheet {
             socket.emit('error', 'you are not allowed to join this room');
         }
     }
+
     async acquireCell(socket, payload) {
         const { x, y } = payload;
         const key = `${x},${y}`;
@@ -158,6 +161,7 @@ class RoomSheet {
             }
         });
     }
+
     async releaseCell(socket, payload) {
         const { x, y } = payload;
         const key = `${x},${y}`;
@@ -172,6 +176,7 @@ class RoomSheet {
             }
         });
     }
+
     async selectCell(socket, payload) {
         const { x, y } = payload;
         socket.to(this.sheetId).emit(Events.CELL_SELECTED, {
@@ -180,6 +185,7 @@ class RoomSheet {
             y
         });
     }
+
     async changeCell(socket, payload) {
         const { x, y, formula, style } = payload;
         const key = `${x},${y}`;
@@ -213,6 +219,7 @@ class RoomSheet {
             session.endSession();
         }
     }
+
     async leave(socket) {
         socket.leave(this.sheetId);
         this.mutex.runExclusive(async () => {
