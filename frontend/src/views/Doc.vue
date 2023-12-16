@@ -319,7 +319,7 @@ export default {
             this.$router.push('/doc/' + this.doc._id);
         },
         setDocName(name) {
-            if (!this.doc?._id) return;
+            if (!this.doc?.id) return;
             if (this.changeDocTimeout) clearTimeout(this.changeDocTimeout);
             this.changeDocTimeout = setTimeout(async () => {
                 this.changeDocTimeout = null;

@@ -37,6 +37,7 @@ import CompNewdoccard from '../components/CompNewdoccard.vue';
 import Lang from '../scripts/Lang';
 import GetText from '../components/text/GetText.vue';
 import API from '../scripts/API';
+import Notify from '../scripts/Notify';
 
 export default {
     name: "MyView",
@@ -76,7 +77,13 @@ export default {
             const interval = setInterval(() => {
                 this.retreiveSheets()
                     .then(() => {})
-                    .catch(e => { clearInterval(interval); });
+                    .catch(async e => {
+                        Notify.error(
+                            await Lang.GetTextAsync(Lang.CreateTranslationContext('errors', 'Error')),
+                            await Lang.GetTextAsync(Lang.CreateTranslationContext('errors', 'Unknown', {msg: e.message}))
+                        );
+                        clearInterval(interval);
+                    });
             }, 2000);
         }
     },
