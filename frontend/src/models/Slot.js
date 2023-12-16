@@ -1,16 +1,30 @@
 import Callbackable from "./Callbackable";
 import User from "./User";
 import { parseFormula } from "js-formula-parser";
+import constants from "./Constants";
 
 let SLOT_ID_COUNTER = 1;
-
-const constants = {
-    'PI': Math.PI
-};
 
 export default class Slot extends Callbackable {
     /** @type {string} Default slot formula */
     static DEFAULT_FORMULA = '';
+
+    /** @type {User[]} Default slot users list */
+    static DEFAULT_USERS = [];
+
+    /**
+     * Builds a new Slot object from given data
+     * @param {object} data Object representing a Slot
+     * @returns A Slot object with the given data properties
+     */
+    static fromData(data) {
+        return new Slot(
+            data.id ?? data._id,
+            data.doc ?? data.document,
+            data.users.map(u => User.fromData(u)),
+            data.formula ?? data.value
+        );
+    }
 
     /** @type {number} internal slot id */
     #id = SLOT_ID_COUNTER++;
@@ -20,14 +34,25 @@ export default class Slot extends Callbackable {
     #formula = '';
     /** @type {string} slot result */
     #result = '';
+    /** @type {Doc} slot document */
+    #doc = null;
 
     /** @type {string} slot listeners for child cells (for result calculations)*/
     #listeners = [];
     
-    constructor() {
+    /**
+     * Defaut slot contructor, with default values if not given
+     * @param {Doc} doc The slot's document
+     * @param {number} id The slot's id
+     * @param {User[]} users The slots's users
+     * @param {string} formula The slots's formula
+     */
+    constructor(id, doc, users, formula) {
         super();
-        this.#users = [];
-        this.#formula = Slot.DEFAULT_FORMULA;
+        this.#id = id ?? SLOT_ID_COUNTER++;
+        this.#users = users ?? Slot.DEFAULT_USERS;
+        this.#formula = formula ?? Slot.DEFAULT_FORMULA;
+        this.#doc = doc ?? null;
     }
 
     /**
@@ -108,6 +133,22 @@ export default class Slot extends Callbackable {
     }
 
     /**
+     * Get slot document
+     * @returns The slot's document
+     */
+    get doc() {
+        return this.#doc;
+    }
+
+    /**
+     * Set slot document
+     * @param {Doc} value the new document
+     */
+    set doc(value) {
+        this.#doc = value;
+    }
+
+    /**
      * Set slot formula
      * @param {string} value the new formula
      */
@@ -117,6 +158,9 @@ export default class Slot extends Callbackable {
         this.#calculateResult();
     }
 
+    /**
+     * Calculate the slot result (from the formula)
+     */
     #calculateResult() {
         // remove all listeners to sub cells
         this.#listeners.forEach(l => l.cell.no(l.id));
@@ -139,6 +183,11 @@ export default class Slot extends Callbackable {
         this._callCallbacks('result', this.#result);
     }
 
+    /**
+     * Resolves all constants in a formula and returns the resolved formula
+     * @param {string} formula The string representing the formula to resolve
+     * @returns The formula with resolved constants each replaced by their value
+     */
     #resolveConstants(formula) {
         const withConstants = formula.replace(/[A-Z][A-Z]+/g, (match, p1) => {
             const constant = constants[match];
@@ -150,7 +199,7 @@ export default class Slot extends Callbackable {
             const parts = match.split('');
             const col = parts[0].charCodeAt(0) - 'A'.charCodeAt(0);
             const row = parseInt(parts[1]) - 1;
-            const cell = window.slots[col]?.[row];
+            const cell = this.doc.getSlotAt(col, row);
             if (cell) {
                 const id = cell.on('result', () => {
                     this.#calculateResult();
@@ -165,6 +214,11 @@ export default class Slot extends Callbackable {
         return withCells;
     }
 
+    /**
+     * Returns if a value is valid for a formula
+     * @param {any} value Value to check
+     * @returns If the value is a number or string representing a number
+     */
     #isValidValue(value) {
         if (typeof(value) === 'number') return !isNaN(value);
         if (typeof(value) === 'string') return value !== '' && this.#isValidValue(Number(value));

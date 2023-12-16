@@ -1,3 +1,5 @@
 {
-    "NewDocument": "New Document"
+    "NewDocument": "New Document",
+    "Loading": "Loading document ...",
+    "LoadingError": "An error occurred while loading the document."
 }

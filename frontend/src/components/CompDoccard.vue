@@ -7,7 +7,7 @@
     >
         <button
             class="show-left absolute top-2 right-2 p-1 hidden group-hover/card:flex w-fit h-fit rounded-md border-2 border-transparent
-                   hover:border-red-500 hover:bg-red-100 transition-all"
+                   hover:border-red-500 hover:bg-red-500/[0.3] text-slate-800 dark:text-slate-200 transition-all"
             @click="deleteDoc"
         >
             <trash-icon class="w-6 h-6" />
@@ -17,7 +17,7 @@
         </div>
         <div class="flex flex-col h-20 justify-evenly w-full bg-slate-950/[0.2] dark:bg-slate-950/[0.5] p-2">
             <p class="text-lg font-semibold whitespace-nowrap text-ellipsis overflow-hidden"> {{ doc.name }} </p>
-            <p class="text-base font-normal whitespace-nowrap text-ellipsis overflow-hidden"> {{ doc.owner.name ?? doc.owner }} </p>
+            <p class="text-base font-normal whitespace-nowrap text-ellipsis overflow-hidden"> {{ ownerName }} </p>
         </div>
     </a>
 </template>
@@ -28,6 +28,7 @@ import {
     TrashIcon
 } from '@heroicons/vue/24/outline';
 import API from '../scripts/API';
+import Ressources from '../scripts/Ressources';
 
 export default {
     name: "CompDoccard",
@@ -48,11 +49,13 @@ export default {
     },
     data() {
         return {
-            
+            ownerName: ". . ."
         };
     },
     mounted() {
-        
+        Ressources.getUser(this.doc.owner._id).then(user => {
+            this.ownerName = user.username;
+        });
     },
     methods: {
         async deleteDoc(ev) {

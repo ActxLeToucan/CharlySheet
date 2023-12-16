@@ -28,7 +28,7 @@ export default class User extends Callbackable {
         const data = localStorage.getItem("user");
         if (!data) return null;
         const userInfos = JSON.parse(data);
-        return new User(userInfos);
+        return User.fromData(userInfos);
     }
 
     /**
@@ -44,6 +44,21 @@ export default class User extends Callbackable {
         User.#currentUser = null;
     }
 
+    /**
+     * Builds a new User object from given data
+     * @param {object} data Object representing a User
+     * @returns A User object with the given data properties
+     */
+    static fromData(data) {
+        return new User(
+            data?.id,
+            data?.username,
+            data?.email,
+            data?.color,
+            data?.token
+        );
+    }
+
     /** @type {string} User id */
     #id = '';
     /** @type {string} User name */
@@ -57,9 +72,17 @@ export default class User extends Callbackable {
     /** @type {Slot} User selected slot */
     #slot = null;
 
-    constructor(infos) {
+    /**
+     * Full User constructor
+     * @param {string} id User unique id
+     * @param {string} username User username
+     * @param {string} email User email address
+     * @param {string} color User color 
+     * @param {string} token User access token
+     */
+    constructor(id, username=User.DEFAULT_USERNAME, email=User.DEFAULT_EMAIL, color=User.DEFAULT_COLOR, token) {
         super();
-        this.setInformations(infos);
+        this.setInformations({id, username, email, color, token});
     }
 
     setInformations(infos) {

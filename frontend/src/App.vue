@@ -1,14 +1,17 @@
 <template>
     <div class="flex flex-col grow min-w-0 min-h-0 dark:bg-slate-700 bg-slate-50 dark:text-slate-200 text-slate-700 overflow-hidden">
+        <comp-notify />
         <router-view />
     </div>
 </template>
 
 <script>
+import CompNotify from './components/CompNotify.vue';
+
 export default {
     name: "App",
     components: {
-        
+        CompNotify
     },
     data() {
         return {}

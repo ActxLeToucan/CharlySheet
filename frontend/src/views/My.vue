@@ -73,7 +73,11 @@ export default {
         this.retreiveSheets();
 
         if (this.continousUpdate) {
-            setInterval(this.retreiveSheets, 2000);
+            const interval = setInterval(() => {
+                this.retreiveSheets()
+                    .then(() => {})
+                    .catch(e => { clearInterval(interval); });
+            }, 2000);
         }
     },
     methods: {

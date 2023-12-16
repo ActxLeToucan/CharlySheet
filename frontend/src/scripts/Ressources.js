@@ -5,7 +5,7 @@ import User from "../models/User";
 export default class Ressources {
     static #USERS_FETCHER = id => async () => {
         const res = await API.execute_logged(API.ROUTE.USERS(id));
-        return new User(res);
+        return User.fromData(res);
     };
 
     static #users = {};

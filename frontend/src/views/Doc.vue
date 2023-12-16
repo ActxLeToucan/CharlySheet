@@ -19,7 +19,7 @@
                 </div>
                 <div class="show-right flex w-full h-fit">
                     <comp-input
-                        :value="doc?.name ?? Lang.CreateTranslationContext('doc', 'NewDocument')"
+                        :value="doc?.title ?? Lang.CreateTranslationContext('doc', 'NewDocument')"
                         @input="setDocName($event.target.value)"
                     />
                     <div class="flex space-x-2 pl-8 w-full">
@@ -78,7 +78,10 @@
                         ref="grid-container"
                         class="flex grow relative w-full h-full overflow-auto bg-slate-50 dark:bg-slate-700"
                     >
-                        <div class="w-fit h-fit">
+                        <div
+                            v-if="doc"
+                            class="w-fit h-fit"
+                        >
                             <div
                                 v-for="row in nbRows"
                                 :key="row"
@@ -97,6 +100,27 @@
                                 </div>
                             </div>
                         </div>
+                        <div
+                            v-else
+                            class="flex w-full h-full items-center justify-center"
+                        >
+                            <div v-if="doc === undefined">
+                                <p class="text-2xl font-semibold tracking-wide">
+                                    <get-text :context="Lang.CreateTranslationContext('doc', 'Loading')" />
+                                </p>
+                            </div>
+                            <div v-if="doc === null">
+                                <p class="text-2xl font-semibold tracking-wide">
+                                    <get-text :context="Lang.CreateTranslationContext('doc', 'LoadingError')" />
+                                </p>
+                                <comp-button
+                                    class="mt-4 mx-auto"
+                                    @click="window.close()"
+                                >
+                                    <get-text :context="Lang.CreateTranslationContext('verbs', 'Back')" />
+                                </comp-button>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -107,14 +131,18 @@
 <script>
 import CompSheetslot from '../components/CompSheetslot.vue';
 import CompInput from '../components/CompInput.vue';
-import Slot from '../models/Slot';
 import User from '../models/User';
+import Doc from '../models/Doc';
 
 import {
     DocumentIcon
 } from '@heroicons/vue/24/outline';
 import API from '../scripts/API';
 import Lang from '../scripts/Lang';
+import * as DocView from '../scripts/DocView';
+import GetText from '../components/text/GetText.vue';
+import Notify from '../scripts/Notify';
+import CompButton from '../components/CompButton.vue';
 
 const menus = [
     {name: 'Fichier'},
@@ -132,7 +160,9 @@ export default {
     components: {
         CompSheetslot,
         DocumentIcon,
-        CompInput
+        CompInput,
+        GetText,
+        CompButton
     },
     data() {
         return {
@@ -147,17 +177,28 @@ export default {
             menus,
             currentFormula: '',
             currentSlot: null,
-            doc: null
+            window
         };
     },
     async mounted() {
+        this.doc = undefined;
+        
         if (this.docMode === this.MODE_NEW) {
             await this.createNewDoc();
+            return;
         }
 
         API.execute_logged(API.ROUTE.SHEETS.call(this.docId)).then(res => {
-            this.doc = res;
-        }).catch(err => console.error(err));
+            this.doc = Doc.fromData(res);
+            this.$forceUpdate();
+        }).catch(async err => {
+            this.doc = null;
+            this.$forceUpdate();
+            Notify.error(
+                await Lang.GetTextAsync(Lang.CreateTranslationContext('errors', 'Error')),
+                await Lang.GetTextAsync(Lang.CreateTranslationContext('errors', 'Unknown', {msg: err.message})),
+            );
+        });
 
         /** @type {HTMLDivElement} */
         const container = this.$refs['grid-container'];
@@ -228,17 +269,18 @@ export default {
             return alphabet[index] + name;
         },
         getSlotAt(x, y) {
-            if (!window.slots) window.slots = [];
-            if (!window.slots[x]) window.slots[x] = [];
-            if (!window.slots[x][y]) window.slots[x][y] = new Slot();
-            return window.slots[x][y];
+            return this.doc.getSlotAt(x, y);
         },
         setBorder(dom1, dom2) {
-            dom1 = this.getSheetSlotDom(dom1);
-            dom2 = this.getSheetSlotDom(dom2);
+            dom1 = DocView.tryGetDomSlot(dom1);
+            dom2 = DocView.tryGetDomSlot(dom2);
 
-            const dom1rect = dom1?.getBoundingClientRect();
-            const dom2rect = dom2?.getBoundingClientRect();
+            if (!dom1 || !dom2) {
+                return;
+            }
+
+            const dom1rect = dom1.getBoundingClientRect();
+            const dom2rect = dom2.getBoundingClientRect();
             /**@type {HTMLDivElement} */
             const container = this.$refs['grid-container'];
             const containerRect = container.getBoundingClientRect();
@@ -268,19 +310,12 @@ export default {
             border.style.width = w + 'px';
             border.style.height = h + 'px';
         },
-        getSheetSlotDom(dom) {
-            let loops = 5;
-            while (dom && dom.classList && !dom.classList.contains('comp-sheetslot') && loops > 0) {
-                dom = dom.parentElement;
-                loops--;
-            }
-            return dom;
-        },
         async createNewDoc() {
-            this.doc = await API.execute_logged(API.ROUTE.SHEETS.call(), API.METHOD.POST, {
+            const res = await API.execute_logged(API.ROUTE.SHEETS.call(), API.METHOD.POST, {
                 name: await Lang.GetTextAsync(Lang.CreateTranslationContext('doc', 'NewDocument'))
             });
-            this.docId = this.doc._id;
+            this.doc = Doc.fromData(res);
+            this.docId = this.doc.id;
             this.$router.push('/doc/' + this.doc._id);
         },
         setDocName(name) {
@@ -289,10 +324,11 @@ export default {
             this.changeDocTimeout = setTimeout(async () => {
                 this.changeDocTimeout = null;
                 try {
-                    await API.execute_logged(API.ROUTE.SHEETS.NAME(this.doc._id), API.METHOD.PUT, {name})
+                    const res = await API.execute_logged(API.ROUTE.SHEETS.NAME(this.doc._id), API.METHOD.PUT, {name});
+                    this.doc.title = res.name;
                 } catch (err) { console.error(err); }
             }, 300);
-        },
+        }
     },
     meta: {
         title: async () => {
