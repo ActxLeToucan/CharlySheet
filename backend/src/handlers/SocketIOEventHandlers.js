@@ -119,21 +119,31 @@ class RoomSheet {
     }
 
     /**
-     *
-     * @param {SocketIO.Socket} socket
+     * @param {import('socket.io').Socket} socket
      */
     async join(socket) {
         const { _id } = socket.decoded;
         const sheet = await Sheet.findById(this.sheetId);
+
         if (!sheet) {
             socket.emit('error', 'sheet not found');
+            return;
         }
+
         if (
             sheet.owner.toString() === _id.toString() ||
             sheet.users.includes(_id)
         ) {
             socket.join(this.sheetId);
+
+            socket.on(Events.ACQUIRE_CELL, (payload) => this.acquireCell(socket, payload));
+            socket.on(Events.RELEASE_CELL, (payload) => this.releaseCell(socket, payload));
+            socket.on(Events.SELECT_CELL, (payload) => this.selectCell(socket, payload));
+            socket.on(Events.CHANGE_CELL, (payload) => this.changeCell(socket, payload));
+            socket.on(Events.LEAVE_ROOM, () => this.leave(socket));
+
             // TODO: rattraper tout les evenements manqués et envoyer la feuille
+
             socket.emit(Events.ROOM_JOINED, {});
         } else {
             socket.emit('error', 'you are not allowed to join this room');
@@ -144,8 +154,8 @@ class RoomSheet {
         const { x, y } = payload;
         const key = `${x},${y}`;
         await this.mutex.runExclusive(async () => {
-            const cell = this.cellsHolder.get(key);
-            if (cell === undefined) {
+            const holderId = this.cellsHolder.get(key);
+            if (holderId === undefined) {
                 this.cellsHolder.set(key, socket.decoded._id);
                 socket.to(this.sheetId).emit(Events.CELL_ACQUIRED, {
                     holderId: socket.decoded._id,
@@ -154,7 +164,7 @@ class RoomSheet {
                 });
             } else {
                 socket.emit(Events.CELL_HOLDED, {
-                    holderId: cell.holderId,
+                    holderId,
                     x,
                     y
                 });
@@ -223,8 +233,8 @@ class RoomSheet {
     async leave(socket) {
         socket.leave(this.sheetId);
         this.mutex.runExclusive(async () => {
-            for (const [key, cell] of this.cells) {
-                if (cell.holderId === socket.decoded._id) {
+            for (const [key, holderId] of this.cellsHolder.entries()) {
+                if (holderId === socket.decoded._id) {
                     this.cellsHolder.delete(key);
                     const { x, y } = key.split(',');
                     socket.to(this.sheetId).emit(Events.CELL_RELEASED, {
