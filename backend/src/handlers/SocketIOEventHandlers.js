@@ -21,6 +21,7 @@ import { logger } from '../utils/logger.js';
  * @property {string} JOIN_ROOM - event fired by client when he wants to join a room
  * @property {string} ROOM_JOINED - event fired by server when a client joined a room
  * @property {string} LEAVE_ROOM - event fired by client when he wants to leave a room
+ * @property {string} ROOM_LEAVED - event fired by server when a client leaved a room
  */
 
 /** @type {Events} */
@@ -36,7 +37,8 @@ const Events = {
     CELL_CHANGED: 'cellChanged',
     JOIN_ROOM: 'joinRoom',
     ROOM_JOINED: 'roomJoined',
-    LEAVE_ROOM: 'leaveRoom'
+    LEAVE_ROOM: 'leaveRoom',
+    ROOM_LEAVED: 'roomLeaved'
 };
 
 export default class SocketIOEventHandlers {
@@ -195,7 +197,7 @@ class RoomSheet {
         await this.mutex.runExclusive(async () => {
             if (this.cellsHolder.get(key) === socket.decoded._id) {
                 this.cellsHolder.delete(key);
-                socket.to(this.sheetId).emit(Events.CELL_RELEASED, {
+                this.io.to(this.sheetId).emit(Events.CELL_RELEASED, {
                     holderId: socket.decoded._id,
                     x,
                     y
@@ -241,7 +243,7 @@ class RoomSheet {
             );
             await session.commitTransaction();
 
-            socket.to(this.sheetId).emit(Events.CELL_CHANGED, {
+            this.io.to(this.sheetId).emit(Events.CELL_CHANGED, {
                 x,
                 y,
                 formula,
@@ -272,5 +274,10 @@ class RoomSheet {
                 }
             }
         });
+        this.io.to(this.sheetId).emit(Events.ROOM_LEAVED, {
+            userId: socket.decoded._id
+        });
+        // disconnect socket
+        socket.disconnect();
     }
 }
