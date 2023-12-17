@@ -159,7 +159,9 @@ class RoomSheet {
 
             // TODO: rattraper tout les evenements manqués et envoyer la feuille
 
-            socket.emit(Events.ROOM_JOINED, {});
+            this.io.to(this.sheetId).emit(Events.ROOM_JOINED, {
+                userId: socket.decoded._id
+            });
         } else {
             socket.emit('error', 'you are not allowed to join this room');
         }
