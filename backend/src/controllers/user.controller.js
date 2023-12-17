@@ -9,7 +9,7 @@ class UserController {
     get = (req, res, next) => {
         const { id } = req.params;
 
-        User.findOne({ _id: id })
+        User.findOne({ _id: id }).select('-recents -email')
             .then((user) => {
                 if (!user) {
                     throw new HttpException(
@@ -19,7 +19,7 @@ class UserController {
                     );
                 }
 
-                res.status(200).json(user.toPublicJSON());
+                res.status(200).json(user);
             })
             .catch(next);
     };
@@ -98,6 +98,41 @@ class UserController {
                 }
             }
         )(req, res, next);
+    };
+
+    search = async (req, res, next) => {
+        const { query } = req.params;
+
+        try {
+            const filter = [
+                {
+                    $expr: {
+                        $ne: [
+                            { $indexOfCP: ['$username', query] },
+                            -1
+                        ]
+                    }
+                }
+            ];
+            if (query.match(/^.+@.+$/)) {
+                filter.push({
+                    $expr: {
+                        $ne: [
+                            { $indexOfCP: ['$email', query] },
+                            -1
+                        ]
+                    }
+                });
+            }
+
+            const users = await User.find({
+                $or: filter
+            }).select('-recents -email');
+
+            res.status(200).json(users);
+        } catch (error) {
+            next(error);
+        }
     };
 }
 
