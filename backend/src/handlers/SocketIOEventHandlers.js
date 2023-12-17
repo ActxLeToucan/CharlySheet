@@ -159,7 +159,9 @@ class RoomSheet {
 
             // TODO: rattraper tout les evenements manqués et envoyer la feuille
 
-            socket.emit(Events.ROOM_JOINED, {});
+            this.io.to(this.sheetId).emit(Events.ROOM_JOINED, {
+                userId: socket.decoded._id
+            });
         } else {
             socket.emit('error', 'you are not allowed to join this room');
         }
@@ -172,7 +174,7 @@ class RoomSheet {
             const holderId = this.cellsHolder.get(key);
             if (holderId === undefined) {
                 this.cellsHolder.set(key, socket.decoded._id);
-                socket.to(this.sheetId).emit(Events.CELL_ACQUIRED, {
+                this.io.to(this.sheetId).emit(Events.CELL_ACQUIRED, {
                     holderId: socket.decoded._id,
                     x,
                     y
