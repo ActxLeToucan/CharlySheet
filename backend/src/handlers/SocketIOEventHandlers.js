@@ -172,7 +172,7 @@ class RoomSheet {
             const holderId = this.cellsHolder.get(key);
             if (holderId === undefined) {
                 this.cellsHolder.set(key, socket.decoded._id);
-                socket.to(this.sheetId).emit(Events.CELL_ACQUIRED, {
+                this.io.to(this.sheetId).emit(Events.CELL_ACQUIRED, {
                     holderId: socket.decoded._id,
                     x,
                     y
