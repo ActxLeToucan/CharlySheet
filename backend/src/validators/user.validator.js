@@ -102,3 +102,23 @@ export const loginSchema = {
     }),
     location: 'body'
 };
+
+/**
+ * @openapi
+ * components:
+ *   parameters:
+ *     userSearch:
+ *       name: query
+ *       in: path
+ *       description: Search query
+ *       required: true
+ *       schema:
+ *         type: string
+ *         minLength: 3
+ */
+export const userSearchSchema = {
+    joiSchema: Joi.object({
+        query: Joi.string().required().min(3)
+    }),
+    location: 'params'
+};
