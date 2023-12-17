@@ -5,6 +5,7 @@ import mongoose from 'mongoose';
 
 import { JWT_SECRET } from '../config/index.js';
 import { Sheet } from '../models/sheet.model.js';
+import { logger } from '../utils/logger.js';
 
 /**
  * @typedef {Object} Events
@@ -73,7 +74,7 @@ export default class SocketIOEventHandlers {
             // join room
             socket.on(Events.JOIN_ROOM, (payload) => {
                 console.log('join', payload);
-                new RoomSheet(payload.sheetId).join(socket);
+                new RoomSheet(payload.sheetId, io).join(socket);
                 // // test if guy has permission to join room
                 // if (checkRight(socket, payload)) {
                 //     socket.join(payload.roomId);
@@ -112,10 +113,16 @@ const getRoom = (roomId) => {
 };
 
 class RoomSheet {
-    constructor(sheetId) {
+    /**
+     *
+     * @param {String} sheetId
+     * @param {Server} io
+     */
+    constructor(sheetId, io) {
         this.sheetId = sheetId;
         this.mutex = new Mutex();
         this.cellsHolder = new Map();
+        this.io = io;
     }
 
     /**
@@ -136,10 +143,18 @@ class RoomSheet {
         ) {
             socket.join(this.sheetId);
 
-            socket.on(Events.ACQUIRE_CELL, (payload) => this.acquireCell(socket, payload));
-            socket.on(Events.RELEASE_CELL, (payload) => this.releaseCell(socket, payload));
-            socket.on(Events.SELECT_CELL, (payload) => this.selectCell(socket, payload));
-            socket.on(Events.CHANGE_CELL, (payload) => this.changeCell(socket, payload));
+            socket.on(Events.ACQUIRE_CELL, (payload) =>
+                this.acquireCell(socket, payload)
+            );
+            socket.on(Events.RELEASE_CELL, (payload) =>
+                this.releaseCell(socket, payload)
+            );
+            socket.on(Events.SELECT_CELL, (payload) =>
+                this.selectCell(socket, payload)
+            );
+            socket.on(Events.CHANGE_CELL, (payload) =>
+                this.changeCell(socket, payload)
+            );
             socket.on(Events.LEAVE_ROOM, () => this.leave(socket));
 
             // TODO: rattraper tout les evenements manqués et envoyer la feuille
@@ -189,26 +204,26 @@ class RoomSheet {
 
     async selectCell(socket, payload) {
         const { x, y } = payload;
-        socket.to(this.sheetId).emit(Events.CELL_SELECTED, {
-            userId: socket.decoded._id,
-            x,
-            y
-        });
+        try {
+            this.io.to(this.sheetId).emit(Events.CELL_SELECTED, {
+                userId: socket.decoded._id,
+                x,
+                y
+            });
+        } catch (error) {
+            logger.error(error);
+        }
     }
 
     async changeCell(socket, payload) {
         const { x, y, formula, style } = payload;
         const key = `${x},${y}`;
+
         if (this.cellsHolder.get(key) !== socket.decoded._id) {
             socket.emit('error', 'you are not the owner of this cell');
             return;
         }
-        socket.to(this.sheetId).emit(Events.CELL_CHANGED, {
-            x,
-            y,
-            formula,
-            style
-        });
+
         const session = await mongoose.startSession();
         session.startTransaction();
         try {
@@ -223,7 +238,17 @@ class RoomSheet {
                 { upsert: true, new: true, session }
             );
             await session.commitTransaction();
+
+            socket.to(this.sheetId).emit(Events.CELL_CHANGED, {
+                x,
+                y,
+                formula,
+                style
+            });
         } catch (error) {
+            logger.error(error);
+            socket.emit('error', 'error while changing cell');
+
             await session.abortTransaction();
         } finally {
             session.endSession();
