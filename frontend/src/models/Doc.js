@@ -1,5 +1,6 @@
 import Callbackable from "./Callbackable";
 import Slot from "./Slot";
+import User from "./User";
 
 let DOC_ID_COUNTER = 1;
 
@@ -28,6 +29,7 @@ export default class Doc extends Callbackable {
     static fromData(data) {
         return new Doc(
             data.id ?? data._id,
+            User.fromData(data.owner ?? data.creator),
             data.name ?? data.title,
             (data.slots ?? data.cells).map(s => Slot.fromData(s)),
             data.users.map(u => User.fromData(u))
@@ -46,16 +48,21 @@ export default class Doc extends Callbackable {
     /** @type {User[]} document users */
     #users = [];
 
+    /** @type {User} document owner user */
+    #owner = null;
+
     /**
      * Defaut document contructor, with default values if not given
      * @param {number} id The document's id
+     * @param {User} owner The document's owner
      * @param {string} title The document's title
      * @param {Slot[]} slots The document's slots
      * @param {User[]} users The document's users
      */
-    constructor(id, title, slots, users) {
+    constructor(id, owner, title, slots, users) {
         super();
         this.#id = id ?? DOC_ID_COUNTER++;
+        this.#owner = owner ?? null;
         this.#title = title ?? Doc.DEFAULT_TITLE;
         this.#slots = slots ?? Doc.DEFAULT_SLOTS;
         this.#users = users ?? Doc.DEFAULT_USERS;
@@ -91,6 +98,14 @@ export default class Doc extends Callbackable {
      */
     get users() {
         return this.#users;
+    }
+
+    /**
+     * Returns the document's owner
+     * @returns {User} The document's owner
+     */
+    get owner() {
+        return this.#owner;
     }
 
     /**

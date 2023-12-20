@@ -18,7 +18,7 @@ export default class {
      * @param {string} desc Notification description
      */
     static log(title, desc) {
-        this.#spawnNewNotif(title, desc, "#4b5563", "#111827");
+        this.#spawnNewNotif(title, desc, "#4b5563", "#1f2937");
     }
 
     /**

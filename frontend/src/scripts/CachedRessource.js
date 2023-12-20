@@ -48,6 +48,10 @@ export default class CachedRessource {
         return (Date.now() - this.#timestamp) / 1000 > this.#timeout;
     }
 
+    invalidate () {
+        this.#ressource = null;
+    }
+
     set timeout (timeout) {
         this.#timeout = timeout;
     }

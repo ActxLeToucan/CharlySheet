@@ -13,6 +13,23 @@ export default class User extends Callbackable {
     /** @type {User} Current device user */
     static #currentUser = null;
 
+    static GetRandomColor() {
+        const hue = Math.floor(Math.random() * 360);
+        const saturation = 60;
+        const lightness = 60;
+
+        return `hsl(${hue}, ${saturation}%, ${lightness}%)`;
+    }
+
+    static GetUserColor(id) {
+        const id2number = id.split('').map(c => c.charCodeAt(0)).reduce((a, b) => a + b, 0);
+        const hue = Math.floor(id2number % 360);
+        const saturation = 60;
+        const lightness = 60;
+
+        return `hsl(${hue}, ${saturation}%, ${lightness}%)`;
+    }
+
     /**
      * Get the current device user
      * @returns A user object representing the current device user
@@ -51,11 +68,11 @@ export default class User extends Callbackable {
      */
     static fromData(data) {
         return new User(
-            data?.id,
-            data?.username,
-            data?.email,
-            data?.color,
-            data?.token
+            data.id ?? data._id,
+            data.username ?? data.pseudo,
+            data.email,
+            data.color,
+            data.token
         );
     }
 
@@ -80,7 +97,7 @@ export default class User extends Callbackable {
      * @param {string} color User color 
      * @param {string} token User access token
      */
-    constructor(id, username=User.DEFAULT_USERNAME, email=User.DEFAULT_EMAIL, color=User.DEFAULT_COLOR, token) {
+    constructor(id, username=User.DEFAULT_USERNAME, email=User.DEFAULT_EMAIL, color, token) {
         super();
         this.setInformations({id, username, email, color, token});
     }
@@ -89,7 +106,7 @@ export default class User extends Callbackable {
         if (!infos) return;
         this.#username = infos?.username ?? this.#username ?? User.DEFAULT_USERNAME;
         this.#email = infos?.email ?? this.#email ?? User.DEFAULT_EMAIL;
-        this.#color = infos?.color ?? this.#color ?? User.DEFAULT_COLOR;
+        this.#color = User.GetUserColor(infos?.id ?? '0');
 
         this.#id = infos?.id ?? this.#id;
         this.#token = infos?.token ?? this.#token;

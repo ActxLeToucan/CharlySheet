@@ -64,6 +64,7 @@ export default class Slot extends Callbackable {
         if (user === null || this.hasUser(user)) return false;
         this.#users.push(user);
         user.slot = this;
+        this._callCallbacks('users', this.#users);
         return true;
     }
 
@@ -86,6 +87,7 @@ export default class Slot extends Callbackable {
         this.#users = this.users.filter(u => !u.equals(user));
         if (this.equals(user.slot))
             user.slot = null;
+        this._callCallbacks('users', this.#users);
         return true;
     }
 
