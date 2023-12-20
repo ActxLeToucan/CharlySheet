@@ -1,7 +1,6 @@
 import { Mutex } from 'async-mutex';
 import jwt from 'jsonwebtoken';
 import { jwtDecode } from 'jwt-decode';
-import mongoose from 'mongoose';
 
 import { JWT_SECRET } from '../config/index.js';
 import { Sheet } from '../models/sheet.model.js';
@@ -138,7 +137,6 @@ class RoomSheet {
             socket.emit('error', 'sheet not found');
             return;
         }
-
         if (
             sheet.owner.toString() === _id.toString() ||
             sheet.users.includes(_id)
@@ -221,28 +219,45 @@ class RoomSheet {
 
     async changeCell(socket, payload) {
         const { x, y, formula, style } = payload;
+        // verify the payload
+        if (
+            typeof x !== 'number' ||
+            typeof y !== 'number' ||
+            typeof formula !== 'string' ||
+            typeof style !== 'object'
+        ) {
+            socket.emit('error', 'invalid payload');
+            return;
+        }
         const key = `${x},${y}`;
 
         if (this.cellsHolder.get(key) !== socket.decoded._id) {
             socket.emit('error', 'you are not the owner of this cell');
             return;
         }
-
-        const session = await mongoose.startSession();
-        session.startTransaction();
+        /**
+         * Les transactions ne sont disponibles que pour les replica set avec mongodb
+         * mais de toute façon on travaille en exclusion mutuelle sur la cellule
+         */
         try {
-            await Sheet.findOneAndUpdate(
-                { _id: this.sheetId, 'cells.x': x, 'cells.y': y },
-                {
-                    $set: {
-                        'cells.$.formula': formula,
-                        'cells.$.style': style
-                    }
-                },
-                { upsert: true, new: true, session }
-            );
-            await session.commitTransaction();
+            const filter = { _id: this.sheetId, 'cells.x': x, 'cells.y': y };
+            const update = {
+                $set: { 'cells.$.formula': formula, 'cells.$.style': style }
+            };
+            const options = { new: true };
 
+            let sheet = await Sheet.findOneAndUpdate(filter, update, options);
+
+            if (!sheet) {
+                const pushUpdate = {
+                    $push: { cells: { x, y, formula, style } }
+                };
+                sheet = await Sheet.findOneAndUpdate(
+                    { _id: this.sheetId },
+                    pushUpdate,
+                    options
+                );
+            }
             this.io.to(this.sheetId).emit(Events.CELL_CHANGED, {
                 x,
                 y,
@@ -252,10 +267,6 @@ class RoomSheet {
         } catch (error) {
             logger.error(error);
             socket.emit('error', 'error while changing cell');
-
-            await session.abortTransaction();
-        } finally {
-            session.endSession();
         }
     }
 
