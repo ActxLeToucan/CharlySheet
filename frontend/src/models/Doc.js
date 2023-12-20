@@ -119,7 +119,7 @@ export default class Doc extends Callbackable {
     getSlotAt(x, y) {
         if (!this.#slots) this.#slots = [];
         if (!this.#slots[x]) this.#slots[x] = [];
-        if (!this.#slots[x][y]) this.#slots[x][y] = new Slot(undefined, this);
+        if (!this.#slots[x][y]) this.#slots[x][y] = new Slot(undefined, this, undefined, undefined, undefined, x, y);
         return this.#slots[x][y];
     }
     

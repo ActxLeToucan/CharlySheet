@@ -77,8 +77,8 @@ export default class MultiDoc {
         });
 
         this.#events.addEventListener(Events.CELL_ACQUIRED, data => {
-            const {x, y, userId} = data;
-            if (userId === User.currentUser.id) {
+            const {x, y, holderId} = data;
+            if (holderId === User.currentUser.id) {
                 this.#eventReponseBuffer[Events.CELL_ACQUIRED]?.resolve(data);
                 this.#eventReponseBuffer[Events.CELL_ACQUIRED] = undefined;
             }
@@ -91,8 +91,8 @@ export default class MultiDoc {
             }
         });
         this.#events.addEventListener(Events.CELL_RELEASED, data => {
-            const {x, y, userId} = data;
-            if (userId === User.currentUser.id) {
+            const {x, y, holderId} = data;
+            if (holderId === User.currentUser.id) {
                 this.#eventReponseBuffer[Events.CELL_RELEASED]?.resolve(data);
                 this.#eventReponseBuffer[Events.CELL_RELEASED] = undefined;
             }
@@ -114,18 +114,9 @@ export default class MultiDoc {
             }
         });
         this.#events.addEventListener(Events.CELL_HOLDED, data => {
-            const {x, y, userId} = data;
-            if (userId === User.currentUser.id) {
-                this.#eventReponseBuffer[Events.CELL_ACQUIRED]?.reject(data);
-                this.#eventReponseBuffer[Events.CELL_ACQUIRED] = undefined;
-            }
-        });
-        this.#events.addEventListener(Events.CELL_HOLDED, data => {
-            const {x, y, userId} = data;
-            if (userId === User.currentUser.id) {
-                this.#eventReponseBuffer[Events.CELL_ACQUIRED]?.reject(data);
-                this.#eventReponseBuffer[Events.CELL_ACQUIRED] = undefined;
-            }
+            const {x, y, holderId} = data;
+            this.#eventReponseBuffer[Events.CELL_ACQUIRED]?.reject(data);
+            this.#eventReponseBuffer[Events.CELL_ACQUIRED] = undefined;
         });
     }
 

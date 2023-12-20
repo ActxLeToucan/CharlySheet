@@ -55,7 +55,7 @@
                             label="Fx"
                             :expand="true"
                             :value="currentFormula || ''"
-                            :disabled="!currentSlot"
+                            :disabled="currentSlotLocked"
                             @change="ev => { if (currentSlot) User.currentUser.slot.formula = ev.target.value }"
                         />
                     </div>
@@ -224,6 +224,7 @@ import Ressources from '../scripts/Ressources';
 import Selections from '../scripts/Selections';
 import CompModal from '../components/CompModal.vue';
 import CompCompletion from '../components/CompCompletion.vue';
+import { toRaw } from 'vue';
 
 const menus = [
     {name: 'Fichier'},
@@ -268,6 +269,8 @@ export default {
             menus,
             currentFormula: '',
             currentSlot: null,
+            currentSlotLocked: true,
+            currentSlotLockedListener: null,
             documentTitle: null,
             documentOwner: null,
             window,
@@ -431,13 +434,27 @@ export default {
         },
         setupUserEvents() {
             User.currentUser.on('slot', slot => {
-                this.currentFormula = slot?.formula;
-                this.currentSlot = slot;
-                
-                // need to do this because Vue.JS is shitty and doesn't update the input value
+                if (this.currentSlot && !this.currentSlotLocked) {
+                    const raw = toRaw(this.currentSlot);
+                    this.multi.askForReleaseCell(raw.x, raw.y).then(res => {
+                        // noice
+                    }).catch(err => {
+                        this.notifyError(err);
+                        console.error(err);
+                    });
+                }
+
                 const formulaInput = this.$refs['formula-input'];
-                if (formulaInput)
-                    formulaInput.$el.querySelector('input').value = this.currentFormula;
+                if (this.currentSlot) toRaw(this.currentSlot).remCallback(this.currentSlotLockedListener);
+                this.currentFormula = slot?.formula ?? '';
+                if (formulaInput) formulaInput.$el.querySelector('input').value = this.currentFormula;
+                this.currentSlot = slot;
+                if (slot === null) return;
+
+                this.currentSlotLockedListener = slot.on('locked', locked => {
+                    this.currentSlotLocked = locked;
+                });
+                this.currentSlotLocked = slot.locked;
             });
         },
         setupSocketEvents() {
@@ -448,8 +465,14 @@ export default {
             container.addEventListener('mousedown', ev => {
                 if (ev.button === 2) return;
                 const cell = ev.target;
+                this.doc.getSlotAt(cell.dataset.x, cell.dataset.y).locked = true;
                 this.multi.askForSelectCell(cell.dataset.x, cell.dataset.y).then(data => {
-                    // cell selected
+                    this.multi.askForAcquireCell(cell.dataset.x, cell.dataset.y).then(res => {
+                        this.doc.getSlotAt(data.x, data.y).locked = false;
+                    }).catch(err => {
+                        // already acquired, do nothing
+                    });
+
                 }).catch(err => {
                     this.notifyError(err);
                     console.error(err);

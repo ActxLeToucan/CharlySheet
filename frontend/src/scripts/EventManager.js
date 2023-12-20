@@ -31,6 +31,7 @@ class EventManager {
 
     #setupSocket() {
         this.#socket.onAny((...args) => {
+            // console.log('Received event : ' + args[0], JSON.stringify(args[1], null, 2));
             this.listeners['<all>'].forEach(cb => {
                 cb(...args);
             });
@@ -55,7 +56,7 @@ class EventManager {
     }
 
     sendEvent(ev, data) {
-        console.log('Sent event : ' + ev, JSON.stringify(data, null, 2));
+        // console.log('Sent event : ' + ev, JSON.stringify(data, null, 2));
         this.#socket.emit(ev, data);
     }
 }

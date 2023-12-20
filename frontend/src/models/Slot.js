@@ -22,7 +22,10 @@ export default class Slot extends Callbackable {
             data.id ?? data._id,
             data.doc ?? data.document,
             data.users.map(u => User.fromData(u)),
-            data.formula ?? data.value
+            data.formula ?? data.value,
+            true,
+            data.x,
+            data.y
         );
     }
 
@@ -36,6 +39,12 @@ export default class Slot extends Callbackable {
     #result = '';
     /** @type {Doc} slot document */
     #doc = null;
+    /** @type {boolean} Is the clel locked o not (other user editing it) */
+    #locked = true;
+    /** @type {number} slot x position */
+    #x = 0;
+    /** @type {number} slot y position */
+    #y = 0;
 
     /** @type {string} slot listeners for child cells (for result calculations)*/
     #listeners = [];
@@ -46,13 +55,19 @@ export default class Slot extends Callbackable {
      * @param {number} id The slot's id
      * @param {User[]} users The slots's users
      * @param {string} formula The slots's formula
+     * @param {boolean} locked Is the slot locked or not
+     * @param {number} x The slot's x position
+     * @param {number} y The slot's y position
      */
-    constructor(id, doc, users, formula) {
+    constructor(id, doc, users, formula, locked, x, y) {
         super();
         this.#id = id ?? SLOT_ID_COUNTER++;
         this.#users = users ?? Slot.DEFAULT_USERS;
         this.#formula = formula ?? Slot.DEFAULT_FORMULA;
         this.#doc = doc ?? null;
+        this.#locked = locked ?? true;
+        this.#x = x ?? 0;
+        this.#y = y ?? 0;
     }
 
     /**
@@ -143,6 +158,30 @@ export default class Slot extends Callbackable {
     }
 
     /**
+     * Get if the slot is locked or not
+     * @returns {boolean} If the slot is locked or not
+     */
+    get locked() {
+        return this.#locked;
+    }
+
+    /**
+     * Get slot x position
+     * @returns {number} The slot's x position
+     */
+    get x() {
+        return this.#x;
+    }
+
+    /**
+     * Get slot y position
+     * @returns {number} The slot's y position
+     */
+    get y() {
+        return this.#y;
+    }
+
+    /**
      * Set slot document
      * @param {Doc} value the new document
      */
@@ -155,9 +194,19 @@ export default class Slot extends Callbackable {
      * @param {string} value the new formula
      */
     set formula(value) {
+        if (this.#locked) return;
         this.#formula = value;
         this._callCallbacks('formula', this.#formula);
         this.#calculateResult();
+    }
+
+    /**
+     * Set if the slot is locked or not
+     * @param {boolean} value the new locked value
+     */
+    set locked(value) {
+        this.#locked = value;
+        this._callCallbacks('locked', this.#locked);
     }
 
     /**
