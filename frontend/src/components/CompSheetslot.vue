@@ -38,6 +38,9 @@ export default {
             if (User.currentUser.slot == this.slot) this.displayMode = 'formula';
             else this.displayMode = 'result';
         });
+        this.slot.on('users', users => {
+            // nothing ?
+        });
     },
     methods: {
         onClick(ev) {

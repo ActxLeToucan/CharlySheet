@@ -6,6 +6,7 @@
                 hover:bg-indigo-500/[0.1] hover:dark:bg-indigo-500/[0.1] hover:text-slate-800 hover:dark:text-slate-50 hover:border-indigo-500 hover:dark:border-indigo-500 hover:shadow-lg hover:-translate-y-1 transition-all"
     >
         <button
+            v-show="ownerId === User.currentUser.id"
             class="show-left absolute top-2 right-2 p-1 hidden group-hover/card:flex w-fit h-fit rounded-md border-2 border-transparent
                    hover:border-red-500 hover:bg-red-500/[0.3] text-slate-800 dark:text-slate-200 transition-all"
             @click="deleteDoc"
@@ -29,6 +30,7 @@ import {
 } from '@heroicons/vue/24/outline';
 import API from '../scripts/API';
 import Ressources from '../scripts/Ressources';
+import User from '../models/User';
 
 export default {
     name: "CompDoccard",
@@ -49,13 +51,18 @@ export default {
     },
     data() {
         return {
-            ownerName: ". . ."
+            User,
+            ownerId: '',
+            ownerName: ''
         };
     },
+    watch: {
+        doc() {
+            this.loadUser();
+        }
+    },
     mounted() {
-        Ressources.getUser(this.doc.owner._id).then(user => {
-            this.ownerName = user.username;
-        });
+        this.loadUser();
     },
     methods: {
         async deleteDoc(ev) {
@@ -67,6 +74,13 @@ export default {
             } catch (err) {
                 console.error(err);
             }
+        },
+        loadUser() {
+            Ressources.getUser(this.doc.owner._id).then(user => {
+                this.owner = user;
+                this.ownerId = user.id;
+                this.ownerName = user.username;
+            });
         }
     }
 }
