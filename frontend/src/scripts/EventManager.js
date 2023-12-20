@@ -18,11 +18,14 @@ class EventManager {
         '<all>': []
     };
 
-    constructor() {
+    /**
+     * Creates a new EventManager object, with a socket connection to the server
+     * @param {string} userToken user token to use for the socket connection
+     */
+    constructor(userToken) {
         const SOCKET_HOST = import.meta.env.VITE_SOCKETIO_HOST;
-        const SOCKET_PATH = import.meta.env.VITE_SOCKETIO_PATH;
 
-        this.#socket = io(SOCKET_HOST, { path: SOCKET_PATH });
+        this.#socket = io(SOCKET_HOST, { auth: { token: userToken } });
         this.#setupSocket();
     }
 
@@ -52,6 +55,7 @@ class EventManager {
     }
 
     sendEvent(ev, data) {
+        console.log('Sent event : ' + ev, JSON.stringify(data, null, 2));
         this.#socket.emit(ev, data);
     }
 }

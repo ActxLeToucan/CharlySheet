@@ -16,10 +16,36 @@
                             {{ menu.name }}
                         </button>
                     </div>
+                    <div class="flex grow justify-end items-center space-x-1">
+                        <button
+                            v-if="documentOwner === User.currentUser.id"
+                            class="show-left flex rounded-full border-2 border-slate-200 dark:border-slate-600 text-slate-600 dark:text-slate-400 w-8 h-8 items-center justify-center px-2
+                                   hover:text-slate-50 hover:dark:text-slate-200 hover:border-slate-200 hover:dark:border-slate-200 transition-all"
+                            @click="$refs['addUserModal'].open()"
+                        >
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="4" stroke="currentColor" class="w-8 h-8">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
+                            </svg>
+                        </button>
+                        <div
+                            v-for="user in doc?.users.concat(doc?.owner)"
+                            :key="user.id"
+                            class="group/usercard show-left flex rounded-full bg-white dark:bg-slate-600 border-2 w-fit h-8 items-center justify-center shadow-md min-w-[2em] max-w-[2em] hover:max-w-[6em] transition-all overflow-hidden px-2"
+                            :style="`border-color: ${user.color};`"
+                        >
+                            <p class="group-hover/usercard:hidden text-slate-600 dark:text-slate-50 font-extrabold">
+                                {{ user.username.charAt(0).toUpperCase() }}
+                            </p>
+                            <p class="hidden group-hover/usercard:flex text-slate-600 dark:text-slate-50 font-extrabold">
+                                {{ user.username.charAt(0).toUpperCase() + user.username.slice(1).toLowerCase() }}
+                            </p>
+                        </div>
+                    </div>
                 </div>
                 <div class="show-right flex w-full h-fit">
                     <comp-input
-                        :value="doc?.title ?? Lang.CreateTranslationContext('doc', 'NewDocument')"
+                        :value="documentTitle ?? Lang.CreateTranslationContext('doc', 'NewDocument')"
+                        :disabled="documentOwner !== User.currentUser.id"
                         @input="setDocName($event.target.value)"
                     />
                     <div class="flex space-x-2 pl-8 w-full">
@@ -75,11 +101,19 @@
                         </div>
                     </div>
                     <div
-                        ref="grid-container"
+                        id="grid-container"
                         class="flex grow relative w-full h-full overflow-auto bg-slate-50 dark:bg-slate-700"
                     >
+                        <div> <!-- selectors -->
+                            <comp-selector
+                                v-for="user in doc?.users.concat(doc?.owner)"
+                                :key="user.id"
+                                :data="user.id"
+                            />
+                        </div>
                         <div
                             v-if="doc"
+                            id="grid"
                             class="w-fit h-fit"
                         >
                             <div
@@ -125,24 +159,71 @@
                 </div>
             </div>
         </div>
+        <comp-modal ref="addUserModal">
+            <div class="text-slate-700 dark:text-slate-200">
+                <p class="text-xl font-bold mx-auto w-fit h-fit mb-4 py-1">
+                    <get-text :context="Lang.CreateTranslationContext('doc', 'InviteUser')" />
+                </p>
+                <p class="text-md font-semibold mr-auto w-fit h-fit text-slate-600 dark:text-slate-300">
+                    <get-text
+                        :context="Lang.CreateTranslationContext('doc', 'InviteUserDesc')"
+                        class="flex flex-col text-center"
+                    />
+                </p>
+                <div class="flex flex-col items-center w-fit mx-auto mb-4">
+                    <comp-input
+                        ref="userEmailInput"
+                        class="w-fit"
+                        :placeholder="Lang.CreateTranslationContext('doc', 'Email')"
+                        @input="() => { validUserSearch = false; }"
+                    />
+                    <comp-completion
+                        ref="userEmailCompletion"
+                        :oncompletion="searchUsers"
+                        :onclick="onUserCompletion"
+                    />
+                </div>
+            </div>
+            <div class="flex grow h-fit justify-between space-x-8 mt-20">
+                <comp-button
+                    :icon="XMarkIcon"
+                    :onclick="() => $refs['addUserModal'].close()"
+                >
+                    <get-text :context="Lang.CreateTranslationContext('verbs', 'Cancel')" />
+                </comp-button>
+                <comp-button
+                    :icon="UserPlusIcon"
+                    :disabled="!validUserSearch"
+                    :onclick="inviteNewUser"
+                >
+                    <get-text :context="Lang.CreateTranslationContext('verbs', 'Invite')" />
+                </comp-button>
+            </div>
+        </comp-modal>
     </div>
 </template>
 
 <script>
 import CompSheetslot from '../components/CompSheetslot.vue';
+import CompSelector from '../components/CompSelector.vue';
 import CompInput from '../components/CompInput.vue';
+import MultiDoc from '../scripts/MultiDoc';
 import User from '../models/User';
-import Doc from '../models/Doc';
 
 import {
-    DocumentIcon
+    DocumentIcon,
+    UserPlusIcon,
+    XMarkIcon
 } from '@heroicons/vue/24/outline';
 import API from '../scripts/API';
 import Lang from '../scripts/Lang';
-import * as DocView from '../scripts/DocView';
-import GetText from '../components/text/GetText.vue';
 import Notify from '../scripts/Notify';
+import GetText from '../components/text/GetText.vue';
 import CompButton from '../components/CompButton.vue';
+import Ressources from '../scripts/Ressources';
+import Selections from '../scripts/Selections';
+import CompModal from '../components/CompModal.vue';
+import CompCompletion from '../components/CompCompletion.vue';
 
 const menus = [
     {name: 'Fichier'},
@@ -162,12 +243,22 @@ export default {
         DocumentIcon,
         CompInput,
         GetText,
-        CompButton
+        CompButton,
+        CompSelector,
+        CompModal,
+        CompCompletion
     },
     data() {
+        if (this.$route.params.id === "new") {
+            this.createNewDoc();
+            return {};
+        }
+
         return {
             Lang,
             User,
+            UserPlusIcon,
+            XMarkIcon,
             MODE_NEW: 0,
             MODE_EDIT: 1,
             docMode: (this.$route.params.id === "new" ? 0 : 1),
@@ -177,87 +268,59 @@ export default {
             menus,
             currentFormula: '',
             currentSlot: null,
-            window
+            documentTitle: null,
+            documentOwner: null,
+            window,
+            validUserSearch: false
         };
     },
     async mounted() {
         this.doc = undefined;
-        
-        if (this.docMode === this.MODE_NEW) {
-            await this.createNewDoc();
-            return;
-        }
 
-        API.execute_logged(API.ROUTE.SHEETS.call(this.docId)).then(res => {
-            this.doc = Doc.fromData(res);
-            this.$forceUpdate();
-        }).catch(async err => {
-            this.doc = null;
-            this.$forceUpdate();
-            Notify.error(
-                await Lang.GetTextAsync(Lang.CreateTranslationContext('errors', 'Error')),
-                await Lang.GetTextAsync(Lang.CreateTranslationContext('errors', 'Unknown', {msg: err.message})),
-            );
-        });
+        this.$refs['userEmailCompletion'].attachInput(
+            this.$refs['userEmailInput'].$el.querySelector('input')
+        );
 
-        /** @type {HTMLDivElement} */
-        const container = this.$refs['grid-container'];
-        /** @type {HTMLDivElement} */
-        const rowBar = this.$refs['row-bar'];
-        /** @type {HTMLDivElement} */
-        const colBar = this.$refs['col-bar'];
-
-        container.addEventListener('scroll', ev => {
-            rowBar.scrollTo(0, ev.target.scrollTop);
-            colBar.scrollTo(ev.target.scrollLeft, 0);
-        });
-
-        let isMouseDown = false;
-        let startDiv = null;
-        let endDiv = null;
-        container.addEventListener('mousedown', ev => {
-            if (ev.button === 2) return;
-            isMouseDown = true;
-            startDiv = ev.target;
-            endDiv = ev.target;
-            this.setBorder(startDiv, endDiv);
-        });
-        container.addEventListener('mouseup', ev => { isMouseDown = false; });
-        container.addEventListener('contextmenu', ev => {
-            ev.preventDefault();
-            return;
-        })
-        container.addEventListener('keydown', ev => {
-            if (ev.key === 'Escape') {
-                document.querySelector(".border-selector")?.remove();
-                User.currentUser.slot = null;
-            }
-            if (ev.key === 'Delete') {
-                for (let x = startDiv.dataset.x; x <= endDiv.dataset.x; x++) {
-                    for (let y = startDiv.dataset.y; y <= endDiv.dataset.y; y++) {
-                        this.getSlotAt(x, y).formula = '';
-                    }
-                }
-            }
-        });
-        container.addEventListener('mousemove', ev => {
-            if (isMouseDown) {
-                endDiv = ev.target;
-                this.setBorder(startDiv, endDiv);
-            }
-        });
-
-        User.currentUser.on('slot', slot => {
-            this.currentFormula = slot?.formula;
-            this.currentSlot = slot;
-            
-            // need to do this because Vue.JS is shitty and doesn't update the input value
-            const formulaInput = this.$refs['formula-input'];
-            if (formulaInput)
-                formulaInput.$el.querySelector('input').value = this.currentFormula;
+        this.retreiveDocument().then(res => {
+            this.setupDomEvents();
+            this.setupUserEvents();
+            this.setupSocketEvents();
         });
     },
     methods: {
+        searchUsers(selector, query) {
+            if (query.length < 3) return;
+
+            API.execute_logged(API.ROUTE.SEARCHUSERS(query)).then(res => {
+                const data = res.map(user => {
+                    return {
+                        id: user._id,
+                        value: user.username,
+                        desc: user.email,
+                        color: User.GetUserColor(user._id)
+                    };
+                });
+                selector.setData(data);
+            }).catch(err => {
+                this.notifyError(err);
+                console.error(err);
+            });
+        },
+        onUserCompletion(data) {
+            this.validUserSearch = data.id;
+        },
+        inviteNewUser() {
+            const userId = this.validUserSearch;
+            this.validUserSearch = false;
+
+            API.execute_logged(API.ROUTE.SHEETS.USERS(this.doc.id), API.METHOD.POST, [userId]).then(res => {
+                this.retreiveDocument(true);
+                this.$refs['addUserModal'].close();
+            }).catch(err => {
+                this.notifyError(err);
+                console.error(err);
+            });
+        },
         getIndexName(index) {
             const alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
             const nbLetters = alphabet.length;
@@ -271,76 +334,144 @@ export default {
         getSlotAt(x, y) {
             return this.doc.getSlotAt(x, y);
         },
-        setBorder(dom1, dom2) {
-            dom1 = DocView.tryGetDomSlot(dom1);
-            dom2 = DocView.tryGetDomSlot(dom2);
-
-            if (!dom1 || !dom2) {
-                return;
-            }
-
-            const dom1rect = dom1.getBoundingClientRect();
-            const dom2rect = dom2.getBoundingClientRect();
-            /**@type {HTMLDivElement} */
-            const container = this.$refs['grid-container'];
-            const containerRect = container.getBoundingClientRect();
-
-            const x = (dom2
-                ? Math.min(dom1rect.x, dom2rect.x)
-                : dom1rect.x) - containerRect.x + container.scrollLeft;
-            const y = (dom2
-                ? Math.min(dom1rect.y, dom2rect.y)
-                : dom1rect.y) - containerRect.y + container.scrollTop;
-            const w = dom2
-                ? Math.max(dom1rect.x, dom2rect.x) - Math.min(dom1rect.x, dom2rect.x) + dom2rect.width
-                : dom1rect.width;
-            const h = dom2
-                ? Math.max(dom1rect.y, dom2rect.y) - Math.min(dom1rect.y, dom2rect.y) + dom2rect.height
-                : dom1rect.height;
-
-            let border = document.querySelector(".border-selector");
-            if (!border) {
-                border = document.createElement('div');
-                border.className = "border-selector";
-                container.firstElementChild.appendChild(border);
-            }
-            border.style.position = 'absolute';
-            border.style.left = x + 'px';
-            border.style.top = y + 'px';
-            border.style.width = w + 'px';
-            border.style.height = h + 'px';
-        },
         async createNewDoc() {
             const res = await API.execute_logged(API.ROUTE.SHEETS.call(), API.METHOD.POST, {
                 name: await Lang.GetTextAsync(Lang.CreateTranslationContext('doc', 'NewDocument'))
             });
-            this.doc = Doc.fromData(res);
-            this.docId = this.doc.id;
-            this.$router.push('/doc/' + this.doc._id);
+            window.location.href = '/doc/' + res._id;
         },
         setDocName(name) {
-            if (!this.doc?.id) return;
+            if (!this.doc?.id || name.length < 3) return;
             if (this.changeDocTimeout) clearTimeout(this.changeDocTimeout);
             this.changeDocTimeout = setTimeout(async () => {
                 this.changeDocTimeout = null;
                 try {
-                    const res = await API.execute_logged(API.ROUTE.SHEETS.NAME(this.doc._id), API.METHOD.PUT, {name});
+                    const res = await API.execute_logged(API.ROUTE.SHEETS.NAME(this.doc.id), API.METHOD.PUT, {name});
                     this.doc.title = res.name;
-                } catch (err) { console.error(err); }
+                    this.documentTitle = res.name;
+                } catch (err) {
+                    this.notifyError(err);
+                    console.error(err);
+                }
             }, 300);
+        },
+        async retreiveDocument(forceFetch=false) {
+            return new Promise((resolve, reject) => {
+                Ressources.getDocument(this.docId, forceFetch).then(doc => {
+                    this.doc = doc;
+                    this.documentTitle = doc.title;
+                    this.documentOwner = doc.owner.id;
+                    this.$forceUpdate();
+                    resolve();
+                }).catch(err => {
+                    this.doc = null;
+                    this.$forceUpdate();
+                    this.notifyError(err);
+                    console.error(err);
+                    reject();
+                });
+            });
+        },
+        setupDomEvents() {
+            /** @type {HTMLDivElement} */
+            const container = this.$el.querySelector('#grid-container');
+            /** @type {HTMLDivElement} */
+            const rowBar = this.$refs['row-bar'];
+            /** @type {HTMLDivElement} */
+            const colBar = this.$refs['col-bar'];
+
+            container.addEventListener('scroll', ev => {
+                rowBar.scrollTo(0, ev.target.scrollTop);
+                colBar.scrollTo(ev.target.scrollLeft, 0);
+            });
+
+            let isMouseDown = false;
+            let startDiv = null;
+            let endDiv = null;
+            container.addEventListener('mousedown', ev => {
+                if (ev.button === 2) return;
+                isMouseDown = true;
+                startDiv = ev.target;
+                endDiv = ev.target;
+
+                Selections.setUserSelection(
+                    User.currentUser.id,
+                    {x: startDiv.dataset.x, y: startDiv.dataset.y},
+                    {x: endDiv.dataset.x, y: endDiv.dataset.y}
+                );
+            });
+            container.addEventListener('mouseup', ev => { isMouseDown = false; });
+            container.addEventListener('contextmenu', ev => {
+                ev.preventDefault();
+                return;
+            });
+            container.addEventListener('keydown', ev => {
+                if (ev.key === 'Escape' && User.currentUser.slot) {
+                    Selections.setUserSelection(User.currentUser.id, null, null);
+                    User.currentUser.slot = null;
+                }
+                if (ev.key === 'Delete') {
+                    for (let x = startDiv.dataset.x; x <= endDiv.dataset.x; x++) {
+                        for (let y = startDiv.dataset.y; y <= endDiv.dataset.y; y++) {
+                            this.getSlotAt(x, y).formula = '';
+                        }
+                    }
+                }
+            });
+            container.addEventListener('mousemove', ev => {
+                if (isMouseDown) {
+                    endDiv = ev.target;
+                    Selections.setUserSelection(
+                        User.currentUser.id,
+                        {x: startDiv.dataset.x, y: startDiv.dataset.y},
+                        {x: endDiv.dataset.x, y: endDiv.dataset.y}
+                    );
+                }
+            });
+        },
+        setupUserEvents() {
+            User.currentUser.on('slot', slot => {
+                this.currentFormula = slot?.formula;
+                this.currentSlot = slot;
+                
+                // need to do this because Vue.JS is shitty and doesn't update the input value
+                const formulaInput = this.$refs['formula-input'];
+                if (formulaInput)
+                    formulaInput.$el.querySelector('input').value = this.currentFormula;
+            });
+        },
+        setupSocketEvents() {
+            /** @type {HTMLDivElement} */
+            const container = this.$el.querySelector('#grid-container');
+            this.multi = new MultiDoc(this.doc);
+
+            container.addEventListener('mousedown', ev => {
+                if (ev.button === 2) return;
+                const cell = ev.target;
+                this.multi.askForSelectCell(cell.dataset.x, cell.dataset.y).then(data => {
+                    // cell selected
+                }).catch(err => {
+                    this.notifyError(err);
+                    console.error(err);
+                });
+            });
+        },
+        async notifyError(err) {
+            Notify.error(
+                await Lang.GetTextAsync(Lang.CreateTranslationContext('errors', 'Error')),
+                await Lang.GetTextAsync(Lang.CreateTranslationContext('errors', 'Unknown', {msg: err.message}))
+            );
+        },
+        inviteUser() {
+            Notify.log("Invite user clicked");
         }
     },
     meta: {
         title: async () => {
-            return "Document " + window.location.href.split('/').pop();
+            const id = window.location.href.split('/').pop();
+            return (await Ressources.getDocument(id)).title;
         }
     }
 }
 
 </script>
-
-<style>
-.border-selector {
-    @apply bg-indigo-500/[0.1] border-2 border-indigo-500 rounded pointer-events-none;
-}
-</style>

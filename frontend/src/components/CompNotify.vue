@@ -3,12 +3,12 @@
         <div
             v-for="notif in notifs"
             :key="notif.id"
-            class="shadow-lg rounded-lg p-2 border-2 h-fit max-w-[15vw] w-fit ml-auto"
+            class="shadow-lg rounded-lg p-2 border-2 h-fit max-w-[15em] w-fit ml-auto"
             :class="notif.removing ? 'hide-down' : 'show-left'"
             :style="'background-color: '+notif.inner_color+'; border-color: '+notif.outer_color+';'"
         >
-            <p class="text-slate-50  font-bold     text-lg  "> {{ notif.message }} </p>
-            <p class="text-slate-200 font-semibold text-base"> {{ notif.description }} </p>
+            <p class="text-slate-50  font-bold     text-base max-w-full w-fit"> {{ notif.message }} </p>
+            <p class="text-slate-200 font-semibold text-base max-w-full w-fit"> {{ notif.description }} </p>
         </div>
     </div>
 </template>
