@@ -74,7 +74,7 @@ class UserRoutes {
          *             schema:
          *               type: array
          *               items:
-         *                 $ref: '#/components/schemas/UserPublic'
+         *                 $ref: '#/components/schemas/User'
          *       422:
          *         $ref: '#/components/responses/errorValidate'
          */
