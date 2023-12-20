@@ -1,5 +1,14 @@
 {
     "NewDocument": "New Document",
     "Loading": "Loading document ...",
-    "LoadingError": "An error occurred while loading the document."
+    "LoadingError": "An error occurred while loading the document.",
+    "JoinedRoom": "Joined document",
+    "JoinedRoomDesc": "You have joined the document {name}.",
+    "UserJoin": "User joined",
+    "UserJoinDesc": "{user} has joined the document.",
+    "UserLeft": "User left",
+    "UserLeftDesc": "{user} has left the document.",
+    "InviteUser": "Add a user",
+    "InviteUserDesc": "Write the email address or the username of the user you want to add.",
+    "Email": "Email address or username"
 }
