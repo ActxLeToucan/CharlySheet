@@ -21,6 +21,7 @@ import { logger } from '../utils/logger.js';
  * @property {string} ROOM_JOINED - event fired by server when a client joined a room
  * @property {string} LEAVE_ROOM - event fired by client when he wants to leave a room
  * @property {string} ROOM_LEAVED - event fired by server when a client leaved a room
+ * @property {string} NEW_MESSAGE - event relayed by server when a client sent a message
  */
 
 /** @type {Events} */
@@ -37,7 +38,8 @@ const Events = {
     JOIN_ROOM: 'joinRoom',
     ROOM_JOINED: 'roomJoined',
     LEAVE_ROOM: 'leaveRoom',
-    ROOM_LEAVED: 'roomLeaved'
+    ROOM_LEAVED: 'roomLeaved',
+    NEW_MESSAGE: 'newMessage'
 };
 
 export default class SocketIOEventHandlers {
@@ -154,6 +156,9 @@ class RoomSheet {
             );
             socket.on(Events.CHANGE_CELL, (payload) =>
                 this.changeCell(socket, payload)
+            );
+            socket.on(Events.NEW_MESSAGE, (payload) =>
+                this.relayMessage(socket, payload)
             );
             socket.on(Events.LEAVE_ROOM, () => this.leave(socket));
 
@@ -290,5 +295,16 @@ class RoomSheet {
         });
         // disconnect socket
         socket.disconnect();
+    }
+    async relayMessage(socket, payload) {
+        const { message } = payload;
+        if (typeof message !== 'string') {
+            socket.emit('error', 'invalid payload');
+            return;
+        }
+        this.io.to(this.sheetId).emit(Events.NEW_MESSAGE, {
+            userId: socket.decoded._id,
+            message: message.substring(0, 1023)
+        });
     }
 }

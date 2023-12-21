@@ -106,28 +106,33 @@ class UserController {
         try {
             const filter = [
                 {
-                    $expr: {
-                        $ne: [
-                            { $indexOfCP: ['$username', query] },
-                            -1
-                        ]
-                    }
+                    $and: [
+                        { username: { $regex: query, $options: 'i' } },
+                        { role: { $ne: 'admin' } } // prevent returning admin by searching username
+                    ]
                 }
             ];
             if (query.match(/^.+@.+$/)) {
                 filter.push({
-                    $expr: {
-                        $ne: [
-                            { $indexOfCP: ['$email', query] },
-                            -1
-                        ]
+                    email: {
+                        $regex: query,
+                        $options: 'i'
                     }
                 });
             }
 
-            const users = await User.find({
+            /**
+             * @type {User[]}
+             */
+            let users = await User.find({
                 $or: filter
-            }).select('-recents -email');
+            }).select('-recents');
+
+            // prevent returning users from regex
+            users = users.filter((user) =>
+                user.username.toLowerCase().includes(query.toLowerCase()) ||
+                user.email.toLowerCase().includes(query.toLowerCase())
+            );
 
             res.status(200).json(users);
         } catch (error) {
