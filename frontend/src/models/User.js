@@ -135,7 +135,7 @@ export default class User extends Callbackable {
      * @returns The user name
      */
     get username() {
-        return this.#username;
+        return this.#username.charAt(0).toUpperCase() + this.#username.slice(1);
     }
     
     /**

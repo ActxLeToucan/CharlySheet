@@ -48,7 +48,7 @@ export default class MultiDoc {
      */
     constructor(doc) {
         this.#doc = doc;
-        this.#events = new EventManager(User.currentUser.token);
+        this.#events = EventManager.Instance;
         this.#setupEvents();
         this.#register();
     }

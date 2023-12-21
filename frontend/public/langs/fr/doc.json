@@ -10,5 +10,6 @@
     "UserLeftDesc": "{user} a quitté le document.",
     "InviteUser": "Ajouter un utilisateur",
     "InviteUserDesc": "Saisissez l'adresse e-mail ou le nom de l'utilisateur que vous souhaitez ajouter.",
-    "Email": "Adresse e-mail ou nom d'utilisateur"
+    "Email": "Adresse e-mail ou nom d'utilisateur",
+    "Chat": "Discussion"
 }

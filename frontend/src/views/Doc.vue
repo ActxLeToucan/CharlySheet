@@ -1,206 +1,224 @@
 <template>
-    <div class="flex grow flex-col min-h-full h-full max-w-full w-full">
-        <div class="flex p-2 w-full h-fit items-center justify-center">
-            <div class="flex w-fit h-full items-center justify-center pr-2">
-                <document-icon class="show-right w-14 h-full text-slate-500 dark:text-slate-400 bg-slate-200 dark:bg-slate-800 rounded-lg p-1" />
-            </div>
-            <div class="flex flex-col w-full h-full space-y-2">
-                <div class="flex w-full h-fit">
-                    <div class="show-down flex space-x-4 items-center justify-center">
-                        <button
-                            v-for="menu in menus"
-                            :key="menu.name"
-                            class="flex items-center justify-center w-fit py-1 px-2 rounded-md text-slate-700 dark:text-slate-200
-                                   hover:bg-slate-200 hover:dark:bg-slate-600 transition-all"
-                        >
-                            {{ menu.name }}
-                        </button>
-                    </div>
-                    <div class="flex grow justify-end items-center space-x-1">
-                        <button
-                            v-if="documentOwner === User.currentUser.id"
-                            class="show-left flex rounded-full border-2 border-slate-200 dark:border-slate-600 text-slate-600 dark:text-slate-400 w-8 h-8 items-center justify-center px-2
-                                   hover:text-slate-50 hover:dark:text-slate-200 hover:border-slate-200 hover:dark:border-slate-200 transition-all"
-                            @click="$refs['addUserModal'].open()"
-                        >
-                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="4" stroke="currentColor" class="w-8 h-8">
-                                <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
-                            </svg>
-                        </button>
-                        <div
-                            v-for="user in doc?.users.concat(doc?.owner)"
-                            :key="user.id"
-                            class="group/usercard show-left flex rounded-full bg-white dark:bg-slate-600 border-2 w-fit h-8 items-center justify-center shadow-md min-w-[2em] max-w-[2em] hover:max-w-[6em] transition-all overflow-hidden px-2"
-                            :style="`border-color: ${user.color};`"
-                        >
-                            <p class="group-hover/usercard:hidden text-slate-600 dark:text-slate-50 font-extrabold">
-                                {{ user.username.charAt(0).toUpperCase() }}
-                            </p>
-                            <p class="hidden group-hover/usercard:flex text-slate-600 dark:text-slate-50 font-extrabold">
-                                {{ user.username.charAt(0).toUpperCase() + user.username.slice(1).toLowerCase() }}
-                            </p>
-                        </div>
-                    </div>
+    <div class="flex grow h-full">
+        <div class="relative flex grow flex-col min-h-full h-full max-w-full w-full min-w-0">
+            <div class="flex p-2 w-full h-fit items-center justify-center">
+                <div class="flex w-fit h-full items-center justify-center pr-2">
+                    <document-icon class="show-right w-14 h-full text-slate-500 dark:text-slate-400 bg-slate-200 dark:bg-slate-800 rounded-lg p-1" />
                 </div>
-                <div class="show-right flex w-full h-fit">
-                    <comp-input
-                        :value="documentTitle ?? Lang.CreateTranslationContext('doc', 'NewDocument')"
-                        :disabled="documentOwner !== User.currentUser.id"
-                        @input="setDocName($event.target.value)"
-                    />
-                    <div class="flex space-x-2 pl-8 w-full">
-                        <comp-input
-                            ref="formula-input"
-                            class="md:space-x-2 w-full"
-                            label="Fx"
-                            name="formula"
-                            :expand="true"
-                            :value="currentFormula || ''"
-                            :disabled="currentSlotLocked"
-                        />
-                    </div>
-                </div>
-            </div>
-        </div>
-        <div class="show-up flex grow min-h-0 max-h-full bg-slate-200 dark:bg-slate-600">
-            <div class="flex flex-col grow min-w-0 overflow-hidden">
-                <div class="flex grow h-fit w-full">
-                    <span class="min-w-[128px] h-8 border-[2px] border-r-[1px] border-b-[1px] border-slate-300 dark:border-slate-500" />
-                    <div
-                        ref="col-bar"
-                        class="flex w-full h-fit overflow-hidden"
-                    >
-                        <div class="flex w-fit h-fit">
-                            <div
-                                v-for="col in nbCols"
-                                :key="col"
-                                class="w-32 h-8 items-center justify-center border-t-[2px] border-[1px] border-slate-300 dark:border-slate-500"
+                <div class="flex flex-col w-full h-full space-y-2">
+                    <div class="flex w-full h-fit">
+                        <div class="show-down flex space-x-4 items-center justify-center">
+                            <button
+                                v-for="menu in menus"
+                                :key="menu.name"
+                                class="flex items-center justify-center w-fit py-1 px-2 rounded-md text-slate-700 dark:text-slate-200
+                                    hover:bg-slate-200 hover:dark:bg-slate-600 transition-all"
                             >
-                                <p class="flex grow w-full h-full h-full justify-center items-center">
-                                    {{ getIndexName(col - 1) }}
-                                </p>
-                            </div>
+                                {{ menu.name }}
+                            </button>
                         </div>
-                    </div>
-                </div>
-                <div class="flex min-w-0 w-full min-h-0 h-full">
-                    <div
-                        ref="row-bar"
-                        class="flex min-w-fit w-fit min-h-0 h-full overflow-hidden"
-                    >
-                        <div class="flex flex-col w-fit h-fit">
-                            <div
-                                v-for="row in nbRows"
-                                :key="row"
-                                class="w-32 h-8 items-center justify-center border-[1px] border-l-[2px] border-slate-300 dark:border-slate-500"
+                        <div class="flex grow justify-end items-center space-x-1">
+                            <button
+                                v-if="documentOwner === User.currentUser.id"
+                                class="show-left flex rounded-full border-2 border-slate-200 dark:border-slate-600 text-slate-600 dark:text-slate-400 w-8 h-8 items-center justify-center
+                                    hover:text-slate-50 hover:dark:text-slate-200 hover:border-slate-200 hover:dark:border-slate-200 transition-all"
+                                @click="$refs['addUserModal'].open()"
                             >
-                                <p class="flex grow h-full justify-center items-center">
-                                    {{ row }}
-                                </p>
-                            </div>
-                        </div>
-                    </div>
-                    <div
-                        id="grid-container"
-                        class="flex grow relative w-full h-full overflow-auto bg-slate-50 dark:bg-slate-700"
-                    >
-                        <div> <!-- selectors -->
-                            <comp-selector
+                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="3" stroke="currentColor" class="w-4 h-4">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
+                                </svg>
+                            </button>
+                            <div
                                 v-for="user in doc?.users.concat(doc?.owner)"
                                 :key="user.id"
-                                :data="user.id"
+                                class="group/usercard show-left flex rounded-full bg-white dark:bg-slate-600 border-2 w-fit h-8 items-center justify-center shadow-md min-w-[2em] max-w-[2em] hover:max-w-[6em] transition-all overflow-hidden px-2"
+                                :style="`border-color: ${user.color};`"
+                            >
+                                <p class="group-hover/usercard:hidden text-slate-600 dark:text-slate-50 font-extrabold">
+                                    {{ user.username.charAt(0) }}
+                                </p>
+                                <p class="hidden group-hover/usercard:flex text-slate-600 dark:text-slate-50 font-extrabold">
+                                    {{ user.username }}
+                                </p>
+                            </div>
+                            <button
+                                class="show-left flex rounded-full border-2 border-slate-200 dark:border-slate-600 text-slate-600 dark:text-slate-400 w-8 h-8 items-center justify-center
+                                    hover:text-slate-50 hover:dark:text-slate-200 hover:border-slate-200 hover:dark:border-slate-200 transition-all"
+                                @click="chatOpen = !chatOpen"
+                            >
+                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M7.5 8.25h9m-9 3H12m-9.75 1.51c0 1.6 1.123 2.994 2.707 3.227 1.129.166 2.27.293 3.423.379.35.026.67.21.865.501L12 21l2.755-4.133a1.14 1.14 0 0 1 .865-.501 48.172 48.172 0 0 0 3.423-.379c1.584-.233 2.707-1.626 2.707-3.228V6.741c0-1.602-1.123-2.995-2.707-3.228A48.394 48.394 0 0 0 12 3c-2.392 0-4.744.175-7.043.513C3.373 3.746 2.25 5.14 2.25 6.741v6.018Z" />
+                                </svg>
+                            </button>
+                        </div>
+                    </div>
+                    <div class="show-right flex w-full h-fit">
+                        <comp-input
+                            :value="documentTitle ?? Lang.CreateTranslationContext('doc', 'NewDocument')"
+                            :disabled="documentOwner !== User.currentUser.id"
+                            @input="setDocName($event.target.value)"
+                        />
+                        <div class="flex space-x-2 pl-8 w-full">
+                            <comp-input
+                                ref="formula-input"
+                                class="md:space-x-2 w-full"
+                                label="Fx"
+                                name="formula"
+                                :expand="true"
+                                :value="currentFormula || ''"
+                                :disabled="currentSlotLocked"
                             />
                         </div>
+                    </div>
+                </div>
+            </div>
+            <div class="show-up flex grow min-h-0 max-h-full bg-slate-200 dark:bg-slate-600">
+                <div class="flex flex-col grow min-w-0 overflow-hidden">
+                    <div class="flex grow h-fit w-full">
+                        <span class="min-w-[128px] h-8 border-[2px] border-r-[1px] border-b-[1px] border-slate-300 dark:border-slate-500" />
                         <div
-                            v-if="doc"
-                            id="grid"
-                            class="w-fit h-fit"
+                            ref="col-bar"
+                            class="flex w-full h-fit overflow-hidden"
                         >
-                            <div
-                                v-for="row in nbRows"
-                                :key="row"
-                                class="flex"
-                            >
+                            <div class="flex w-fit h-fit">
                                 <div
                                     v-for="col in nbCols"
                                     :key="col"
-                                    class="w-32 h-8 items-center justify-center"
+                                    class="w-32 h-8 items-center justify-center border-t-[2px] border-[1px] border-slate-300 dark:border-slate-500"
                                 >
-                                    <comp-sheetslot
-                                        class="comp-sheetslot"
-                                        :data="getSlotAt(col-1, row-1)"
-                                        :data-x="col-1"
-                                        :data-y="row-1"
-                                    />
+                                    <p class="flex grow w-full h-full h-full justify-center items-center">
+                                        {{ getIndexName(col - 1) }}
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="flex min-w-0 w-full min-h-0 h-full">
+                        <div
+                            ref="row-bar"
+                            class="flex min-w-fit w-fit min-h-0 h-full overflow-hidden"
+                        >
+                            <div class="flex flex-col w-fit h-fit">
+                                <div
+                                    v-for="row in nbRows"
+                                    :key="row"
+                                    class="w-32 h-8 items-center justify-center border-[1px] border-l-[2px] border-slate-300 dark:border-slate-500"
+                                >
+                                    <p class="flex grow h-full justify-center items-center">
+                                        {{ row }}
+                                    </p>
                                 </div>
                             </div>
                         </div>
                         <div
-                            v-else
-                            class="flex w-full h-full items-center justify-center"
+                            id="grid-container"
+                            class="flex grow relative w-full h-full overflow-auto bg-slate-50 dark:bg-slate-700"
                         >
-                            <div v-if="doc === undefined">
-                                <p class="text-2xl font-semibold tracking-wide">
-                                    <get-text :context="Lang.CreateTranslationContext('doc', 'Loading')" />
-                                </p>
+                            <div> <!-- selectors -->
+                                <comp-selector
+                                    v-for="user in doc?.users.concat(doc?.owner)"
+                                    :key="user.id"
+                                    :data="user.id"
+                                />
                             </div>
-                            <div v-if="doc === null">
-                                <p class="text-2xl font-semibold tracking-wide">
-                                    <get-text :context="Lang.CreateTranslationContext('doc', 'LoadingError')" />
-                                </p>
-                                <comp-button
-                                    class="mt-4 mx-auto"
-                                    @click="window.close()"
+                            <div
+                                v-if="doc"
+                                id="grid"
+                                class="w-fit h-fit"
+                            >
+                                <div
+                                    v-for="row in nbRows"
+                                    :key="row"
+                                    class="flex"
                                 >
-                                    <get-text :context="Lang.CreateTranslationContext('verbs', 'Back')" />
-                                </comp-button>
+                                    <div
+                                        v-for="col in nbCols"
+                                        :key="col"
+                                        class="w-32 h-8 items-center justify-center"
+                                    >
+                                        <comp-sheetslot
+                                            class="comp-sheetslot"
+                                            :data="getSlotAt(col-1, row-1)"
+                                            :data-x="col-1"
+                                            :data-y="row-1"
+                                        />
+                                    </div>
+                                </div>
+                            </div>
+                            <div
+                                v-else
+                                class="flex w-full h-full items-center justify-center"
+                            >
+                                <div v-if="doc === undefined">
+                                    <p class="text-2xl font-semibold tracking-wide">
+                                        <get-text :context="Lang.CreateTranslationContext('doc', 'Loading')" />
+                                    </p>
+                                </div>
+                                <div v-if="doc === null">
+                                    <p class="text-2xl font-semibold tracking-wide">
+                                        <get-text :context="Lang.CreateTranslationContext('doc', 'LoadingError')" />
+                                    </p>
+                                    <comp-button
+                                        class="mt-4 mx-auto"
+                                        @click="window.close()"
+                                    >
+                                        <get-text :context="Lang.CreateTranslationContext('verbs', 'Back')" />
+                                    </comp-button>
+                                </div>
                             </div>
                         </div>
                     </div>
                 </div>
             </div>
-        </div>
-        <comp-modal ref="addUserModal">
-            <div class="text-slate-700 dark:text-slate-200">
-                <p class="text-xl font-bold mx-auto w-fit h-fit mb-4 py-1">
-                    <get-text :context="Lang.CreateTranslationContext('doc', 'InviteUser')" />
-                </p>
-                <p class="text-md font-semibold mr-auto w-fit h-fit text-slate-600 dark:text-slate-300">
-                    <get-text
-                        :context="Lang.CreateTranslationContext('doc', 'InviteUserDesc')"
-                        class="flex flex-col text-center"
-                    />
-                </p>
-                <div class="flex flex-col items-center w-fit mx-auto mb-4">
-                    <comp-input
-                        ref="userEmailInput"
-                        class="w-fit"
-                        :placeholder="Lang.CreateTranslationContext('doc', 'Email')"
-                        @input="() => { validUserSearch = false; }"
-                    />
-                    <comp-completion
-                        ref="userEmailCompletion"
-                        :oncompletion="searchUsers"
-                        :onclick="onUserCompletion"
-                    />
+            <comp-modal ref="addUserModal">
+                <div class="text-slate-700 dark:text-slate-200">
+                    <p class="text-xl font-bold mx-auto w-fit h-fit mb-4 py-1">
+                        <get-text :context="Lang.CreateTranslationContext('doc', 'InviteUser')" />
+                    </p>
+                    <p class="text-md font-semibold mr-auto w-fit h-fit text-slate-600 dark:text-slate-300">
+                        <get-text
+                            :context="Lang.CreateTranslationContext('doc', 'InviteUserDesc')"
+                            class="flex flex-col text-center"
+                        />
+                    </p>
+                    <div class="flex flex-col items-center w-fit mx-auto mb-4">
+                        <comp-input
+                            ref="userEmailInput"
+                            class="w-fit"
+                            :placeholder="Lang.CreateTranslationContext('doc', 'Email')"
+                            @input="() => { validUserSearch = false; }"
+                        />
+                        <comp-completion
+                            ref="userEmailCompletion"
+                            :oncompletion="searchUsers"
+                            :onclick="onUserCompletion"
+                        />
+                    </div>
                 </div>
-            </div>
-            <div class="flex grow h-fit justify-between space-x-8 mt-20">
-                <comp-button
-                    :icon="XMarkIcon"
-                    :onclick="() => $refs['addUserModal'].close()"
-                >
-                    <get-text :context="Lang.CreateTranslationContext('verbs', 'Cancel')" />
-                </comp-button>
-                <comp-button
-                    :icon="UserPlusIcon"
-                    :disabled="!validUserSearch"
-                    :onclick="inviteNewUser"
-                >
-                    <get-text :context="Lang.CreateTranslationContext('verbs', 'Invite')" />
-                </comp-button>
-            </div>
-        </comp-modal>
+                <div class="flex grow h-fit justify-between space-x-8 mt-20">
+                    <comp-button
+                        :icon="XMarkIcon"
+                        :onclick="() => $refs['addUserModal'].close()"
+                    >
+                        <get-text :context="Lang.CreateTranslationContext('verbs', 'Cancel')" />
+                    </comp-button>
+                    <comp-button
+                        :icon="UserPlusIcon"
+                        :disabled="!validUserSearch"
+                        :onclick="inviteNewUser"
+                    >
+                        <get-text :context="Lang.CreateTranslationContext('verbs', 'Invite')" />
+                    </comp-button>
+                </div>
+            </comp-modal>
+            <comp-notify />
+        </div>
+        <div
+            class="flex flex-col min-h-0 h-full w-full transition-all"
+            :style="chatOpen ? `width: ${chatWidth}px;` : `width: 0px;`"
+        >
+            <comp-chat />
+        </div>
     </div>
 </template>
 
@@ -227,6 +245,8 @@ import Selections from '../scripts/Selections';
 import CompModal from '../components/CompModal.vue';
 import CompCompletion from '../components/CompCompletion.vue';
 import { toRaw } from 'vue';
+import CompChat from '../components/CompChat.vue';
+import CompNotify from '../components/CompNotify.vue';
 
 const menus = [
     {name: 'Fichier'},
@@ -249,7 +269,9 @@ export default {
         CompButton,
         CompSelector,
         CompModal,
-        CompCompletion
+        CompCompletion,
+        CompChat,
+        CompNotify
     },
     data() {
         if (this.$route.params.id === "new") {
@@ -276,7 +298,9 @@ export default {
             documentTitle: null,
             documentOwner: null,
             window,
-            validUserSearch: false
+            validUserSearch: false,
+            chatOpen: false,
+            chatWidth: window.innerWidth * 0.25
         };
     },
     async mounted() {

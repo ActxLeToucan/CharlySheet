@@ -1,0 +1,9 @@
+{
+    "Chat": "Chat",
+    "Send": "Send",
+    "Message": "Message",
+    "Messages": "Messages",
+    "NoMessages": "No messages",
+    "NoMessagesDesc": "You can start a conversation by typing a message below.",
+    "SentAt": "Sent at {time}"
+}
