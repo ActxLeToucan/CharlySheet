@@ -50,9 +50,8 @@ export default {
             return document.getElementById('grid');
         },
         getSlotAt(x, y) {
-            /** @type {HTMLElement} */
             const container = this.getContainer();
-            return container.children[y]?.children[x];
+            return container.children[y]?.children[x].firstElementChild;
         },
         setBorderAt(x1, y1, x2, y2) {
             const dom1 = this.getSlotAt(x1, y1);

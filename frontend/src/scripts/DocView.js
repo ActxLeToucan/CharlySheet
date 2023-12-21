@@ -5,10 +5,14 @@
  * If not, returns null
  */
 export function tryGetDomSlot(dom) {
+    // console.log('tryGetDomSlot', dom);
+    // console.trace();
     let loops = 5;
     while (dom && dom.classList && !dom.classList.contains('comp-sheetslot') && loops > 0) {
+        // console.log('tryGetDomSlot', dom);
         dom = dom.parentElement;
         loops--;
     }
+    // console.log('tryGetDomSlot-res', dom)
     return loops > 0 ? dom : null;
 }

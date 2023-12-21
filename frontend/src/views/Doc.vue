@@ -57,7 +57,6 @@
                             :expand="true"
                             :value="currentFormula || ''"
                             :disabled="currentSlotLocked"
-                            @change="ev => { if (currentSlot) User.currentUser.slot.formula = ev.target.value }"
                         />
                     </div>
                 </div>
@@ -125,9 +124,10 @@
                                 <div
                                     v-for="col in nbCols"
                                     :key="col"
-                                    class="w-32 h-8 items-center justify-center comp-sheetslot"
+                                    class="w-32 h-8 items-center justify-center"
                                 >
                                     <comp-sheetslot
+                                        class="comp-sheetslot"
                                         :data="getSlotAt(col-1, row-1)"
                                         :data-x="col-1"
                                         :data-y="row-1"
@@ -210,6 +210,7 @@ import CompSelector from '../components/CompSelector.vue';
 import CompInput from '../components/CompInput.vue';
 import MultiDoc from '../scripts/MultiDoc';
 import User from '../models/User';
+import * as DocView from '../scripts/DocView';
 
 import {
     DocumentIcon,
@@ -395,8 +396,8 @@ export default {
             container.addEventListener('mousedown', ev => {
                 if (ev.button === 2) return;
                 isMouseDown = true;
-                startDiv = ev.target;
-                endDiv = ev.target;
+                startDiv = DocView.tryGetDomSlot(ev.target);
+                endDiv = DocView.tryGetDomSlot(ev.target);
 
                 Selections.setUserSelection(
                     User.currentUser.id,
@@ -425,13 +426,17 @@ export default {
             });
             container.addEventListener('mousemove', ev => {
                 if (isMouseDown) {
-                    endDiv = ev.target;
+                    endDiv = DocView.tryGetDomSlot(ev.target);
                     Selections.setUserSelection(
                         User.currentUser.id,
                         {x: startDiv.dataset.x, y: startDiv.dataset.y},
                         {x: endDiv.dataset.x, y: endDiv.dataset.y}
                     );
                 }
+            });
+            this.$el.querySelector('input[name=formula]').addEventListener('keyup', ev => {
+                if (!User.currentUser.slot) return console.warn('User has no slot');
+                User.currentUser.slot.formula = ev.target.value;
             });
         },
         setupUserEvents() {
@@ -442,7 +447,7 @@ export default {
                 this.currentFormula = slot?.formula ?? '';
                 this.$el.querySelector('input[name=formula]').value = this.currentFormula;
                 this.currentSlot = slot;
-                if (slot === null) return;
+                if (!slot) return;
 
                 this.currentSlotLockedListener = slot.on('locked', locked => {
                     this.currentSlotLocked = locked;
@@ -457,8 +462,14 @@ export default {
 
             container.addEventListener('mousedown', ev => {
                 if (ev.button === 2) return;
-                const cell = ev.target;
-                this.doc.getSlotAt(cell.dataset.x, cell.dataset.y).locked = true;
+                const cell = DocView.tryGetDomSlot(ev.target);
+                if (!cell) return;
+
+                const slot = this.doc.getSlotAt(cell.dataset.x, cell.dataset.y);
+                if (slot.equals(User.currentUser.slot)) return console.warn('User already has this slot');
+                User.currentUser.slot = slot;
+                slot.locked = true;
+
                 this.multi.askForSelectCell(cell.dataset.x, cell.dataset.y).then(data => {
                     this.multi.askForAcquireCell(cell.dataset.x, cell.dataset.y).then(res => {
                         this.doc.getSlotAt(data.x, data.y).locked = false;

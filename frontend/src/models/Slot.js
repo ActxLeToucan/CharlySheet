@@ -51,8 +51,8 @@ export default class Slot extends Callbackable {
     
     /**
      * Defaut slot contructor, with default values if not given
-     * @param {Doc} doc The slot's document
      * @param {number} id The slot's id
+     * @param {Doc} doc The slot's document
      * @param {User[]} users The slots's users
      * @param {string} formula The slots's formula
      * @param {boolean} locked Is the slot locked or not
@@ -113,7 +113,7 @@ export default class Slot extends Callbackable {
      */
     equals(slot) {
         if (slot === null) return false;
-        return this.#id === slot.#id;
+        return this.id === slot.id && this.x === slot.x && this.y === slot.y;
     }
 
     /**
@@ -213,6 +213,8 @@ export default class Slot extends Callbackable {
      * Calculate the slot result (from the formula)
      */
     #calculateResult() {
+        const oldErrorLog = console.error;
+        console.error = () => {}; // disable error log to avoid spamming console
         // remove all listeners to sub cells
         this.#listeners.forEach(l => l.cell.no(l.id));
         this.#listeners = [];
@@ -232,6 +234,7 @@ export default class Slot extends Callbackable {
         }
 
         this._callCallbacks('result', this.#result);
+        console.error = oldErrorLog;
     }
 
     /**

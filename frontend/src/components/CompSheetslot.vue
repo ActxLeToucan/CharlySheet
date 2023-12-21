@@ -1,7 +1,6 @@
 <template>
     <button
         class="flex w-full h-full items-center justify-center border border-slate-200 dark:border-slate-600 hover:border-slate-400 hover:dark:border-slate-400"
-        @mousedown="onClick"
     >
         <p class="w-fit h-fit whitespace-nowrap text-ellipsis overflow-hidden max-w-full p-1"> {{ displayMode === 'formula' ? formula : result }} </p>
     </button>
@@ -43,9 +42,7 @@ export default {
         });
     },
     methods: {
-        onClick(ev) {
-            User.currentUser.slot = this.slot;
-        }
+        
     }
 }
 </script>
