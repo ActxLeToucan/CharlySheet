@@ -53,6 +53,7 @@
                             ref="formula-input"
                             class="md:space-x-2 w-full"
                             label="Fx"
+                            name="formula"
                             :expand="true"
                             :value="currentFormula || ''"
                             :disabled="currentSlotLocked"
@@ -409,7 +410,8 @@ export default {
                 return;
             });
             container.addEventListener('keydown', ev => {
-                if (ev.key === 'Escape' && User.currentUser.slot) {
+                if (ev.key === 'Escape') {
+                    if (!User.currentUser.slot) return console.warn('User has no slot');
                     Selections.setUserSelection(User.currentUser.id, null, null);
                     User.currentUser.slot = null;
                 }
@@ -434,20 +436,11 @@ export default {
         },
         setupUserEvents() {
             User.currentUser.on('slot', slot => {
-                if (this.currentSlot && !this.currentSlotLocked) {
-                    const raw = toRaw(this.currentSlot);
-                    this.multi.askForReleaseCell(raw.x, raw.y).then(res => {
-                        // noice
-                    }).catch(err => {
-                        this.notifyError(err);
-                        console.error(err);
-                    });
-                }
+                this.releaseCell();
 
-                const formulaInput = this.$refs['formula-input'];
                 if (this.currentSlot) toRaw(this.currentSlot).remCallback(this.currentSlotLockedListener);
                 this.currentFormula = slot?.formula ?? '';
-                if (formulaInput) formulaInput.$el.querySelector('input').value = this.currentFormula;
+                this.$el.querySelector('input[name=formula]').value = this.currentFormula;
                 this.currentSlot = slot;
                 if (slot === null) return;
 
@@ -478,6 +471,25 @@ export default {
                     console.error(err);
                 });
             });
+
+            window.addEventListener('keydown', ev => {
+                if (ev.key === 'Escape' && User.currentUser.slot) {
+                    this.releaseCell();
+                }
+            });
+        },
+        releaseCell() {
+            if (this.currentSlot && !this.currentSlotLocked) {
+                const raw = toRaw(this.currentSlot);
+                this.multi.askForReleaseCell(raw.x, raw.y).then(res => {
+                    // noice
+                }).catch(err => {
+                    this.notifyError(err);
+                    console.error(err);
+                });
+            }
+            this.currentSlot = null;
+            this.currentSlotLocked = true;
         },
         async notifyError(err) {
             Notify.error(
