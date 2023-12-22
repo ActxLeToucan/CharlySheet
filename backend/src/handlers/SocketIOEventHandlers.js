@@ -1,6 +1,5 @@
 import { Mutex } from 'async-mutex';
 import jwt from 'jsonwebtoken';
-import { jwtDecode } from 'jwt-decode';
 
 import { JWT_SECRET } from '../config/index.js';
 import { Sheet } from '../models/sheet.model.js';
@@ -83,16 +82,6 @@ export default class SocketIOEventHandlers {
         });
     }
 }
-
-const checkRight = async (socket, payload) => {
-    const { roomId } = payload;
-    const { token } = socket.handshake.auth;
-    const sheet = await Sheet.findById(roomId);
-    const { _id } = jwtDecode(token);
-    if (sheet.ownerId === _id) {
-        return true;
-    }
-};
 
 class RoomOrganizer {
     /**
