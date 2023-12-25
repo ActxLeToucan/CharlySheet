@@ -66,6 +66,7 @@ export default class Doc extends Callbackable {
         this.#title = title ?? Doc.DEFAULT_TITLE;
         this.#slots = slots ?? Doc.DEFAULT_SLOTS;
         this.#users = users ?? Doc.DEFAULT_USERS;
+        Doc.#currentDoc = this;
     }
 
     /**

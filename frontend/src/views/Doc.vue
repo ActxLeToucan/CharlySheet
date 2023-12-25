@@ -458,9 +458,18 @@ export default {
                     );
                 }
             });
-            this.$el.querySelector('input[name=formula]').addEventListener('keyup', ev => {
+            const formula = this.$el.querySelector('input[name=formula]');
+            formula.addEventListener('keyup', ev => {
                 if (!User.currentUser.slot) return console.warn('User has no slot');
                 User.currentUser.slot.formula = ev.target.value;
+            });
+            formula.addEventListener('change', ev => {
+                this.multi.askForChangeCell(
+                    User.currentUser.slot.x,
+                    User.currentUser.slot.y,
+                    User.currentUser.slot.formula,
+                    '' // style : not implemented yet
+                );
             });
         },
         setupUserEvents() {

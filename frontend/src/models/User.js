@@ -148,7 +148,7 @@ export default class User extends Callbackable {
     
     /**
      * Get the user slot
-     * @returns The user slot
+     * @returns {Slot} The user slot
      */
     get slot() {
         return this.#slot;

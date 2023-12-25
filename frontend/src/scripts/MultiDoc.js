@@ -107,10 +107,13 @@ export default class MultiDoc {
             }
         });
         this.#events.addEventListener(Events.CELL_CHANGED, data => {
-            const {x, y, userId} = data;
+            const {x, y, userId, formula, style} = data;
             if (userId === User.currentUser.id) {
                 this.#eventReponseBuffer[Events.CELL_CHANGED]?.resolve(data);
                 this.#eventReponseBuffer[Events.CELL_CHANGED] = undefined;
+            } else {
+                Doc.currentDoc.getSlotAt(x, y).formula = formula;
+                // style not implemented yet
             }
         });
         this.#events.addEventListener(Events.CELL_HOLDED, data => {
