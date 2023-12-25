@@ -12,7 +12,7 @@ import { Server } from 'socket.io';
 
 import { JWT_SECRET, LOG_FORMAT, MONGO_URI, NODE_ENV, ORIGIN, PORT } from './config/index.js';
 import { HttpException } from './exceptions/HttpException.js';
-import SocketIOEventHandlers from './handlers/SocketIOEventHandlers.js';
+import SocketIOEventHandlers from './handlers/index.js';
 import errorMiddleware from './middlewares/error.middleware.js';
 import userModel from './models/user.model.js';
 import HealthcheckRoutes from './routes/healthcheck.routes.js';
