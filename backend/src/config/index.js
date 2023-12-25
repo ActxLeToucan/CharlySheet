@@ -32,5 +32,9 @@ export const {
     /**
      * @type {string}
      */
-    EXPIRES_IN
+    EXPIRES_IN,
+    /**
+     * @type {number}
+     */
+    COOLDOWN_SHEET_CREATION
 } = validateEnv();

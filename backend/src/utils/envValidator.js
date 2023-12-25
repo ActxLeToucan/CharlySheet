@@ -1,5 +1,5 @@
 import dotenv from 'dotenv';
-import { cleanEnv, port, str } from 'envalid';
+import { cleanEnv, num, port, str } from 'envalid';
 
 dotenv.config();
 
@@ -15,7 +15,8 @@ const validateEnv = () => {
         PORT: port({ default: 3000 }),
         MONGO_URI: str(),
         JWT_SECRET: str(),
-        EXPIRES_IN: str({ default: '1d' })
+        EXPIRES_IN: str({ default: '1d' }),
+        COOLDOWN_SHEET_CREATION: num({ default: 10 })
     });
 };
 
