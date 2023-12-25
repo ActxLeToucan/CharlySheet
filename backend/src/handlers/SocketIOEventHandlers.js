@@ -1,6 +1,5 @@
 import { Mutex } from 'async-mutex';
 import jwt from 'jsonwebtoken';
-import { jwtDecode } from 'jwt-decode';
 
 import { JWT_SECRET } from '../config/index.js';
 import { Sheet } from '../models/sheet.model.js';
@@ -75,45 +74,49 @@ export default class SocketIOEventHandlers {
                 console.log('disconnected');
             });
             // join room
-            socket.on(Events.JOIN_ROOM, (payload) => {
+            socket.on(Events.JOIN_ROOM, async (payload) => {
                 console.log('join', payload);
-                new RoomSheet(payload.sheetId, io).join(socket);
-                // // test if guy has permission to join room
-                // if (checkRight(socket, payload)) {
-                //     socket.join(payload.roomId);
-                // } else {
-                //     socket.emit(
-                //         'error',
-                //         'you are not allowed to join this room'
-                //     );
-                // }
+                const room = await RoomOrganizer.getRoom(payload.sheetId, io);
+                room.join(socket);
             });
         });
     }
 }
 
-const checkRight = async (socket, payload) => {
-    const { roomId } = payload;
-    const { token } = socket.handshake.auth;
-    const sheet = await Sheet.findById(roomId);
-    const { _id } = jwtDecode(token);
-    if (sheet.ownerId === _id) {
-        return true;
-    }
-};
+class RoomOrganizer {
+    /**
+     * @type {Map<string, RoomSheet>}
+     */
+    static rooms = new Map();
+    /**
+     * @type {Mutex}
+     */
+    static mutex = new Mutex();
 
-const roomsMutex = new Map();
-const getRoomMutex = new Mutex();
-const getRoom = (roomId) => {
-    if (!roomsMutex.has(roomId)) {
-        getRoomMutex.runExclusive(() => {
-            if (!roomsMutex.has(roomId)) {
-                roomsMutex.set(roomId, new Mutex());
-            }
-        });
+    /**
+     * get a room or create it if it doesn't exist
+     * @param {string} roomId
+     * @param {Server} io
+     * @returns {RoomSheet}
+     * @memberof RoomOrganizer
+     */
+    static async getRoom(roomId, io) {
+        /**
+         * on ne perd du temps à faire une exclusion mutuelle que si la room n'existe pas
+         */
+        if (!this.rooms.has(roomId)) {
+            await this.mutex.runExclusive(() => {
+                /**
+                 * on recheck si la room n'existe pas car elle peut avoir été créée entre temps
+                 */
+                if (!this.rooms.has(roomId)) {
+                    this.rooms.set(roomId, new RoomSheet(roomId, io));
+                }
+            });
+        }
+        return this.rooms.get(roomId);
     }
-    return roomsMutex.get(roomId);
-};
+}
 
 class RoomSheet {
     /**
@@ -126,6 +129,7 @@ class RoomSheet {
         this.mutex = new Mutex();
         this.cellsHolder = new Map();
         this.io = io;
+        this.users = new Map();
     }
 
     /**
@@ -167,6 +171,23 @@ class RoomSheet {
             this.io.to(this.sheetId).emit(Events.ROOM_JOINED, {
                 userId: socket.decoded._id
             });
+            for (const [key, obj] of this.users.entries()) {
+                console.log(key, obj);
+                socket.emit(Events.ROOM_JOINED, {
+                    userId: key
+                });
+                if (obj.position) {
+                    socket.emit(Events.CELL_SELECTED, {
+                        userId: key,
+                        ...obj.position
+                    });
+                }
+            }
+            if (!this.users.has(socket.decoded._id)) {
+                this.users.set(socket.decoded._id, {
+                    position: null
+                });
+            }
         } else {
             socket.emit('error', 'you are not allowed to join this room');
         }
@@ -216,6 +237,9 @@ class RoomSheet {
                 userId: socket.decoded._id,
                 x,
                 y
+            });
+            this.users.set(socket.decoded._id, {
+                position: { x, y }
             });
         } catch (error) {
             logger.error(error);
@@ -277,6 +301,7 @@ class RoomSheet {
 
     async leave(socket) {
         socket.leave(this.sheetId);
+        this.users.delete(socket.decoded._id);
         this.mutex.runExclusive(async () => {
             for (const [key, holderId] of this.cellsHolder.entries()) {
                 if (holderId === socket.decoded._id) {
