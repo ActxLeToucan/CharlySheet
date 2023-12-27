@@ -49,6 +49,10 @@
                                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5">
                                     <path stroke-linecap="round" stroke-linejoin="round" d="M7.5 8.25h9m-9 3H12m-9.75 1.51c0 1.6 1.123 2.994 2.707 3.227 1.129.166 2.27.293 3.423.379.35.026.67.21.865.501L12 21l2.755-4.133a1.14 1.14 0 0 1 .865-.501 48.172 48.172 0 0 0 3.423-.379c1.584-.233 2.707-1.626 2.707-3.228V6.741c0-1.602-1.123-2.995-2.707-3.228A48.394 48.394 0 0 0 12 3c-2.392 0-4.744.175-7.043.513C3.373 3.746 2.25 5.14 2.25 6.741v6.018Z" />
                                 </svg>
+                                <span
+                                    v-show="hasUnreadMessages"
+                                    class="notif-show absolute bottom-1 right-1 w-2 h-2 bg-slate-300 rounded-full"
+                                />
                             </button>
                         </div>
                     </div>
@@ -302,7 +306,8 @@ export default {
             validUserSearch: false,
             chatOpen: false,
             chatWidth: window.innerWidth * 0.25,
-            connectedUsers: []
+            connectedUsers: [],
+            hasUnreadMessages: false
         };
     },
     async mounted() {
@@ -544,6 +549,11 @@ export default {
                 const userId = ev.userId;
                 this.connectedUsers = this.connectedUsers.filter(u => u.id !== userId);
             });
+
+            this.multi.getEventManager().addEventListener('newMessage', ev => {
+                if (!this.chatOpen)
+                    this.hasUnreadMessages = true;
+            });
         },
         releaseCell() {
             if (this.currentSlot && !this.currentSlotLocked) {
@@ -570,6 +580,7 @@ export default {
         toggleChatPanel() {
             this.chatOpen = !this.chatOpen;
             if (this.chatOpen) {
+                this.hasUnreadMessages = false;
                 const messageInput = this.$el.querySelector('input[name=message]');
                 setTimeout(() => {
                     messageInput.focus();
@@ -586,3 +597,22 @@ export default {
 }
 
 </script>
+
+<style scoped>
+@keyframes notif-show {
+    0% {
+        transform: scale(0.5);
+    }
+    40% {
+        transform: scale(1.3);
+    }
+    60% {
+        transform: scale(0.9);
+    }
+    100% {
+        transform: scale(1);
+    }
+}
+
+.notif-show { animation: notif-show 0.2s ease-in-out }
+</style>
