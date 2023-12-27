@@ -125,6 +125,10 @@ export default class MultiDoc {
             this.#eventReponseBuffer[Events.CELL_ACQUIRED]?.reject(data);
             this.#eventReponseBuffer[Events.CELL_ACQUIRED] = undefined;
         });
+        this.#events.addEventListener(Events.ROOM_LEFT, data => {
+            const { userId } = data;
+            Selections.setUserSelection(userId, null, null);
+        });
     }
 
     /**
