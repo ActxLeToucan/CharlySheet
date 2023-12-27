@@ -77,7 +77,6 @@ export default class SocketIOEventHandlers {
                 socket.emit('pong', { message: 'pong' });
             });
             socket.on('disconnect', () => {
-                console.log('disconnected');
                 const room = socket.data.room;
                 /**
                  * On vérifie que le socket a bien une room
@@ -85,14 +84,18 @@ export default class SocketIOEventHandlers {
                  */
                 if (room) {
                     room.leave(socket);
-                    RoomOrganizer.garbageCollect(io, socket);
+                    RoomOrganizer.garbageCollect(io, room);
                 }
             });
             // join room
             socket.on(Events.JOIN_ROOM, async (payload) => {
-                console.log('join', payload);
                 const room = await RoomOrganizer.getRoom(payload.sheetId, io);
-                room.join(socket);
+                await room.join(socket);
+                /**
+                 * Il se peut que la personne n'ait pas eu le droit de rejoindre la room
+                 * et donc elle peut être vide
+                 */
+                RoomOrganizer.garbageCollect(io, room);
             });
         });
     }
@@ -126,7 +129,6 @@ class RoomOrganizer {
                  */
                 if (!this.rooms.has(roomId)) {
                     this.rooms.set(roomId, new RoomSheet(roomId, io));
-                    console.log('room created');
                 }
             });
         }
@@ -134,10 +136,8 @@ class RoomOrganizer {
     }
     static async garbageCollect(io, room) {
         await this.mutex.runExclusive(() => {
-            console.log('garbage collect');
-            if (room.data.room.users.size === 0) {
-                this.rooms.delete(room.data.room.sheetId);
-                console.log('room deleted');
+            if (room.users.size === 0) {
+                this.rooms.delete(room.sheetId);
             }
         });
     }
@@ -163,7 +163,6 @@ class RoomSheet {
     async join(socket) {
         const { _id } = socket.decoded;
         const sheet = await Sheet.findById(this.sheetId);
-
         if (!sheet) {
             socket.emit('error', 'sheet not found');
             return;
@@ -197,7 +196,6 @@ class RoomSheet {
                 userId: socket.decoded._id
             });
             for (const [key, obj] of this.users.entries()) {
-                console.log(key, obj);
                 socket.emit(Events.ROOM_JOINED, {
                     userId: key
                 });
