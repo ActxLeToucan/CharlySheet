@@ -30,7 +30,9 @@ const Events = {
     /** Event fired by server when a client joined a room */
     ROOM_JOINED: 'roomJoined',
     /** Event fired by client when he wants to leave a room */
-    LEAVE_ROOM: 'leaveRoom'
+    LEAVE_ROOM: 'leaveRoom',
+    /** Event fired by server when a client left a room */
+    ROOM_LEFT: 'roomLeaved',
 };
 
 export default class MultiDoc {
@@ -41,6 +43,8 @@ export default class MultiDoc {
 
     /**@type {object} Buffer for event responses */
     #eventReponseBuffer = {};
+
+    static Events = Events;
 
     /**
      * Creates a new MultiDoc object for a given document
@@ -204,5 +208,9 @@ export default class MultiDoc {
                 style: style ?? {}
             });
         });
+    }
+
+    getEventManager() {
+        return this.#events;
     }
 }

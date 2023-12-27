@@ -29,7 +29,7 @@
                                 </svg>
                             </button>
                             <div
-                                v-for="user in doc?.users.concat(doc?.owner)"
+                                v-for="user in connectedUsers"
                                 :key="user.id"
                                 class="group/usercard show-left flex rounded-full bg-white dark:bg-slate-600 border-2 w-fit h-8 items-center justify-center shadow-md min-w-[2em] max-w-[2em] hover:max-w-[6em] transition-all overflow-hidden px-2"
                                 :style="`border-color: ${user.color};`"
@@ -247,6 +247,7 @@ import CompCompletion from '../components/CompCompletion.vue';
 import { toRaw } from 'vue';
 import CompChat from '../components/CompChat.vue';
 import CompNotify from '../components/CompNotify.vue';
+import EventManager from '../scripts/EventManager';
 
 const menus = [
     {name: 'Fichier'},
@@ -300,7 +301,8 @@ export default {
             window,
             validUserSearch: false,
             chatOpen: false,
-            chatWidth: window.innerWidth * 0.25
+            chatWidth: window.innerWidth * 0.25,
+            connectedUsers: []
         };
     },
     async mounted() {
@@ -522,6 +524,25 @@ export default {
                 if (ev.key === 'Escape' && User.currentUser.slot) {
                     this.releaseCell();
                 }
+            });
+
+            this.multi.getEventManager().addEventListener(MultiDoc.Events.ROOM_JOINED, async ev => {
+                const userId = ev.userId;
+                const user = await Ressources.getUser(userId);
+                if (!user) return console.warn('User not found for id', userId);
+                
+                if (!this.connectedUsers.find(u => u.id === userId)) {
+                    this.connectedUsers.push({
+                        id: userId,
+                        username: user.username,
+                        color: User.GetUserColor(userId)
+                    });
+                }
+            });
+
+            this.multi.getEventManager().addEventListener(MultiDoc.Events.ROOM_LEFT, async ev => {
+                const userId = ev.userId;
+                this.connectedUsers = this.connectedUsers.filter(u => u.id !== userId);
             });
         },
         releaseCell() {
