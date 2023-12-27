@@ -21,7 +21,7 @@ export default class Slot extends Callbackable {
         return new Slot(
             data.id ?? data._id,
             data.doc ?? data.document,
-            data.users.map(u => User.fromData(u)),
+            data.users?.map(u => User.fromData(u)) ?? [],
             data.formula ?? data.value,
             true,
             data.x,
@@ -194,7 +194,6 @@ export default class Slot extends Callbackable {
      * @param {string} value the new formula
      */
     set formula(value) {
-        if (this.#locked) return;
         this.#formula = value;
         this._callCallbacks('formula', this.#formula);
         this.#calculateResult();

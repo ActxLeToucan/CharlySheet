@@ -458,17 +458,20 @@ export default {
                     );
                 }
             });
+            let keyupListenerTimeout = null;
             const formula = this.$el.querySelector('input[name=formula]');
             formula.addEventListener('keyup', ev => {
                 if (!User.currentUser.slot) return console.warn('User has no slot');
                 User.currentUser.slot.formula = ev.target.value;
-            });
-            formula.addEventListener('change', ev => {
-                this.multi.askForChangeCell(
-                    User.currentUser.slot.x,
-                    User.currentUser.slot.y,
-                    User.currentUser.slot.formula
-                );
+                if (keyupListenerTimeout) clearTimeout(keyupListenerTimeout);
+                keyupListenerTimeout = setTimeout(() => {
+                    keyupListenerTimeout = null;
+                    this.multi.askForChangeCell(
+                        User.currentUser.slot.x,
+                        User.currentUser.slot.y,
+                        User.currentUser.slot.formula
+                    );
+                }, 300);
             });
         },
         setupUserEvents() {
@@ -495,7 +498,7 @@ export default {
             container.addEventListener('mousedown', ev => {
                 if (ev.button === 2) return;
                 const cell = DocView.tryGetDomSlot(ev.target);
-                if (!cell) return;
+                if (!cell) return console.warn('Cell not found for div', ev.target);
 
                 const slot = this.doc.getSlotAt(cell.dataset.x, cell.dataset.y);
                 if (slot.equals(User.currentUser.slot)) return console.warn('User already has this slot');
