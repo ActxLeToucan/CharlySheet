@@ -1,13 +1,16 @@
 <template>
-    <div class="flex grow h-full">
-        <div class="relative flex grow flex-col min-h-full h-full max-w-full w-full min-w-0">
+    <div class="flex grow h-full w-full">
+        <div
+            class="relative flex grow flex-col min-h-full h-full max-w-full w-full min-w-0"
+            :style="chatOpen ? `width: ${window.innerWidth - chatWidth}px;` : `width: 100%;`"
+        >
             <div class="flex p-2 w-full h-fit items-center justify-center">
                 <div class="flex w-fit h-full items-center justify-center pr-2">
                     <document-icon class="show-right w-14 h-full text-slate-500 dark:text-slate-400 bg-slate-200 dark:bg-slate-800 rounded-lg p-1" />
                 </div>
-                <div class="flex flex-col w-full h-full space-y-2">
-                    <div class="flex w-full h-fit">
-                        <div class="show-down flex space-x-4 items-center justify-center">
+                <div class="flex flex-col min-w-0 max-w-full w-full h-full space-y-2">
+                    <div class="flex min-w-0 max-w-full w-full h-fit">
+                        <div class="show-down flex space-x-2 w-fit items-center justify-center">
                             <button
                                 v-for="menu in menus"
                                 :key="menu.name"
@@ -17,46 +20,48 @@
                                 {{ menu.name }}
                             </button>
                         </div>
-                        <div class="flex grow justify-end items-center space-x-1">
-                            <button
-                                v-if="documentOwner === User.currentUser.id"
-                                class="show-left flex rounded-full border-2 border-slate-200 dark:border-slate-600 text-slate-600 dark:text-slate-400 w-8 h-8 items-center justify-center
-                                    hover:text-slate-50 hover:dark:text-slate-200 hover:border-slate-200 hover:dark:border-slate-200 transition-all"
-                                @click="$refs['addUserModal'].open()"
-                            >
-                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="3" stroke="currentColor" class="w-4 h-4">
-                                    <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
-                                </svg>
-                            </button>
-                            <div
-                                v-for="user in connectedUsers"
-                                :key="user.id"
-                                class="group/usercard show-left flex rounded-full bg-white dark:bg-slate-600 border-2 w-fit h-8 items-center justify-center shadow-md min-w-[2em] max-w-[2em] hover:max-w-[6em] transition-all overflow-hidden px-2"
-                                :style="`border-color: ${user.color};`"
-                            >
-                                <p class="group-hover/usercard:hidden text-slate-600 dark:text-slate-50 font-extrabold">
-                                    {{ user.username.charAt(0) }}
-                                </p>
-                                <p class="hidden group-hover/usercard:flex text-slate-600 dark:text-slate-50 font-extrabold">
-                                    {{ user.username }}
-                                </p>
+                        <div class="flex grow justify-end min-w-0 max-w-full overflow-hidden">
+                            <div class="flex items-center space-x-1 w-fit">
+                                <button
+                                    v-if="documentOwner === User.currentUser.id"
+                                    class="show-left flex rounded-full border-2 border-slate-200 dark:border-slate-600 text-slate-600 dark:text-slate-400 w-8 h-8 items-center justify-center
+                                        hover:text-slate-50 hover:dark:text-slate-200 hover:border-slate-200 hover:dark:border-slate-200 transition-all"
+                                    @click="$refs['addUserModal'].open()"
+                                >
+                                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="3" stroke="currentColor" class="w-4 h-4">
+                                        <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
+                                    </svg>
+                                </button>
+                                <div
+                                    v-for="user in connectedUsers"
+                                    :key="user.id"
+                                    class="group/usercard show-left flex rounded-full bg-white dark:bg-slate-600 border-2 w-fit h-8 items-center justify-center shadow-md min-w-[2em] max-w-[2em] hover:max-w-[20em] transition-all overflow-hidden px-2"
+                                    :style="`border-color: ${user.color};`"
+                                >
+                                    <p class="group-hover/usercard:hidden text-slate-600 dark:text-slate-50 font-extrabold">
+                                        {{ user.username.charAt(0) }}
+                                    </p>
+                                    <p class="hidden group-hover/usercard:flex text-slate-600 dark:text-slate-50 font-extrabold">
+                                        {{ user.username }}
+                                    </p>
+                                </div>
+                                <button
+                                    class="show-left flex rounded-full border-2 border-slate-200 dark:border-slate-600 text-slate-600 dark:text-slate-400 w-8 h-8 items-center justify-center
+                                        hover:text-slate-50 hover:dark:text-slate-200 hover:border-slate-200 hover:dark:border-slate-200 transition-all"
+                                    @click="toggleChatPanel"
+                                >
+                                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5">
+                                        <path stroke-linecap="round" stroke-linejoin="round" d="M7.5 8.25h9m-9 3H12m-9.75 1.51c0 1.6 1.123 2.994 2.707 3.227 1.129.166 2.27.293 3.423.379.35.026.67.21.865.501L12 21l2.755-4.133a1.14 1.14 0 0 1 .865-.501 48.172 48.172 0 0 0 3.423-.379c1.584-.233 2.707-1.626 2.707-3.228V6.741c0-1.602-1.123-2.995-2.707-3.228A48.394 48.394 0 0 0 12 3c-2.392 0-4.744.175-7.043.513C3.373 3.746 2.25 5.14 2.25 6.741v6.018Z" />
+                                    </svg>
+                                    <span
+                                        v-show="hasUnreadMessages"
+                                        class="notif-show absolute bottom-1 right-1 w-2 h-2 bg-slate-300 rounded-full"
+                                    />
+                                </button>
                             </div>
-                            <button
-                                class="show-left flex rounded-full border-2 border-slate-200 dark:border-slate-600 text-slate-600 dark:text-slate-400 w-8 h-8 items-center justify-center
-                                    hover:text-slate-50 hover:dark:text-slate-200 hover:border-slate-200 hover:dark:border-slate-200 transition-all"
-                                @click="toggleChatPanel"
-                            >
-                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5">
-                                    <path stroke-linecap="round" stroke-linejoin="round" d="M7.5 8.25h9m-9 3H12m-9.75 1.51c0 1.6 1.123 2.994 2.707 3.227 1.129.166 2.27.293 3.423.379.35.026.67.21.865.501L12 21l2.755-4.133a1.14 1.14 0 0 1 .865-.501 48.172 48.172 0 0 0 3.423-.379c1.584-.233 2.707-1.626 2.707-3.228V6.741c0-1.602-1.123-2.995-2.707-3.228A48.394 48.394 0 0 0 12 3c-2.392 0-4.744.175-7.043.513C3.373 3.746 2.25 5.14 2.25 6.741v6.018Z" />
-                                </svg>
-                                <span
-                                    v-show="hasUnreadMessages"
-                                    class="notif-show absolute bottom-1 right-1 w-2 h-2 bg-slate-300 rounded-full"
-                                />
-                            </button>
                         </div>
                     </div>
-                    <div class="show-right flex w-full h-fit">
+                    <div class="show-right flex min-w-0 max-w-full w-full h-fit">
                         <comp-input
                             :value="documentTitle ?? Lang.CreateTranslationContext('doc', 'NewDocument')"
                             :disabled="documentOwner !== User.currentUser.id"
@@ -218,9 +223,14 @@
             <comp-notify />
         </div>
         <div
-            class="flex flex-col min-h-0 h-full w-full transition-all"
+            class="flex min-h-0 h-full"
+            :class="resizingChat ? '' : ' transition-all'"
             :style="chatOpen ? `width: ${chatWidth}px;` : `width: 0px;`"
         >
+            <span
+                class="resize-chat flex w-[6px] h-full bg-slate-200 dark:bg-slate-600 cursor-col-resize select-none"
+                @mousedown="resizingChat = true"
+            />
             <comp-chat />
         </div>
     </div>
@@ -307,7 +317,8 @@ export default {
             chatOpen: false,
             chatWidth: window.innerWidth * 0.25,
             connectedUsers: [],
-            hasUnreadMessages: false
+            hasUnreadMessages: false,
+            resizingChat: false
         };
     },
     async mounted() {
@@ -322,6 +333,7 @@ export default {
             this.setupUserEvents();
             this.setupSocketEvents();
         });
+        this.setupChatListeners();
     },
     methods: {
         searchUsers(selector, query) {
@@ -588,6 +600,16 @@ export default {
                 }, 150);
             }
         },
+        setupChatListeners() {
+            window.addEventListener('mouseup', ev => {
+                this.resizingChat = false;
+            });
+            window.addEventListener('mousemove', ev => {
+                if (this.resizingChat) {
+                    this.chatWidth = Math.min(Math.max(window.innerWidth - ev.clientX, 300), window.innerWidth - 900);
+                }
+            });
+        }
     },
     meta: {
         title: async () => {

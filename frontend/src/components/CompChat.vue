@@ -1,5 +1,5 @@
 <template>
-    <div class="flex flex-col max-h-full h-full min-h-0 border-l-4 border-slate-200 dark:border-slate-600">
+    <div class="flex flex-col max-h-full h-full min-h-0 max-w-full min-w-0 w-full">
         <div class="flex h-fit border-b-2 border-slate-200 dark:border-slate-800">
             <p class="m-4 text-xl font-bold">
                 <get-text :context="Lang.CreateTranslationContext('chat', 'Chat')" />
@@ -89,7 +89,7 @@ export default {
                 msg = input.value;
             }
             if (!msg || msg.trim() === '') return;
-            
+
             this.events.sendEvent('newMessage', {
                 message: msg
             });
