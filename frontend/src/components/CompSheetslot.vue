@@ -40,6 +40,9 @@ export default {
         this.slot.on('users', users => {
             // nothing ?
         });
+        this.formula = this.slot.formula;
+        this.result = this.slot.result;
+        this.displayMode = User.currentUser.slot == this.slot ? 'formula' : 'result';
     },
     methods: {
         

@@ -395,6 +395,7 @@ export default {
             return new Promise((resolve, reject) => {
                 Ressources.getDocument(this.docId, forceFetch).then(doc => {
                     this.doc = doc;
+                    window.doc = doc;
                     this.documentTitle = doc.title;
                     this.documentOwner = doc.owner.id;
                     this.$forceUpdate();

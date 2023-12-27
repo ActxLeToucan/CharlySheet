@@ -64,7 +64,7 @@ export default class Doc extends Callbackable {
         this.#id = id ?? DOC_ID_COUNTER++;
         this.#owner = owner ?? null;
         this.#title = title ?? Doc.DEFAULT_TITLE;
-        this.#slots = slots ?? Doc.DEFAULT_SLOTS;
+        this.#generateSlotsTiles(slots ?? Doc.DEFAULT_SLOTS);
         this.#users = users ?? Doc.DEFAULT_USERS;
         Doc.#currentDoc = this;
     }
@@ -129,5 +129,9 @@ export default class Doc extends Callbackable {
         if (!this.#slots) this.#slots = [];
         if (!this.#slots[x]) this.#slots[x] = [];
         if (!this.#slots[x][y]) this.#slots[x][y] = slot;
+    }
+
+    #generateSlotsTiles(slots) {
+        slots.forEach(s => this.setSlotAt(s.x, s.y, s));
     }
 }
