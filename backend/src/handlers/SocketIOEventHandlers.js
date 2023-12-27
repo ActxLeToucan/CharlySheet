@@ -21,6 +21,7 @@ import { logger } from '../utils/logger.js';
  * @property {string} LEAVE_ROOM - event fired by client when he wants to leave a room
  * @property {string} ROOM_LEAVED - event fired by server when a client leaved a room
  * @property {string} NEW_MESSAGE - event relayed by server when a client sent a message
+ * @property {string} SHEET_SYNC - event fired by server when a client joined a room
  */
 
 /** @type {Events} */
@@ -38,7 +39,8 @@ const Events = {
     ROOM_JOINED: 'roomJoined',
     LEAVE_ROOM: 'leaveRoom',
     ROOM_LEAVED: 'roomLeaved',
-    NEW_MESSAGE: 'newMessage'
+    NEW_MESSAGE: 'newMessage',
+    SHEET_SYNC: 'sheetSync'
 };
 
 export default class SocketIOEventHandlers {
@@ -53,6 +55,10 @@ export default class SocketIOEventHandlers {
      */
     constructor(io) {
         this.io = io;
+        /**
+         * On autorise seulement les connexions de nos utilisateurs
+         * pour ne pas servir de relais gratuit
+         */
         io.use((socket, next) => {
             const token =
                 socket.handshake.auth.token?.split(' ')[1] ??
@@ -72,6 +78,15 @@ export default class SocketIOEventHandlers {
             });
             socket.on('disconnect', () => {
                 console.log('disconnected');
+                const room = socket.data.room;
+                /**
+                 * On vérifie que le socket a bien une room
+                 * car il peut très bien avoir initié une connexion sans faire de join
+                 */
+                if (room) {
+                    room.leave(socket);
+                    RoomOrganizer.garbageCollect(io, socket);
+                }
             });
             // join room
             socket.on(Events.JOIN_ROOM, async (payload) => {
@@ -111,10 +126,20 @@ class RoomOrganizer {
                  */
                 if (!this.rooms.has(roomId)) {
                     this.rooms.set(roomId, new RoomSheet(roomId, io));
+                    console.log('room created');
                 }
             });
         }
         return this.rooms.get(roomId);
+    }
+    static async garbageCollect(io, room) {
+        await this.mutex.runExclusive(() => {
+            console.log('garbage collect');
+            if (room.data.room.users.size === 0) {
+                this.rooms.delete(room.data.room.sheetId);
+                console.log('room deleted');
+            }
+        });
     }
 }
 
@@ -191,6 +216,7 @@ class RoomSheet {
         } else {
             socket.emit('error', 'you are not allowed to join this room');
         }
+        socket.data.room = this;
     }
 
     async acquireCell(socket, payload) {
@@ -300,6 +326,11 @@ class RoomSheet {
     }
 
     async leave(socket) {
+        /**
+         * On vérifie que le socket n'a pas déjà quitté la room
+         * pour éviter une boucle infinie dans l'event disconnect
+         */
+        if (socket.data.leaved) return;
         socket.leave(this.sheetId);
         this.users.delete(socket.decoded._id);
         this.mutex.runExclusive(async () => {
@@ -320,6 +351,7 @@ class RoomSheet {
         });
         // disconnect socket
         socket.disconnect();
+        socket.data.leaved = true;
     }
     async relayMessage(socket, payload) {
         const { message } = payload;
