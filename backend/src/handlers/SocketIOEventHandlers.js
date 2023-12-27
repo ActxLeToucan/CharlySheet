@@ -317,7 +317,8 @@ class RoomSheet {
                 x,
                 y,
                 formula,
-                style
+                style,
+                userId: socket.decoded._id
             });
         } catch (error) {
             logger.error(error);
