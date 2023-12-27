@@ -87,8 +87,9 @@ export default {
             if (!msg) {
                 const input = this.getInput();
                 msg = input.value;
-                console.log(msg)
             }
+            if (!msg || msg.trim() === '') return;
+            
             this.events.sendEvent('newMessage', {
                 message: msg
             });
