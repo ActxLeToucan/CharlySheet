@@ -467,8 +467,7 @@ export default {
                 this.multi.askForChangeCell(
                     User.currentUser.slot.x,
                     User.currentUser.slot.y,
-                    User.currentUser.slot.formula,
-                    '' // style : not implemented yet
+                    User.currentUser.slot.formula
                 );
             });
         },

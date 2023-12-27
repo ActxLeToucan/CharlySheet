@@ -201,7 +201,7 @@ export default class MultiDoc {
                 x,
                 y,
                 formula,
-                style
+                style: style ?? {}
             });
         });
     }
