@@ -18,38 +18,41 @@
                             <get-text :context="Lang.CreateTranslationContext('parameters', 'ModifyAccount')" />
                         </comp-title>
                     </div>
-                    <div class="flex flex-col space-y-4 mx-auto">
-                        <div ref="updateAccount-input">
-                            <comp-input
-                                :label="Lang.CreateTranslationContext('home', 'Username')"
-                                :placeholder="Lang.CreateTranslationContext('home', 'Username')"
-                                name="username"
-                                :value="formProperties.properties.username"
-                            />
-                            <comp-input
-                                :label="Lang.CreateTranslationContext('home', 'Email')"
-                                :placeholder="Lang.CreateTranslationContext('home', 'Email')"
-                                name="email"
-                                :value="formProperties.properties.email"
-                            />
-                            <comp-button
-                                class="mx-auto my-2"
-                                :icon="CheckIcon"
-                                :onclick="() => modifyAccount()"
-                                :disabled="isButtonDisabled"
-                            >
-                                <get-text :context="Lang.CreateTranslationContext('parameters', 'SaveModify')" />
-                            </comp-button>
-                        </div>
-                        
+                    <div
+                        v-if="shownPanel === 'updateAccount-panel'"
+                        ref="updateAccount-input"
+                        class="flex flex-col space-y-4 mx-auto"
+                    >
+                        <comp-input
+                            :label="Lang.CreateTranslationContext('home', 'Username')"
+                            :placeholder="Lang.CreateTranslationContext('home', 'Username')"
+                            name="username"
+                            :value="formProperties.properties.username"
+                        />
+                        <comp-input
+                            :label="Lang.CreateTranslationContext('home', 'Email')"
+                            :placeholder="Lang.CreateTranslationContext('home', 'Email')"
+                            name="email"
+                            :value="formProperties.properties.email"
+                        />
                         <comp-button
                             class="mx-auto my-2"
-                            :icon="UserMinusIcon"
-                            :onclick="() => disconnect()"
+                            :icon="CheckIcon"
+                            :onclick="() => modifyAccount()"
+                            :disabled="isButtonDisabled"
                         >
-                            <get-text :context="Lang.CreateTranslationContext('verbs', 'LogOut')" />
+                            <get-text :context="Lang.CreateTranslationContext('parameters', 'SaveModify')" />
                         </comp-button>
                     </div>
+                    
+
+                    <comp-button
+                        class="mx-auto my-2"
+                        :icon="UserMinusIcon"
+                        :onclick="() => disconnect()"
+                    >
+                        <get-text :context="Lang.CreateTranslationContext('verbs', 'LogOut')" />
+                    </comp-button>
 
                     <div
                         class="flex flex-col grow justify-end"
@@ -58,7 +61,7 @@
                         <div class="flex flex-wrap w-full h-fit">
                             <comp-button
                                 class="mx-auto my-2"
-                                :icon="XCircleIcon"
+                                :icon="ChevronLeftIcon"
                                 :onclick="() => goToDelete()"
                             >
                                 <get-text :context="Lang.CreateTranslationContext('parameters', 'DeleteAccount')" />
@@ -222,7 +225,7 @@ export default {
     mounted() {
 
         const updateAccount = this.$refs['updateAccount-input'];
-        updateAccount.addEventListener('keydown', ev => {
+        updateAccount.addEventListener('keydown', () =>{
             this.isButtonDisabled = false;
         });
         setTimeout(() => {
@@ -266,9 +269,6 @@ export default {
         goToDelete() {
             this.showPanel('delete-panel');
         },
-        goToMy() {
-            this.$router.push({name: 'My'});
-        },
         async modifyAccount(){
             const logZone = this.$refs['modifyAccount-log-zone'];
             const log = logZone.log('', Logs.INFO);
@@ -294,7 +294,7 @@ export default {
             }
 
             try {
-                const response = await API.execute_logged(API.ROUTE.ME(), API.METHOD.PATCH ,  {
+                await API.execute_logged(API.ROUTE.ME(), API.METHOD.PATCH ,  {
                     username: username.value,
                     email: email.value
                 });
@@ -387,7 +387,7 @@ export default {
             }
 
             try {
-                const response = await API.execute_logged(API.ROUTE.Change_PWD(), API.METHOD.PATCH, {
+                await API.execute_logged(API.ROUTE.Change_PWD(), API.METHOD.PATCH, {
                     oldpassword: oldPassword.value,
                     newpassword: newPassword.value
                 });

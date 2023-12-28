@@ -69,8 +69,8 @@ export default class User extends Callbackable {
         this.#email = infos?.email ?? User.DEFAULT_EMAIL;
         this.#color = infos?.color ?? User.DEFAULT_COLOR;
 
-        this.#id = infos?.id;
-        this.#token = infos?.token;
+        this.#id = infos?.id ?? this.#id;
+        this.#token = infos?.token ?? this.#token;
     }
 
     async fetchInformations() {
