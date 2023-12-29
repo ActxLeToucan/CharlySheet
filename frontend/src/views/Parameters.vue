@@ -61,7 +61,7 @@
                         <div class="flex flex-wrap w-full h-fit">
                             <comp-button
                                 class="mx-auto my-2"
-                                :icon="ChevronLeftIcon"
+                                :icon="TrashIcon"
                                 :onclick="() => goToDelete()"
                             >
                                 <get-text :context="Lang.CreateTranslationContext('parameters', 'DeleteAccount')" />
@@ -191,7 +191,7 @@ import API from '../scripts/API';
 import Lang from '../scripts/Lang';
 import Logs from '../scripts/Logs';
 
-import {CheckIcon, ChevronLeftIcon, ChevronRightIcon, UserMinusIcon, XCircleIcon} from '@heroicons/vue/24/outline';
+import {CheckIcon, ChevronLeftIcon, ChevronRightIcon, UserMinusIcon, TrashIcon} from '@heroicons/vue/24/outline';
 import User from '../models/User';
 
 export default {
@@ -211,7 +211,7 @@ export default {
             ChevronRightIcon,
             UserMinusIcon,
             CheckIcon,
-            XCircleIcon,
+            TrashIcon,
             shownPanel: 'updateAccount-panel',
             formProperties: {
                 properties: {
