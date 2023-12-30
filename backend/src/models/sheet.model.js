@@ -94,6 +94,18 @@ schema.set('toJSON', {
     }
 });
 
+schema.methods.export = function () {
+    const sheet = this.toJSON();
+    delete sheet.owner;
+    delete sheet.users;
+    delete sheet._id;
+    sheet.cells = sheet.cells.map((cell) => {
+        delete cell._id;
+        return cell;
+    });
+    return sheet;
+};
+
 /**
  * @type {import('mongoose').Model}
  */
