@@ -4,6 +4,7 @@ export default {
     ME: (...args) => "/user/me" + (args.length ? "/" + args.join("/") : ""),
     LOGIN: (...args) => "/user/login" + (args.length ? "/" + args.join("/") : ""),
     SIGNUP: (...args) => "/user/signup" + (args.length > 1 ? `/${args[0]}?token=${args[1]}` : ""),
+    Change_PWD: (...args) => "/user/me/password" + (args.length ? "/" + args.join("/") : ""),
     SHEETS: {
         call: (...args) => "/sheets" + (args.length ? "/" + args.join("/") : ""),
         ME: (...args) => "/sheets/me" + (args.length ? "/" + args.join("/") : ""),
