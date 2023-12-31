@@ -1,7 +1,9 @@
 <template>
     <div class="show-down flex h-fit border-b-2 border-slate-200 dark:border-slate-800 p-2">
         <div class="flex items-center w-[30%]">
-            <comp-icon class="w-10" />
+            <comp-icon
+                class="w-10"
+            />
         </div>
         <div class="flex items-center mx-auto">
             <comp-title class="text-slate-600 dark:text-slate-200">
@@ -10,10 +12,10 @@
         </div>
         <div class="flex items-center w-[30%] justify-end">
             <comp-button
-                :icon="UserMinusIcon"
-                :onclick="disconnect"
-            >  
-                <get-text :context="Lang.CreateTranslationContext('verbs', 'LogOut')" />
+                :icon="Cog8ToothIcon"
+                :onclick="parameter"
+            >
+                <get-text :context="Lang.CreateTranslationContext('my', 'Param')" />
             </comp-button>
         </div>
     </div>
@@ -23,7 +25,7 @@
 import CompTitle from './CompTitle.vue'
 
 import {
-    UserMinusIcon,
+    Cog8ToothIcon,
     // ChevronLeftIcon
 } from '@heroicons/vue/24/outline';
 import User from '../models/User';
@@ -39,21 +41,20 @@ export default {
         CompButton,
         GetText,
         CompIcon,
-        // ChevronLeftIcon
+    // ChevronLeftIcon
     },
     data() {
         return {
             Lang,
-            UserMinusIcon
+            Cog8ToothIcon
         };
     },
     mounted() {
-        
+
     },
     methods: {
-        disconnect() {
-            User.forget();
-            this.$router.push({ name: 'Home' });
+        parameter() {
+            this.$router.push({name: 'Parameters'});
         }
     }
 }

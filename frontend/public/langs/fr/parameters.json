@@ -1,0 +1,11 @@
+{
+  "OldPassword": "Ancien mot de passe",
+  "NewPassword": "Nouveau mot de passe",
+  "ConfirmPassword": "Confirmer le nouveau le mot de passe",
+  "ModifyPassword": "Modifier votre mot de passe",
+  "ModifyAccount": "Modifier votre compte",
+  "SaveModify": "Enregistrer les modifications",
+  "DeletingAccount": "Suppression du compte",
+  "DeleteAccount": "Supprimer votre compte",
+  "DeleteAccConfirm": "Êtes-vous sûr de vouloir supprimer votre compte ?"
+}

@@ -6,7 +6,10 @@ import validate from '../../middlewares/validator.middleware.js';
 import {
     loginSchema,
     newUserSchema,
-    userIdentifierSchema, userSearchSchema
+    userIdentifierSchema,
+    modifyUserSchema,
+    modifyPasswordSchema,
+    userSearchSchema
 } from '../../validators/user.validator.js';
 
 class UserRoutes {
@@ -177,6 +180,115 @@ class UserRoutes {
             validate(userIdentifierSchema),
             this.#controller.get
         );
+
+
+        /**
+         * @openapi
+         * /v1/user/me:
+         *   patch:
+         *     summary: modify account
+         *     security:
+         *       - bearerAuth: []
+         *     tags:
+         *       - User
+         *     requestBody:
+         *       $ref: '#/components/requestBodies/modifyUser'
+         *     responses:
+         *       200:
+         *         description: User
+         *         content:
+         *           application/json:
+         *             schema:
+         *               $ref: '#/components/schemas/User'
+         *       404:
+         *         description: User not found
+         *         content:
+         *           application/json:
+         *             schema:
+         *               $ref: '#/components/schemas/Error'
+         *       409:
+         *         description: Username or email already exists
+         *         content:
+         *           application/json:
+         *             schema:
+         *               $ref: '#/components/schemas/Error'
+         *       422:
+         *         $ref: '#/components/responses/errorValidate'
+         */
+        this.router.patch(
+            `${this.path}/me`,
+            validate(modifyUserSchema),
+            authenticateJWT,
+            this.#controller.changeAccount
+        );
+
+        /**
+         * @openapi
+         * /v1/user/me/password:
+         *   patch:
+         *     summary: modify password
+         *     security:
+         *       - bearerAuth: []
+         *     tags:
+         *       - User
+         *     requestBody:
+         *       $ref: '#/components/requestBodies/modifyPassword'
+         *     responses:
+         *       200:
+         *         description: User
+         *         content:
+         *           application/json:
+         *             schema:
+         *               $ref: '#/components/schemas/User'
+         *       400:
+         *         description: Password not changed
+         *         content:
+         *           application/json:
+         *             schema:
+         *               $ref: '#/components/schemas/Error'
+         *       404:
+         *         description: User not found
+         *         content:
+         *           application/json:
+         *             schema:
+         *               $ref: '#/components/schemas/Error'
+         *       422:
+         *         $ref: '#/components/responses/errorValidate'
+         *
+         */
+        this.router.patch(
+            `${this.path}/me/password`,
+            validate(modifyPasswordSchema),
+            authenticateJWT,
+            this.#controller.changePassword
+        );
+
+        /**
+         * @openapi
+         * /v1/user/me:
+         *   delete:
+         *     summary: delete current user
+         *     security:
+         *       - bearerAuth: []
+         *     tags:
+         *       - User
+         *     responses:
+         *       204:
+         *         description: User deleted
+         *       404:
+         *         description: User not found
+         *         content:
+         *           application/json:
+         *             schema:
+         *               $ref: '#/components/schemas/Error'
+         *
+         */
+        this.router.delete(
+            `${this.path}/me`,
+            authenticateJWT,
+            this.#controller.deleteUser
+        );
+
     }
 }
 

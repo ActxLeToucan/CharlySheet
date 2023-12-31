@@ -1,0 +1,12 @@
+{
+  "OldPassword": "Old password",
+  "NewPassword": "New password",
+  "ConfirmPassword": "Confirm new password",
+  "ModifyPassword": "Modify your password",
+  "ModifyAccount": "Modify your account",
+  "SaveModify": "Save modify",
+  "DeletingAccount": "Deleting account",
+  "DeleteAccount": "Delete your account",
+  "DeleteAccountConfirm": "Are you sure you want to delete your account?"
+
+}

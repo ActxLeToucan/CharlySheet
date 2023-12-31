@@ -4,6 +4,7 @@ import passport from 'passport';
 import { EXPIRES_IN, JWT_SECRET } from '../config/index.js';
 import { HttpException } from '../exceptions/HttpException.js';
 import User from '../models/user.model.js';
+import {Sheet} from '../models/sheet.model.js';
 
 class UserController {
     get = (req, res, next) => {
@@ -99,7 +100,94 @@ class UserController {
             }
         )(req, res, next);
     };
+    changeAccount = async (req, res, next) => {
+        try {
+            const {email, username} = req.body;
+            const {user} = req;
 
+            const dbUser = await User.findById(user._id);
+            if (!dbUser) {
+                throw new HttpException(
+                    404,
+                    'User not found',
+                    'User not found'
+                );
+            }
+            if (
+                await User.exists({
+                    $or: [{ email }, { username }],
+                    _id: { $ne: user._id }
+                })
+            ) {
+                throw new HttpException(
+                    409,
+                    'User already exists',
+                    'User already exists'
+                );
+            }
+
+            dbUser.username =  username || dbUser.username;
+            dbUser.email = email || dbUser.email;
+            await dbUser.save();
+            res.json(dbUser.toJSON());
+        } catch (error) {
+            next(error);
+        }
+    };
+
+    changePassword = async (req, res, next) => {
+        try {
+            const {oldpassword, newpassword} = req.body;
+            const {user} = req;
+
+            const dbUser = await User.findById(user._id);
+            if (!dbUser) {
+                throw new HttpException(404, 'User not found', 'User not found');
+            }
+
+            dbUser.changePassword(oldpassword, newpassword, (err) => {
+                if (err) {
+                    next(new HttpException(400, 'Failed to change password', 'Failed to change password'));
+                } else {
+                    res.json(dbUser.toJSON());
+                }
+            });
+
+        } catch (error) {
+            next(error);
+        }
+    };
+
+
+    deleteUser = async (req, res, next) => {
+        try {
+            const {user} = req;
+
+            const dbUser = await User.findById(user._id);
+            if (!dbUser) {
+                throw new HttpException(
+                    404,
+                    'User not found',
+                    'User not found'
+                );
+            }
+
+            //remove user from all sheets
+            await Sheet.updateMany({
+                users: user._id
+            }, {
+                $pull: {
+                    users: user._id
+                }
+            });
+
+            await Sheet.deleteMany({ owner: user._id});
+            await dbUser.deleteOne();
+            res.status(204).end();
+        } catch (error) {
+            next(error);
+        }
+    };
     search = async (req, res, next) => {
         const { query } = req.params;
 

@@ -36,6 +36,13 @@ const routes = [
         name: 'NotFound',
         component: () => import("./views/NotFound.vue"),
         meta: { title: () => Lang.CreateTranslationContext('errors', 'Error') }
+    },
+    {
+        path: "/parameters",
+        name: "Parameters",
+        component: () => import("./views/Parameters.vue"),
+        condition: () => User.currentUser !== null,
+        meta: { title: () => Lang.CreateTranslationContext('my', 'Documents') }
     }
 ];
 
