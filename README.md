@@ -1,6 +1,8 @@
 # CharlySheet
 Similaire à Google Sheets. Projet d'étudiant en 4ème année d'informatique à la Faculté des Sciences et Technologies de Nancy.
 
+Une instance de CharlySheet est disponible à l'adresse suivante : https://charlysheet.projects.antoinectx.fr
+
 # Installation et utilisation
 
 * [API](./backend/README.md)
@@ -64,6 +66,9 @@ Le backend de CharlySheet est construit avec Node.js et Express.js. Il sert d'AP
 Divers middlewares sont également utilisés pour sécuriser, compresser, ... les requêtes HTTP.
 
 L'architecture de l'API s'inspire de celle utilisée par la Direction du Numérique de l'UL dans ses API TypeScript.
+
+Point intéressant et documenté : 
+[SocketIOEventHandlers.js](./backend/src/handlers/SocketIOEventHandlers.js)
 
 ### Frontend
 Le frontend de CharlySheet est construit avec Vue.js. Il communique avec le backiend via des requêtes HTTP à l'API REST et avec ``socket.io`` qui utilise WebSocket quand il le peut via son mecanisme d'upgrade ou le long-polling. Les principales bibliothèques utilisées sont :
