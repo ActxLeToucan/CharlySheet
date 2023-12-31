@@ -82,6 +82,8 @@ Le frontend de CharlySheet est construit avec Vue.js. Il communique avec le back
 
 JavaScript est un langage non typé, donc des bugs apparraissent facilement dans le code. Nous avions l'habitude de travailler avec TypeScript sur nos autres projets pour palier à cela. Cependant, l'enseignant a souhaité que nous restions en JavaScript "pur", ce qui a entrainé une perte de temps assez importante et des prises de têtes, surtout que les IDEs ont bien plus de mal à nous assister et se trompent régulièrement dans les types.
 
+Les opérations d'upsert avec Mongoose sont très mal documentées (documentation fausse ou inexistante) et certaines opérations ne sont possibles qu'avec un cluster MongoDb , après plusieurs bugs une partie du code mongoose a été remplacé par des opérations directement sur les collections javascript pour être sûr du résultat même si c'est moins optimisé.
+
 ## Déroulé du projet
 Nous avons commencé par créer l'API Rest permettant de créer des utilisateurs et des feuilles en soignant la documentation tandis que les pages de connexion/inscription, accueil étaient en train d'être créées.
 
