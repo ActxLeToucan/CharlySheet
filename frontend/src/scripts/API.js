@@ -148,8 +148,6 @@ class API {
                 });
             };
 
-            console.log("API call: " + method + " " + API.API_URL + path + " " + JSON.stringify(reqBody) + " " + JSON.stringify(reqHeaders));
-
             fetch(API.API_URL + path, {
                 credentials: "omit",
                 method: method,
