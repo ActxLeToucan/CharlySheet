@@ -13,6 +13,14 @@
         >
             <trash-icon class="w-6 h-6" />
         </button>
+        <button
+            v-show="ownerId === User.currentUser.id"
+            class="show-right absolute top-2 left-2 p-1 hidden group-hover/card:flex w-fit h-fit rounded-md border-2 border-transparent
+                   hover:border-indigo-500 hover:bg-indigo-500/[0.3] text-slate-800 dark:text-slate-200 transition-all"
+            @click="exportDoc"
+        >
+            <arrow-down-tray-icon class="w-6 h-6" />
+        </button>
         <div class="flex grow justify-center items-center">
             <table-cells-icon class="w-16" />
         </div>
@@ -31,10 +39,12 @@ import {
 import API from '../scripts/API';
 import Ressources from '../scripts/Ressources';
 import User from '../models/User';
+import { ArrowDownTrayIcon } from "@heroicons/vue/20/solid";
 
 export default {
     name: "CompDoccard",
     components: {
+        ArrowDownTrayIcon,
         TableCellsIcon,
         TrashIcon
     },
@@ -71,6 +81,25 @@ export default {
             try {
                 await API.execute_logged(API.ROUTE.SHEETS.call(this.doc._id), API.METHOD.DELETE);
                 this.onDelete?.();
+            } catch (err) {
+                console.error(err);
+            }
+        },
+        async exportDoc(ev) {
+            ev.preventDefault();
+            ev.stopPropagation();
+            try {
+                const res = await API.execute_logged(API.ROUTE.SHEETS.EXPORT(this.doc._id), API.METHOD.GET);
+                const blob = new Blob([JSON.stringify(res)], {
+                    type: 'application/json'
+                });
+                const url = window.URL.createObjectURL(blob);
+                const link = document.createElement('a');
+                link.href = url;
+                link.setAttribute('download', this.doc.name + '.json');
+                document.body.appendChild(link);
+                link.click();
+                link.remove();
             } catch (err) {
                 console.error(err);
             }

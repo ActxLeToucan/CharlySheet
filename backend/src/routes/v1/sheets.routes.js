@@ -1,5 +1,6 @@
 import { Router } from 'express';
 import Joi from 'joi';
+import multer from 'multer';
 
 import { COOLDOWN_SHEET_CREATION } from '../../config/index.js';
 import SheetController from '../../controllers/sheet.controller.js';
@@ -22,6 +23,13 @@ class RouterSheets {
     };
 
     #controller = new SheetController();
+
+    #uploads = multer({
+        storage: multer.memoryStorage(),
+        limits: {
+            fileSize: 5 * 1024 * 1024 // 5 MB
+        }
+    });
 
     constructor() {
         this.#initializeRoutes();
@@ -178,6 +186,53 @@ class RouterSheets {
             validate(sheetSchema),
             cool(COOLDOWN_SHEET_CREATION, 'createSheet'),
             this.#controller.createSheet
+        );
+
+        /**
+         * @openapi
+         * /v1/sheets/import:
+         *   post:
+         *     summary: Import a sheet
+         *     security:
+         *     - bearerAuth: []
+         *     tags:
+         *     - Sheets
+         *     requestBody:
+         *       required: true
+         *       content:
+         *         multipart/form-data:
+         *           schema:
+         *             type: object
+         *             properties:
+         *               file:
+         *                 type: string
+         *     responses:
+         *       200:
+         *         description: The imported sheet
+         *         content:
+         *           application/json:
+         *             schema:
+         *               $ref: '#/components/schemas/Sheet'
+         *       401:
+         *         description: Unauthorized
+         *         content:
+         *           application/json:
+         *             schema:
+         *               $ref: '#/components/schemas/Error'
+         *       404:
+         *         description: User not found
+         *         content:
+         *           application/json:
+         *             schema:
+         *               $ref: '#/components/schemas/Error'
+         *       422:
+         *         $ref: '#/components/responses/errorValidate'
+         */
+        this.router.post(
+            `${this.path}/import`,
+            authenticateJWT,
+            this.#uploads.single('file'),
+            this.#controller.importSheet
         );
 
         /**
@@ -412,6 +467,42 @@ class RouterSheets {
             authenticateJWT,
             validate(sheetIdandUserIdSchema),
             this.#controller.removeUser
+        );
+
+        /**
+         * @openapi
+         * /v1/sheets/{id}/export:
+         *   get:
+         *     summary: Export a sheet
+         *     security:
+         *     - bearerAuth: []
+         *     tags:
+         *     - Sheets
+         *     parameters:
+         *     - $ref: '#/components/parameters/id'
+         *     responses:
+         *       200:
+         *         description: The exported sheet
+         *       403:
+         *         description: Forbidden
+         *         content:
+         *           application/json:
+         *             schema:
+         *               $ref: '#/components/schemas/Error'
+         *       404:
+         *         description: Sheet not found
+         *         content:
+         *           application/json:
+         *             schema:
+         *               $ref: '#/components/schemas/Error'
+         *       '422':
+         *         $ref: '#/components/responses/errorValidate'
+         */
+        this.router.get(
+            `${this.path}/:id/export`,
+            authenticateJWT,
+            validate(sheetIdentifierSchema),
+            this.#controller.exportSheet
         );
     }
 }

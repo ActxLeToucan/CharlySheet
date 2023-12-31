@@ -258,6 +258,87 @@ class SheetController {
             next(error);
         }
     };
+
+    exportSheet = async (req, res, next) => {
+        const { id } = req.params;
+        const { user } = req;
+        try {
+            const sheet = await Sheet.findById(id);
+            if (!sheet) {
+                throw new HttpException(
+                    404,
+                    'Sheet not found',
+                    'Sheet not found'
+                );
+            }
+            if (
+                // if the user is not the owner of the sheet and is not a user of the sheet
+                sheet.owner._id.toString() !== user._id.toString() &&
+                !sheet.users.some(
+                    (u) => u._id.toString() === user._id.toString()
+                )
+            ) {
+                throw new HttpException(
+                    403,
+                    'You do not have access to this sheet',
+                    'You do not have access to this sheet'
+                );
+            }
+
+            // send the sheet as a json file
+            res.setHeader('Content-Type', 'application/json');
+            res.setHeader(
+                'Content-Disposition',
+                `attachment; filename=charlysheet_${sheet.name}.json`
+            );
+            res.send(JSON.stringify(sheet.export()));
+        } catch (error) {
+            next(error);
+        }
+    };
+
+    importSheet = async (req, res, next) => {
+        const { user, file } = req;
+
+        try {
+            if (!file) {
+                throw new HttpException(422, 'No file provided', 'No file provided');
+            }
+
+            const { name, createdAt, cells } = JSON.parse(file.buffer.toString());
+            if (!name || !createdAt || !cells) {
+                throw new HttpException(
+                    422,
+                    'Invalid file format',
+                    'Invalid file format'
+                );
+            }
+
+            const sheet = new Sheet({ name, createdAt, users: [] });
+
+            const dbUser = await User.findById(user._id);
+            if (!dbUser) {
+                throw new HttpException(
+                    404,
+                    'User not found',
+                    'User not found'
+                );
+            }
+            sheet.owner = dbUser._id;
+            cells.forEach((cell) => {
+                const { x, y, formula, style } = cell;
+                sheet.cells.push({ x, y, formula, style });
+            });
+            await sheet.save();
+            await sheet.populate('owner', '-recents -email');
+
+            this.#updateRecents(dbUser, sheet);
+
+            res.json(sheet.toJSON());
+        } catch (error) {
+            next(error);
+        }
+    };
 }
 
 export default SheetController;
