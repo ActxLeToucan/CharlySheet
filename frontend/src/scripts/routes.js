@@ -10,6 +10,8 @@ export default {
         SHARED: (...args) => "/sheets/me/shared" + (args.length ? "/" + args.join("/") : ""),
         RECENTS: (...args) => "/sheets/me/recents" + (args.length ? "/" + args.join("/") : ""),
         USERS: (...args) => `/sheets/${args.length > 0 ? args[0] : null}/users${args.length > 1 ? `/${args[1]}` : ""}`,
-        NAME: (...args) => `/sheets/${args.length > 0 ? args[0] : null}/name`
+        NAME: (...args) => `/sheets/${args.length > 0 ? args[0] : null}/name`,
+        EXPORT: (...args) => `/sheets/${args.length > 0 ? args[0] : null}/export`,
+        IMPORT: (...args) => `/sheets/import`,
     }
 };

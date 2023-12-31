@@ -25,6 +25,25 @@
                         </div>
                     </div>
                 </div>
+                <form
+                    class="show-up flex flex-col items-center space-y-4 pt-24"
+                    :style="'animation-delay: '+(categs.length)+'00ms;'"
+                    @submit.prevent="importSheet"
+                >
+                    <input
+                        ref="importInput"
+                        type="file"
+                        accept=".json"
+                        @change="selectFile"
+                    >
+                    <comp-button
+                        :icon="ArrowUpTrayIcon"
+                        :disabled="importDisabled"
+                        type="submit"
+                    >
+                        <get-text :context="Lang.CreateTranslationContext('my', 'Import')" />
+                    </comp-button>
+                </form>
             </div>
         </div>
     </div>
@@ -38,10 +57,13 @@ import Lang from '../scripts/Lang';
 import GetText from '../components/text/GetText.vue';
 import API from '../scripts/API';
 import Notify from '../scripts/Notify';
+import CompButton from "../components/CompButton.vue";
+import { ArrowUpTrayIcon } from "@heroicons/vue/24/outline";
 
 export default {
     name: "MyView",
     components: {
+        CompButton,
         CompNavbar,
         CompDoccard,
         CompNewdoccard,
@@ -67,8 +89,14 @@ export default {
                     docs: []
                 }
             ],
-            continousUpdate: true
+            continousUpdate: true,
+            importDisabled: true
         };
+    },
+    computed: {
+        Lang() {
+            return Lang
+        }
     },
     mounted() {
         this.retreiveSheets();
@@ -88,6 +116,7 @@ export default {
         }
     },
     methods: {
+        ArrowUpTrayIcon,
         async retreiveSheets() {
             const ME = await API.execute_logged(API.ROUTE.SHEETS.ME());
             const RECENTS = await API.execute_logged(API.ROUTE.SHEETS.RECENTS());
@@ -96,6 +125,25 @@ export default {
             this.categs.find(c => c.id === "ME").docs = ME;
             this.categs.find(c => c.id === "RECENTS").docs = RECENTS;
             this.categs.find(c => c.id === "SHARED").docs = SHARED;
+        },
+        async importSheet() {
+            const file = this.$refs.importInput.files[0];
+            if (!file) return;
+
+            const res = await API.execute_logged(API.ROUTE.SHEETS.IMPORT(), API.METHOD.POST, file, API.TYPE.FILE);
+
+            if (res) {
+                this.$router.push({
+                    name: 'Doc',
+                    params: {
+                        id: res._id
+                    }
+                });
+            }
+        },
+        selectFile() {
+            const file = this.$refs.importInput.files[0];
+            this.importDisabled = !file;
         }
     }
 }

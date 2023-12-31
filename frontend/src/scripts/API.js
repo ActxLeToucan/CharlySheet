@@ -123,7 +123,8 @@ class API {
 
             if (type == this.TYPE.FILE) { // create a form data from the body
                 reqBody = new FormData();
-                reqBody.append("model", body);
+                reqBody.append("file", body);
+                delete reqHeaders["Content-Type"];
             }
 
             const sendError = (err) => {
@@ -146,6 +147,8 @@ class API {
                     });
                 });
             };
+
+            console.log("API call: " + method + " " + API.API_URL + path + " " + JSON.stringify(reqBody) + " " + JSON.stringify(reqHeaders));
 
             fetch(API.API_URL + path, {
                 credentials: "omit",
