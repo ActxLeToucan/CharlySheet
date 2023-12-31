@@ -88,3 +88,8 @@ Les opérations d'upsert avec Mongoose sont très mal documentées (documentatio
 Nous avons commencé par créer l'API Rest permettant de créer des utilisateurs et des feuilles en soignant la documentation tandis que les pages de connexion/inscription, accueil étaient en train d'être créées.
 
 Puis nous avons développé la communication en temps réel entre les utilisateurs pour modifier une feuille.
+
+## FAQ
+* **Pourquoi CharlySheet ?**\
+  *Charly* pour Charlemagne, car nous sommes tous les quatre fiers d'avoir étudié à l'IUT Nancy-Charlemagne.
+  Et *Sheet* pour "feuille" en anglais.
