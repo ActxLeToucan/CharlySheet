@@ -294,24 +294,30 @@ class RoomSheet {
          * mais de toute façon on travaille en exclusion mutuelle sur la cellule
          */
         try {
-            const filter = { _id: this.sheetId, 'cells.x': x, 'cells.y': y };
-            const update = {
-                $set: { 'cells.$.formula': formula, 'cells.$.style': style }
-            };
-            const options = { new: true };
-
-            let sheet = await Sheet.findOneAndUpdate(filter, update, options);
-
+            /**
+             * Fix
+             * L'upsert est mal documenté et ne fonctionne pas comme on le pense
+             * donc il a été remplacé par du JS pure mais la liste entiere des cellules est echangée avec le sgbd
+             * ce n'est pas optimal.
+             */
+            const sheet = await Sheet.findById(this.sheetId);
             if (!sheet) {
-                const pushUpdate = {
-                    $push: { cells: { x, y, formula, style } }
-                };
-                sheet = await Sheet.findOneAndUpdate(
-                    { _id: this.sheetId },
-                    pushUpdate,
-                    options
-                );
+                socket.emit('error', 'sheet not found');
+                return;
             }
+            const cellIndex = sheet.cells.findIndex(
+                (cell) => cell.x === x && cell.y === y
+            );
+
+            if (cellIndex === -1) {
+                // Ajouter la nouvelle cellule
+                sheet.cells.push({ x, y, formula, style });
+            } else {
+                // Mettez à jour la cellule existante
+                sheet.cells[cellIndex].formula = formula;
+                sheet.cells[cellIndex].style = style;
+            }
+            await sheet.save();
             this.io.to(this.sheetId).emit(Events.CELL_CHANGED, {
                 x,
                 y,
