@@ -173,7 +173,7 @@ class UserController {
             }
 
             //remove user from all sheets
-            const sheets = await Sheet.updateMany({
+            await Sheet.updateMany({
                 users: user._id
             }, {
                 $pull: {
