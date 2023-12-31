@@ -1,7 +1,6 @@
 <template>
     <button
         class="flex w-full h-full items-center justify-center border border-slate-200 dark:border-slate-600 hover:border-slate-400 hover:dark:border-slate-400"
-        @click="onClick"
     >
         <p class="w-fit h-fit whitespace-nowrap text-ellipsis overflow-hidden max-w-full p-1"> {{ displayMode === 'formula' ? formula : result }} </p>
     </button>
@@ -38,11 +37,15 @@ export default {
             if (User.currentUser.slot == this.slot) this.displayMode = 'formula';
             else this.displayMode = 'result';
         });
+        this.slot.on('users', users => {
+            // nothing ?
+        });
+        this.formula = this.slot.formula;
+        this.result = this.slot.result;
+        this.displayMode = User.currentUser.slot == this.slot ? 'formula' : 'result';
     },
     methods: {
-        onClick(ev) {
-            User.currentUser.slot = this.slot;
-        }
+        
     }
 }
 </script>

@@ -13,6 +13,23 @@ export default class User extends Callbackable {
     /** @type {User} Current device user */
     static #currentUser = null;
 
+    static GetRandomColor() {
+        const hue = Math.floor(Math.random() * 360);
+        const saturation = 60;
+        const lightness = 60;
+
+        return `hsl(${hue}, ${saturation}%, ${lightness}%)`;
+    }
+
+    static GetUserColor(id) {
+        const id2number = id.split('').map(c => c.charCodeAt(0)).reduce((a, b) => a + b, 0);
+        const hue = Math.floor(id2number % 360);
+        const saturation = 60;
+        const lightness = 60;
+
+        return `hsl(${hue}, ${saturation}%, ${lightness}%)`;
+    }
+
     /**
      * Get the current device user
      * @returns A user object representing the current device user
@@ -28,7 +45,7 @@ export default class User extends Callbackable {
         const data = localStorage.getItem("user");
         if (!data) return null;
         const userInfos = JSON.parse(data);
-        return new User(userInfos);
+        return User.fromData(userInfos);
     }
 
     /**
@@ -44,6 +61,21 @@ export default class User extends Callbackable {
         User.#currentUser = null;
     }
 
+    /**
+     * Builds a new User object from given data
+     * @param {object} data Object representing a User
+     * @returns A User object with the given data properties
+     */
+    static fromData(data) {
+        return new User(
+            data.id ?? data._id,
+            data.username ?? data.pseudo,
+            data.email,
+            data.color,
+            data.token
+        );
+    }
+
     /** @type {string} User id */
     #id = '';
     /** @type {string} User name */
@@ -57,17 +89,24 @@ export default class User extends Callbackable {
     /** @type {Slot} User selected slot */
     #slot = null;
 
-    constructor(infos) {
+    /**
+     * Full User constructor
+     * @param {string} id User unique id
+     * @param {string} username User username
+     * @param {string} email User email address
+     * @param {string} color User color 
+     * @param {string} token User access token
+     */
+    constructor(id, username=User.DEFAULT_USERNAME, email=User.DEFAULT_EMAIL, color, token) {
         super();
-        this.setInformations(infos);
+        this.setInformations({id, username, email, color, token});
     }
 
     setInformations(infos) {
         if (!infos) return;
-        console.log('creating user', infos)
-        this.#username = infos?.username ?? User.DEFAULT_USERNAME;
-        this.#email = infos?.email ?? User.DEFAULT_EMAIL;
-        this.#color = infos?.color ?? User.DEFAULT_COLOR;
+        this.#username = infos?.username ?? this.#username ?? User.DEFAULT_USERNAME;
+        this.#email = infos?.email ?? this.#email ?? User.DEFAULT_EMAIL;
+        this.#color = User.GetUserColor(infos?.id ?? '0');
 
         this.#id = infos?.id ?? this.#id;
         this.#token = infos?.token ?? this.#token;
@@ -96,7 +135,7 @@ export default class User extends Callbackable {
      * @returns The user name
      */
     get username() {
-        return this.#username;
+        return this.#username.charAt(0).toUpperCase() + this.#username.slice(1);
     }
     
     /**
@@ -109,7 +148,7 @@ export default class User extends Callbackable {
     
     /**
      * Get the user slot
-     * @returns The user slot
+     * @returns {Slot} The user slot
      */
     get slot() {
         return this.#slot;

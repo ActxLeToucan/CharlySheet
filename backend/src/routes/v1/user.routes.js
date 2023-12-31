@@ -8,7 +8,8 @@ import {
     newUserSchema,
     userIdentifierSchema,
     modifyUserSchema,
-    modifyPasswordSchema
+    modifyPasswordSchema,
+    userSearchSchema
 } from '../../validators/user.validator.js';
 
 class UserRoutes {
@@ -55,6 +56,36 @@ class UserRoutes {
             `${this.path}/signup`,
             validate(newUserSchema),
             this.#controller.signup
+        );
+
+        /**
+         * @openapi
+         * /v1/user/search/{query}:
+         *   get:
+         *     tags:
+         *     - User
+         *     summary: Search users
+         *     security:
+         *     - bearerAuth: []
+         *     parameters:
+         *     - $ref: '#/components/parameters/userSearch'
+         *     responses:
+         *       200:
+         *         description: Search results
+         *         content:
+         *           application/json:
+         *             schema:
+         *               type: array
+         *               items:
+         *                 $ref: '#/components/schemas/User'
+         *       422:
+         *         $ref: '#/components/responses/errorValidate'
+         */
+        this.router.get(
+            `${this.path}/search/:query`,
+            authenticateJWT,
+            validate(userSearchSchema),
+            this.#controller.search
         );
 
         /**

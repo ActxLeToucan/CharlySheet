@@ -319,7 +319,7 @@ export default {
                     password: password.value
                 });
                 
-                const user = new User({ token: response.token });
+                const user = User.fromData({ token: response.token });
                 await user.fetchInformations();
                 user.save();
 
@@ -335,6 +335,7 @@ export default {
                     log.delete(4000);
                     break;
                 default:
+                    console.error(err);
                     log.update(await Lang.GetTextAsync(Lang.CreateTranslationContext('errors', 'Unknown', {msg: err.message})), Logs.ERROR);
                     log.delete(4000);
                     break;
@@ -396,7 +397,7 @@ export default {
                     password: password.value
                 });
                 
-                const user = new User({ token: response.token });
+                const user = User.fromData({ token: response.token });
                 await user.fetchInformations();
                 user.save();
 

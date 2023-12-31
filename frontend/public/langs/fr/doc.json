@@ -1,0 +1,15 @@
+{
+    "NewDocument": "Nouveau document",
+    "Loading": "Chargement du document ...",
+    "LoadingError": "Une erreur est survenue lors du chargement du document.",
+    "JoinedRoom": "Document rejoint",
+    "JoinedRoomDesc": "Vous avez rejoint le document.",
+    "UserJoin": "Nouvel utilisateur",
+    "UserJoinDesc": "{user} a rejoint le document.",
+    "UserLeft": "Utilisateur parti",
+    "UserLeftDesc": "{user} a quitté le document.",
+    "InviteUser": "Ajouter un utilisateur",
+    "InviteUserDesc": "Saisissez l'adresse e-mail ou le nom de l'utilisateur que vous souhaitez ajouter.",
+    "Email": "Adresse e-mail ou nom d'utilisateur",
+    "Chat": "Discussion"
+}

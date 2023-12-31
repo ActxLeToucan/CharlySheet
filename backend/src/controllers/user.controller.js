@@ -10,7 +10,7 @@ class UserController {
     get = (req, res, next) => {
         const { id } = req.params;
 
-        User.findOne({ _id: id })
+        User.findOne({ _id: id }).select('-recents -email')
             .then((user) => {
                 if (!user) {
                     throw new HttpException(
@@ -20,7 +20,7 @@ class UserController {
                     );
                 }
 
-                res.status(200).json(user.toPublicJSON());
+                res.status(200).json(user);
             })
             .catch(next);
     };
@@ -100,7 +100,6 @@ class UserController {
             }
         )(req, res, next);
     };
-
     changeAccount = async (req, res, next) => {
         try {
             const {email, username} = req.body;
@@ -189,7 +188,45 @@ class UserController {
             next(error);
         }
     };
+    search = async (req, res, next) => {
+        const { query } = req.params;
 
+        try {
+            const filter = [
+                {
+                    $and: [
+                        { username: { $regex: query, $options: 'i' } },
+                        { role: { $ne: 'admin' } } // prevent returning admin by searching username
+                    ]
+                }
+            ];
+            if (query.match(/^.+@.+$/)) {
+                filter.push({
+                    email: {
+                        $regex: query,
+                        $options: 'i'
+                    }
+                });
+            }
+
+            /**
+             * @type {User[]}
+             */
+            let users = await User.find({
+                $or: filter
+            }).select('-recents');
+
+            // prevent returning users from regex
+            users = users.filter((user) =>
+                user.username.toLowerCase().includes(query.toLowerCase()) ||
+                user.email.toLowerCase().includes(query.toLowerCase())
+            );
+
+            res.status(200).json(users);
+        } catch (error) {
+            next(error);
+        }
+    };
 }
 
 export default UserController;

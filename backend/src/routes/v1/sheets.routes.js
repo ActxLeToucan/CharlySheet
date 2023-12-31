@@ -324,7 +324,7 @@ class RouterSheets {
          *           example: ["60f9a5f9d3f9f20015c1d7a8"]
          *     responses:
          *       200:
-         *         description: The users added to the sheet
+         *         description: The users of the sheet after the addition
          *         content:
          *           application/json:
          *             schema:
@@ -378,6 +378,7 @@ class RouterSheets {
          *           maxLength: 24
          *     responses:
          *       200:
+         *         description: The users of the sheet after the removal
          *         content:
          *           application/json:
          *             schema:

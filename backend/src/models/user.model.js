@@ -69,6 +69,17 @@ schema.set('toJSON', {
     }
 });
 
+schema.plugin(uniqueValidator);
+schema.plugin(passportLocalMongoose, {
+    session: false
+});
+
+/**
+ * @type {import('mongoose').Model}
+ */
+export default model('User', schema);
+
+
 /**
  * @openapi
  * components:
@@ -94,18 +105,3 @@ schema.set('toJSON', {
  *           description: Date of creation
  *           format: date-time
  */
-schema.methods.toPublicJSON = function toPublicJSON() {
-    const user = this.toJSON();
-    delete user.email;
-    return user;
-};
-
-schema.plugin(uniqueValidator);
-schema.plugin(passportLocalMongoose, {
-    session: false
-});
-
-/**
- * @type {import('mongoose').Model}
- */
-export default model('User', schema);

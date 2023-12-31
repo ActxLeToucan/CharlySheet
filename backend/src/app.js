@@ -46,6 +46,15 @@ class App {
         this.env = NODE_ENV;
         this.port = PORT;
         this.server = createServer(this.app);
+        this.server.on('error', (e) => {
+            if (e.code === 'EADDRINUSE') {
+                logger.error('Adress already in use, retrying...');
+                setTimeout(() => {
+                    this.server.close();
+                    this.server.listen(this.port);
+                }, 1000);
+            }
+        });
         this.io = new Server(this.server, { cors: { origin: ORIGIN } });
     }
 

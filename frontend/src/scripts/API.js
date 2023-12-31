@@ -158,7 +158,8 @@ class API {
                 if (!response.status.toString().startsWith("2")) {
                     sendError(response);
                 } else {
-                    response.json().then(data => {
+                    if (response.status == 204) resolve({});
+                    else response.json().then(data => {
                         resolve(data);
                     }).catch(err => sendError(err));
                 }
