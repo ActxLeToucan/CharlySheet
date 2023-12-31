@@ -24,6 +24,7 @@ services:
       MONGO_URI: mongodb://root:motdepasse@mongo:27017/charlysheet?authMechanism=default&authSource=admin # TODO: change this
       JWT_SECRET: # TODO: set this (you can use `openssl rand -hex 64` to generate a random secret)
       EXPIRES_IN: 7d
+      COOLDOWN_SHEET_CREATION: 10
   mongo:
     image: mongo:4.4
     restart: always

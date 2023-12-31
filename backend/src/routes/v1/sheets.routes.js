@@ -1,8 +1,10 @@
 import { Router } from 'express';
 import Joi from 'joi';
 
+import { COOLDOWN_SHEET_CREATION } from '../../config/index.js';
 import SheetController from '../../controllers/sheet.controller.js';
 import authenticateJWT from '../../middlewares/authenticateJWT.middleware.js';
+import cool from '../../middlewares/cooldown.middleware.js';
 import validate from '../../middlewares/validator.middleware.js';
 import {
     sheetIdandUserIdSchema,
@@ -163,11 +165,18 @@ class RouterSheets {
          *           application/json:
          *             schema:
          *               $ref: '#/components/schemas/Error'
+         *       '429':
+         *         description: Too Many Requests
+         *         content:
+         *           application/json:
+         *             schema:
+         *               $ref: '#/components/schemas/Error'
          */
         this.router.post(
             `${this.path}`,
             authenticateJWT,
             validate(sheetSchema),
+            cool(COOLDOWN_SHEET_CREATION, 'createSheet'),
             this.#controller.createSheet
         );
 
