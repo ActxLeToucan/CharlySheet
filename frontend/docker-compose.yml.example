@@ -7,7 +7,7 @@ services:
     ports:
       - "80:80"
     environment:
-      VITE_API_HOST: <apiHost>
-      VITE_SOCKETIO_HOST: <socketioHost>
-      VITE_SOCKETIO_PATH: <socketioPath>
+      VITE_API_HOST: localhost:3000/v1
+      VITE_SOCKETIO_HOST: localhost:3000
+      VITE_SOCKETIO_PATH: /
     restart: always

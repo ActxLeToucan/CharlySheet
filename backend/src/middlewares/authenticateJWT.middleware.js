@@ -3,7 +3,6 @@ import passport from 'passport';
 import { HttpException } from '../exceptions/HttpException.js';
 
 /**
- * @param error {HttpException}
  * @param req {import('express').Request}
  * @param res {import('express').Response}
  * @param next {import('express').NextFunction}

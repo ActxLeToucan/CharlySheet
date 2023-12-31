@@ -13,6 +13,7 @@ This website uses the following technologies:
 
 - Clone the repository
 - Install the dependencies with `npm install`
+- Copy the `.env.example` file to `.env` and change the values to your liking (if you use docker, same thing with `docker-compose.yml`)
 
 # Usage
 

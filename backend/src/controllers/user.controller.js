@@ -3,8 +3,8 @@ import passport from 'passport';
 
 import { EXPIRES_IN, JWT_SECRET } from '../config/index.js';
 import { HttpException } from '../exceptions/HttpException.js';
+import { Sheet } from '../models/sheet.model.js';
 import User from '../models/user.model.js';
-import {Sheet} from '../models/sheet.model.js';
 
 class UserController {
     get = (req, res, next) => {
@@ -100,10 +100,11 @@ class UserController {
             }
         )(req, res, next);
     };
+
     changeAccount = async (req, res, next) => {
         try {
-            const {email, username} = req.body;
-            const {user} = req;
+            const { email, username } = req.body;
+            const { user } = req;
 
             const dbUser = await User.findById(user._id);
             if (!dbUser) {
@@ -126,7 +127,7 @@ class UserController {
                 );
             }
 
-            dbUser.username =  username || dbUser.username;
+            dbUser.username = username || dbUser.username;
             dbUser.email = email || dbUser.email;
             await dbUser.save();
             res.json(dbUser.toJSON());
@@ -137,8 +138,8 @@ class UserController {
 
     changePassword = async (req, res, next) => {
         try {
-            const {oldpassword, newpassword} = req.body;
-            const {user} = req;
+            const { oldpassword, newpassword } = req.body;
+            const { user } = req;
 
             const dbUser = await User.findById(user._id);
             if (!dbUser) {
@@ -158,10 +159,9 @@ class UserController {
         }
     };
 
-
     deleteUser = async (req, res, next) => {
         try {
-            const {user} = req;
+            const { user } = req;
 
             const dbUser = await User.findById(user._id);
             if (!dbUser) {
@@ -181,13 +181,14 @@ class UserController {
                 }
             });
 
-            await Sheet.deleteMany({ owner: user._id});
+            await Sheet.deleteMany({ owner: user._id });
             await dbUser.deleteOne();
             res.status(204).end();
         } catch (error) {
             next(error);
         }
     };
+
     search = async (req, res, next) => {
         const { query } = req.params;
 

@@ -4,7 +4,7 @@ import Joi from 'joi';
  * @openapi
  * components:
  *   parameters:
- *     id:
+ *     sheetId:
  *       name: id
  *       in: path
  *       description: Id of the sheet
@@ -16,11 +16,27 @@ import Joi from 'joi';
  */
 export const sheetIdentifierSchema = {
     joiSchema: Joi.object({
-        id: Joi.string().required().min(24).max(24)
+        id: Joi.string().required().length(24)
     }),
     location: 'params'
 };
 
+/**
+ * @openapi
+ * components:
+ *   requestBodies:
+ *     sheetSchema:
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               name:
+ *                 description: Name of the sheet
+ *                 type: string
+ *                 minLength: 3
+ *                 maxLength: 30
+ */
 export const sheetSchema = {
     joiSchema: Joi.object({
         name: Joi.string().required().min(3).max(30)

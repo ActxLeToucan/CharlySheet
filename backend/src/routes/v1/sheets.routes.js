@@ -1,5 +1,4 @@
 import { Router } from 'express';
-import Joi from 'joi';
 import multer from 'multer';
 
 import { COOLDOWN_SHEET_CREATION } from '../../config/index.js';
@@ -7,11 +6,7 @@ import SheetController from '../../controllers/sheet.controller.js';
 import authenticateJWT from '../../middlewares/authenticateJWT.middleware.js';
 import cool from '../../middlewares/cooldown.middleware.js';
 import validate from '../../middlewares/validator.middleware.js';
-import {
-    sheetIdandUserIdSchema,
-    sheetIdentifierSchema,
-    sheetSchema
-} from '../../validators/sheet.validator.js';
+import { sheetIdandUserIdSchema, sheetIdentifierSchema, sheetSchema } from '../../validators/sheet.validator.js';
 import { arrayOfUserIdsSchema } from '../../validators/user.validator.js';
 
 class RouterSheets {
@@ -97,6 +92,7 @@ class RouterSheets {
             authenticateJWT,
             this.#controller.getSharedSheets
         );
+
         /**
          * @openapi
          * /v1/sheets/me/recents:
@@ -121,6 +117,12 @@ class RouterSheets {
          *           application/json:
          *             schema:
          *               $ref: '#/components/schemas/Error'
+         *       '404':
+         *         description: User not found
+         *         content:
+         *           application/json:
+         *             schema:
+         *               $ref: '#/components/schemas/Error'
          */
         this.router.get(
             `${this.path}/me/recents`,
@@ -138,16 +140,7 @@ class RouterSheets {
          *     tags:
          *       - Sheets
          *     requestBody:
-         *       required: true
-         *       content:
-         *         application/json:
-         *           schema:
-         *             type: object
-         *             properties:
-         *               name:
-         *                 type: string
-         *             required:
-         *               - name
+         *       $ref: '#/components/requestBodies/sheetSchema'
          *     responses:
          *       '200':
          *         description: The created sheet
@@ -161,18 +154,14 @@ class RouterSheets {
          *           application/json:
          *             schema:
          *               $ref: '#/components/schemas/Error'
-         *       '403':
-         *         description: Forbidden
+         *       '404':
+         *         description: User not found
          *         content:
          *           application/json:
          *             schema:
          *               $ref: '#/components/schemas/Error'
-         *       '422':
-         *         description: Unprocessable Entity
-         *         content:
-         *           application/json:
-         *             schema:
-         *               $ref: '#/components/schemas/Error'
+         *       422:
+         *         $ref: '#/components/responses/errorValidate'
          *       '429':
          *         description: Too Many Requests
          *         content:
@@ -225,8 +214,6 @@ class RouterSheets {
          *           application/json:
          *             schema:
          *               $ref: '#/components/schemas/Error'
-         *       422:
-         *         $ref: '#/components/responses/errorValidate'
          */
         this.router.post(
             `${this.path}/import`,
@@ -245,18 +232,9 @@ class RouterSheets {
          *     tags:
          *       - Sheets
          *     parameters:
-         *       - $ref: '#/components/parameters/id'
+         *       - $ref: '#/components/parameters/sheetId'
          *     requestBody:
-         *       required: true
-         *       content:
-         *         application/json:
-         *           schema:
-         *             type: object
-         *             properties:
-         *               name:
-         *                 type: string
-         *             required:
-         *               - name
+         *       $ref: '#/components/requestBodies/sheetSchema'
          *     responses:
          *       '200':
          *         description: The updated sheet
@@ -282,23 +260,14 @@ class RouterSheets {
          *           application/json:
          *             schema:
          *               $ref: '#/components/schemas/Error'
-         *       '422':
-         *         description: Unprocessable Entity
-         *         content:
-         *           application/json:
-         *             schema:
-         *               $ref: '#/components/schemas/Error'
+         *       422:
+         *         $ref: '#/components/responses/errorValidate'
          */
         this.router.put(
             `${this.path}/:id/name`,
             authenticateJWT,
             validate(sheetIdentifierSchema),
-            validate({
-                joiSchema: Joi.object({
-                    name: Joi.string().required().min(3).max(30)
-                }),
-                location: 'body'
-            }),
+            validate(sheetSchema),
             this.#controller.changeName
         );
 
@@ -311,7 +280,7 @@ class RouterSheets {
          *      - bearerAuth: []
          *     tags: [Sheets]
          *     parameters:
-         *       - $ref: '#/components/parameters/id'
+         *       - $ref: '#/components/parameters/sheetId'
          *     responses:
          *       200:
          *         description: The sheet
@@ -325,13 +294,16 @@ class RouterSheets {
          *           application/json:
          *             schema:
          *               $ref: '#/components/schemas/Error'
+         *       '422':
+         *         $ref: '#/components/responses/errorValidate'
          */
         this.router.get(
             `${this.path}/:id`,
-            validate(sheetIdentifierSchema),
             authenticateJWT,
+            validate(sheetIdentifierSchema),
             this.#controller.getById
         );
+
         /**
          * @openapi
          * /v1/sheets/{id}:
@@ -341,10 +313,16 @@ class RouterSheets {
          *       - bearerAuth: []
          *     tags: [Sheets]
          *     parameters:
-         *       - $ref: '#/components/parameters/id'
+         *       - $ref: '#/components/parameters/sheetId'
          *     responses:
          *       '204':
          *         description: Sheet deleted
+         *       '401':
+         *         description: Unauthorized
+         *         content:
+         *           application/json:
+         *             schema:
+         *               $ref: '#/components/schemas/Error'
          *       '403':
          *         description: Forbidden
          *         content:
@@ -357,8 +335,9 @@ class RouterSheets {
          *           application/json:
          *             schema:
          *               $ref: '#/components/schemas/Error'
+         *       '422':
+         *         $ref: '#/components/responses/errorValidate'
          */
-
         this.router.delete(
             `${this.path}/:id`,
             authenticateJWT,
@@ -376,16 +355,9 @@ class RouterSheets {
          *     tags:
          *       - Sheets
          *     parameters:
-         *       - $ref: '#/components/parameters/id'
+         *       - $ref: '#/components/parameters/sheetId'
          *     requestBody:
-         *       required: true
-         *       content:
-         *         application/json:
-         *           schema:
-         *             type: array
-         *             items:
-         *               type: string
-         *           example: ["60f9a5f9d3f9f20015c1d7a8"]
+         *       $ref: '#/components/requestBodies/arrayOfUserIds'
          *     responses:
          *       200:
          *         description: The users of the sheet after the addition
@@ -395,8 +367,8 @@ class RouterSheets {
          *               type: array
          *               items:
          *                 $ref: '#/components/schemas/UserPublic'
-         *       404:
-         *         description: Sheet not found
+         *       '401':
+         *         description: Unauthorized
          *         content:
          *           application/json:
          *             schema:
@@ -407,12 +379,14 @@ class RouterSheets {
          *           application/json:
          *             schema:
          *               $ref: '#/components/schemas/Error'
-         *       422:
-         *         description: Unprocessable Entity
+         *       404:
+         *         description: Sheet not found
          *         content:
          *           application/json:
          *             schema:
          *               $ref: '#/components/schemas/Error'
+         *       422:
+         *         $ref: '#/components/responses/errorValidate'
          */
         this.router.post(
             `${this.path}/:id/users`,
@@ -421,6 +395,7 @@ class RouterSheets {
             validate(arrayOfUserIdsSchema),
             this.#controller.addUsers
         );
+
         /**
          * @openapi
          * /v1/sheets/{id}/users/{userId}:
@@ -431,7 +406,7 @@ class RouterSheets {
          *     tags:
          *       - Sheets
          *     parameters:
-         *       - $ref: '#/components/parameters/id'
+         *       - $ref: '#/components/parameters/sheetId'
          *       - name: userId
          *         in: path
          *         required: true
@@ -449,6 +424,12 @@ class RouterSheets {
          *               type: array
          *               items:
          *                 $ref: '#/components/schemas/UserPublic'
+         *       '401':
+         *         description: Unauthorized
+         *         content:
+         *           application/json:
+         *             schema:
+         *               $ref: '#/components/schemas/Error'
          *       403:
          *         description: Forbidden
          *         content:
@@ -461,6 +442,8 @@ class RouterSheets {
          *           application/json:
          *             schema:
          *               $ref: '#/components/schemas/Error'
+         *       '422':
+         *         $ref: '#/components/responses/errorValidate'
          */
         this.router.delete(
             `${this.path}/:id/users/:userId`,
@@ -479,10 +462,16 @@ class RouterSheets {
          *     tags:
          *     - Sheets
          *     parameters:
-         *     - $ref: '#/components/parameters/id'
+         *     - $ref: '#/components/parameters/sheetId'
          *     responses:
          *       200:
          *         description: The exported sheet
+         *       '401':
+         *         description: Unauthorized
+         *         content:
+         *           application/json:
+         *             schema:
+         *               $ref: '#/components/schemas/Error'
          *       403:
          *         description: Forbidden
          *         content:

@@ -20,6 +20,7 @@ class SheetController {
         user.recents = user.recents.slice(0, 10);
         await user.save();
     };
+
     getById = async (req, res, next) => {
         const { id } = req.params;
         const { user } = req;
@@ -58,6 +59,7 @@ class SheetController {
             next(error);
         }
     };
+
     deleteById = async (req, res, next) => {
         try {
             const { id } = req.params;
@@ -83,6 +85,7 @@ class SheetController {
             next(error);
         }
     };
+
     getMySheets = async (req, res, next) => {
         try {
             const { user } = req;
@@ -107,6 +110,7 @@ class SheetController {
             next(error);
         }
     };
+
     getRecentsSheets = async (req, res, next) => {
         try {
             const { user } = req;
@@ -125,6 +129,7 @@ class SheetController {
             next(error);
         }
     };
+
     createSheet = async (req, res, next) => {
         const { name } = req.body;
         /**
@@ -152,6 +157,7 @@ class SheetController {
             next(error);
         }
     };
+
     changeName = async (req, res, next) => {
         const { id } = req.params;
         const { name } = req.body;
@@ -180,6 +186,7 @@ class SheetController {
             next(error);
         }
     };
+
     addUsers = async (req, res, next) => {
         const { id } = req.params;
         const { user } = req;
@@ -223,6 +230,7 @@ class SheetController {
             next(error);
         }
     };
+
     removeUser = async (req, res, next) => {
         const { id, userId } = req.params;
         const { user } = req;

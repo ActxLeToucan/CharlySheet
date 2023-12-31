@@ -18,7 +18,7 @@ const cool = (duration, action) => (req, res, next) => {
             'Unauthorized'
         );
     }
-    
+
     const key = `${user._id}:${action}`;
     const cached = cache.get(key);
     if (cached) {
@@ -28,7 +28,7 @@ const cool = (duration, action) => (req, res, next) => {
             'Too Many Requests'
         );
     }
-    
+
     cache.set(key, true, duration);
     next();
 };

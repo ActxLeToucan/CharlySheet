@@ -5,10 +5,10 @@ import authenticateJWT from '../../middlewares/authenticateJWT.middleware.js';
 import validate from '../../middlewares/validator.middleware.js';
 import {
     loginSchema,
+    modifyPasswordSchema,
+    modifyUserSchema,
     newUserSchema,
     userIdentifierSchema,
-    modifyUserSchema,
-    modifyPasswordSchema,
     userSearchSchema
 } from '../../validators/user.validator.js';
 
@@ -78,6 +78,12 @@ class UserRoutes {
          *               type: array
          *               items:
          *                 $ref: '#/components/schemas/User'
+         *       '401':
+         *         description: Unauthorized
+         *         content:
+         *           application/json:
+         *             schema:
+         *               $ref: '#/components/schemas/Error'
          *       422:
          *         $ref: '#/components/responses/errorValidate'
          */
@@ -104,6 +110,18 @@ class UserRoutes {
          *           application/json:
          *             schema:
          *               $ref: '#/components/schemas/User'
+         *       '401':
+         *         description: Unauthorized
+         *         content:
+         *           application/json:
+         *             schema:
+         *               $ref: '#/components/schemas/Error'
+         *       '404':
+         *         description: User not found
+         *         content:
+         *           application/json:
+         *             schema:
+         *               $ref: '#/components/schemas/Error'
          */
         this.router.get(
             `${this.path}/me`,
@@ -200,6 +218,12 @@ class UserRoutes {
          *           application/json:
          *             schema:
          *               $ref: '#/components/schemas/User'
+         *       '401':
+         *         description: Unauthorized
+         *         content:
+         *           application/json:
+         *             schema:
+         *               $ref: '#/components/schemas/Error'
          *       404:
          *         description: User not found
          *         content:
@@ -217,8 +241,8 @@ class UserRoutes {
          */
         this.router.patch(
             `${this.path}/me`,
-            validate(modifyUserSchema),
             authenticateJWT,
+            validate(modifyUserSchema),
             this.#controller.changeAccount
         );
 
@@ -246,6 +270,12 @@ class UserRoutes {
          *           application/json:
          *             schema:
          *               $ref: '#/components/schemas/Error'
+         *       '401':
+         *         description: Unauthorized
+         *         content:
+         *           application/json:
+         *             schema:
+         *               $ref: '#/components/schemas/Error'
          *       404:
          *         description: User not found
          *         content:
@@ -254,12 +284,11 @@ class UserRoutes {
          *               $ref: '#/components/schemas/Error'
          *       422:
          *         $ref: '#/components/responses/errorValidate'
-         *
          */
         this.router.patch(
             `${this.path}/me/password`,
-            validate(modifyPasswordSchema),
             authenticateJWT,
+            validate(modifyPasswordSchema),
             this.#controller.changePassword
         );
 
@@ -275,6 +304,12 @@ class UserRoutes {
          *     responses:
          *       204:
          *         description: User deleted
+         *       '401':
+         *         description: Unauthorized
+         *         content:
+         *           application/json:
+         *             schema:
+         *               $ref: '#/components/schemas/Error'
          *       404:
          *         description: User not found
          *         content:
@@ -288,7 +323,6 @@ class UserRoutes {
             authenticateJWT,
             this.#controller.deleteUser
         );
-
     }
 }
 

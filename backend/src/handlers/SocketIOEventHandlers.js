@@ -134,6 +134,7 @@ class RoomOrganizer {
         }
         return this.rooms.get(roomId);
     }
+
     static async garbageCollect(io, room) {
         await this.mutex.runExclusive(() => {
             if (room.users.size === 0) {
@@ -352,6 +353,7 @@ class RoomSheet {
         socket.disconnect();
         socket.data.leaved = true;
     }
+
     async relayMessage(socket, payload) {
         const { message } = payload;
         if (typeof message !== 'string') {

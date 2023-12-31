@@ -4,11 +4,11 @@ class HealthcheckRoutes {
     path = '/healthcheck';
     router = Router();
 
-    constructor () {
+    constructor() {
         this.#initializeRoutes();
     }
 
-    #initializeRoutes () {
+    #initializeRoutes() {
         /**
          * @openapi
          * /healthcheck:
